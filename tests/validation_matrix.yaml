@@ -16,10 +16,11 @@ stages:
       abstention: "Missing, cross-scope, or conflicting diagnostics cannot produce a confident cause."
       human_review: "Every result requires approval and never executes an action."
   stage_3_integration:
-    state: local_fixture_only
+    state: local_mcp_synthetic_only
     criteria:
       http_journey: "Local page and API serve synthetic investigations."
-      mcp_and_model: "Real MCP and model flows tested without credential exposure."
+      mcp_transport: "Synthetic diagnostics pass through official SDK Streamable HTTP locally."
+      live_tools_and_model: "Live authorized diagnostics and model flow tested without credential exposure."
   stage_4_benchmarks:
     state: not_run
     criteria:

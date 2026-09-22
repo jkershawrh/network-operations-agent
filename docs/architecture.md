@@ -17,6 +17,12 @@ agent, hardware agent, or RAN vendor can be connected without rewriting the
 learner journey. The model endpoint and key are runtime configuration, not
 learner-facing source files or rendered Showroom values.
 
+The current build includes a synthetic read-only MCP server and client using
+Streamable HTTP. The local web process selects that path only when
+`NETWORK_OPS_MCP_URL` is configured; otherwise it uses direct fixtures. The
+MCP server is unauthenticated and must remain on loopback for development.
+No live diagnostic connector, model client, or vector retrieval is connected.
+
 ## Reference event flow
 
 ```text

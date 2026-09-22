@@ -4,10 +4,12 @@ WORKDIR /opt/network-operations-agent
 COPY --chown=1001:0 src/ ./src/
 COPY --chown=1001:0 data/ ./data/
 COPY --chown=1001:0 web/ ./web/
+COPY --chown=1001:0 requirements-mcp.txt ./requirements-mcp.txt
+RUN pip install --no-cache-dir -r requirements-mcp.txt
 
 ENV PYTHONPATH=/opt/network-operations-agent/src \
     NETWORK_OPS_CONTAINER_MODE=1 \
     PYTHONDONTWRITEBYTECODE=1
-EXPOSE 8080
+EXPOSE 8080 8095
 USER 1001
 CMD ["python3", "-m", "network_ops", "serve"]

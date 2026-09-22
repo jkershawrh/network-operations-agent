@@ -1,12 +1,21 @@
-.PHONY: test-unit test-all run-local audit-claims build-container
+.PHONY: test-unit test-mcp test-all run-local run-mcp audit-claims build-container
+
+PYTHON ?= python3
 
 test-unit:
-	PYTHONPATH=src python3 -m unittest discover -s tests -v
+	PYTHONPATH=src $(PYTHON) -m unittest discover -s tests -v
 
-test-all: test-unit
+test-mcp:
+	$(PYTHON) -c 'import mcp'
+	PYTHONPATH=src $(PYTHON) -m unittest discover -s tests -p 'test_mcp*.py' -v
+
+test-all: test-mcp test-unit
 
 run-local:
-	PYTHONPATH=src python3 -m network_ops serve
+	PYTHONPATH=src $(PYTHON) -m network_ops serve
+
+run-mcp:
+	PYTHONPATH=src $(PYTHON) -m network_ops.mcp_server
 
 build-container:
 	podman build -f Containerfile -t network-operations-agent:local .

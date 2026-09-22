@@ -51,7 +51,15 @@ class LabHandler(BaseHTTPRequestHandler):
         except (ValueError, TypeError, UnicodeDecodeError):
             self._json(400, {"error": "Select an approved synthetic scenario"})
             return
-        self._json(200, investigate(scenario_id))
+        endpoint = os.environ.get("NETWORK_OPS_MCP_URL")
+        if endpoint:
+            from .mcp_client import MCPDiagnosticTool
+            tools = [MCPDiagnosticTool(scope, endpoint) for scope in (
+                "network", "openshift_platform", "hardware"
+            )]
+            self._json(200, investigate(scenario_id, tools=tools))
+        else:
+            self._json(200, investigate(scenario_id))
 
 
 def serve(host: str = "127.0.0.1", port: int = 8080) -> None:

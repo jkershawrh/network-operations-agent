@@ -4,7 +4,7 @@ Explore a synthetic telco timing incident, compare current diagnostics with hist
 
 Network operations teams need to distinguish current observations from past incidents before attributing an alarm to a platform or hardware fault. This quickstart candidate teaches that decision using two contrasting synthetic scenarios. India Mobile Congress (IMC) is an audience profile, not a vendor dependency.
 
-**Status:** container-packaged fixture proof, not an orderable quickstart or deployed lab. No live MCP connection, model inference, vector RAG, or remediation exists yet.
+**Status:** container-packaged synthetic proof with working MCP transport, not an orderable quickstart or deployed lab. No live network diagnostics, model inference, vector RAG, or remediation exists yet.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ The learner investigates a synthetic network alarm, reviews network, platform, a
 
 ## Detailed description
 
-The local runner assembles an evidence ledger with identifiers and provenance. Fixture providers are replaceable behind bounded interfaces; the approved-tool adapter is not itself an MCP transport. Historical excerpts are labeled context, never live telemetry. The two scenarios point to different hypotheses.
+The local runner assembles an evidence ledger with identifiers and provenance. Fixture providers are replaceable behind bounded interfaces; an official-SDK MCP server and client now exercise the synthetic diagnostics over Streamable HTTP. Historical excerpts are labeled context, never live telemetry. The two scenarios point to different hypotheses.
 
 ### Architecture diagrams
 
@@ -38,8 +38,9 @@ For the fixture proof: a computer able to run Python and a loopback service. Clu
 
 ### Minimum software requirements
 
-Python 3.10 or newer. The local application uses only the Python standard library.
-Building the optional image requires Podman or an equivalent container builder.
+Python 3.11 or newer. The fixture-only page uses the Python standard library;
+MCP mode additionally requires `requirements-mcp.txt`. Building the optional
+image requires Podman or an equivalent container builder.
 
 ### Required user permissions
 
@@ -53,12 +54,25 @@ Use a local checkout of this directory. Do not provide credentials: fixture mode
 
 ### Installation
 
-Run `make test-unit`, then `make run-local`. Open `http://127.0.0.1:8080`, choose either scenario, and select **Investigate**. For a terminal run, use `PYTHONPATH=src python3 -m network_ops ptp-hardware` or `ptp-platform`.
+Create a virtual environment with Python 3.11 and install
+`requirements-mcp.txt`. Run `make test-all PYTHON=.venv/bin/python`, then
+`make run-local PYTHON=.venv/bin/python`. Open `http://127.0.0.1:8080`, choose
+either scenario, and select **Investigate**. For a terminal-only fixture run,
+use `PYTHONPATH=src .venv/bin/python -m network_ops ptp-hardware` or
+`ptp-platform`.
+
+To exercise real MCP transport locally, start `make run-mcp PYTHON=.venv/bin/python`
+in another terminal, then start the web app with
+`NETWORK_OPS_MCP_URL=http://127.0.0.1:8095/mcp make run-local PYTHON=.venv/bin/python`.
+The MCP tools still read synthetic fixtures. The MCP server has no user
+authentication; keep it on loopback and do not expose it through a public Route.
 `make build-container` builds the fixture-only UBI Python image; no registry push or cluster deployment is implied.
 
 ### Validating the deployment
 
-`make test-all` runs local behavior and HTTP checks. `/health` reports `synthetic_local_proof`, not model or MCP connectivity. Confirm distinct hypotheses and `action_executed: false`.
+`make test-all PYTHON=.venv/bin/python` runs behavior, HTTP, and MCP checks.
+`/health` reports `synthetic_local_proof`, not model or MCP connectivity.
+Confirm distinct hypotheses and `action_executed: false`.
 
 ### Delete
 
@@ -73,6 +87,7 @@ Stop the local process with Ctrl-C. No participant state or secrets are stored.
 - `contracts/`: proposed lab interface contract.
 - `docs/`: architecture and proof gates.
 - `Containerfile`: UBI-based packaging for the synthetic proof; not a published image.
+- `requirements-mcp.txt`: pinned Python MCP SDK dependency.
 
 ## References
 
