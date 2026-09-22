@@ -95,7 +95,6 @@ class LabHandler(BaseHTTPRequestHandler):
                     os.environ["NETWORK_OPS_MODEL_BASE_URL"],
                     os.environ["NETWORK_OPS_MODEL_NAME"],
                     os.environ["NETWORK_OPS_MODEL_API_KEY"],
-                    non_thinking=os.environ.get("NETWORK_OPS_MODEL_NON_THINKING") == "1",
                 )
                 result = add_model_draft(result, model)
             except (KeyError, ValueError):

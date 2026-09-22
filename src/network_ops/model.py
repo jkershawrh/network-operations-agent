@@ -20,8 +20,7 @@ class ModelClient(Protocol):
 class OpenAICompatibleModel:
     """Small runtime-only client for an OpenAI-compatible chat endpoint."""
 
-    def __init__(self, base_url: str, model: str, api_key: str,
-                 non_thinking: bool = False):
+    def __init__(self, base_url: str, model: str, api_key: str):
         parts = urlsplit(base_url)
         if (not parts.hostname or parts.username or parts.password or parts.query or
                 parts.fragment or parts.scheme not in {"http", "https"} or
@@ -32,7 +31,6 @@ class OpenAICompatibleModel:
         self._url = base_url.rstrip("/") + "/chat/completions"
         self._model = model
         self._api_key = api_key
-        self._non_thinking = non_thinking
 
     def draft(self, evidence: dict) -> dict:
         prompt = {
@@ -41,7 +39,7 @@ class OpenAICompatibleModel:
             "historical_context": evidence["historical_context_with_source_revision"],
             "unknowns": evidence["unknowns_and_conflicts"],
         }
-        payload = {
+        body = json.dumps({
             "model": self._model,
             "temperature": 0,
             "max_tokens": 300,
@@ -58,16 +56,13 @@ class OpenAICompatibleModel:
                 )},
                 {"role": "user", "content": json.dumps(prompt)},
             ],
-        }
-        if self._non_thinking:
-            # Opt-in Qwen3/vLLM chat-template extension; omit for generic APIs.
-            payload["chat_template_kwargs"] = {"enable_thinking": False}
-        body = json.dumps(payload).encode()
+        }).encode()
         request = Request(self._url, data=body, method="POST", headers={
             "Content-Type": "application/json",
             "Authorization": "Bearer " + self._api_key,
         })
-        with build_opener(_NoRedirect).open(request, timeout=12) as response:
+        # CPU inference can take tens of seconds even for a short draft.
+        with build_opener(_NoRedirect).open(request, timeout=60) as response:
             raw = response.read(65537)
         if len(raw) > 65536:
             raise ValueError("Model response too large")

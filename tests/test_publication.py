@@ -12,6 +12,11 @@ class PublicationTests(unittest.TestCase):
         self.assertTrue(license_text.startswith("MIT License\n"))
         self.assertIn("Copyright (c) 2026 Jonathan Kershaw", license_text)
 
+    def test_cpu_target_is_documented_without_hardware_overclaim(self):
+        text = (ROOT / "README.md").read_text()
+        self.assertIn("granite-3-2-8b-instruct-cpu", text)
+        self.assertIn("backend placement still needs cluster-side confirmation", text)
+
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()
         title = text.splitlines()[0]

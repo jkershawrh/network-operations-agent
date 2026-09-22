@@ -25,10 +25,10 @@ confident diagnoses on incomplete or conflicting data. Record the model ID,
 endpoint owner, evaluation date, and reviewer; do not record keys or raw
 bearer headers.
 
-On 2026-09-22, the two cases also passed a limited [direct RACMaaS Qwen3-14B
-review](model-validation-2026-09-22.md). The tenant-keyed LiteMaaS gateway
-was not validated, and no performance or broader quality claim follows from
-two fixtures.
+On 2026-09-22, the two cases also passed a limited [direct RACMaaS
+CPU-labeled Granite 8B review](model-validation-2026-09-22.md). Backend CPU
+placement and the tenant-keyed LiteMaaS gateway were not independently
+validated; no performance or broader quality claim follows from two fixtures.
 
 ## Publication and environment gates
 

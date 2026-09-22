@@ -81,7 +81,7 @@ If the registry image is private, create an image-pull Secret in the namespace t
 The runtime variables are listed without values in [.env.example](.env.example). A model endpoint must use HTTPS, except for loopback HTTP during local development. The key is supplied by the endpoint owner or provisioner; this repository never assigns one. The model only drafts an explanation after a supported hypothesis exists. A missing, malformed, or unsupported model response leaves the evidence-based investigation intact. Review every model sentence against the cited IDs; no target-model quality claim has been made.
 
 With an assigned endpoint, `make test-model PYTHON=.venv/bin/python` exercises both synthetic cases and prints drafts for review. Apply the [model-quality rubric](docs/model-quality-rubric.md); a passing structural check is not a factual-quality result.
-For a Qwen3 model served by vLLM, set `NETWORK_OPS_MODEL_NON_THINKING=1` to use its optional chat-template extension and keep the short JSON draft from being consumed by reasoning tokens. Leave this unset for other OpenAI-compatible endpoints.
+The intended model for this quickstart is CPU-hosted. A direct route labeled `granite-3-2-8b-instruct-cpu` passed the two synthetic explanation checks; see the [limited CPU-targeted review](docs/model-validation-2026-09-22.md). Its backend placement still needs cluster-side confirmation. Do not substitute an accelerator-backed model for this quickstart.
 
 ### Validating the deployment
 
@@ -108,7 +108,7 @@ Run `make compose-down` with the same `COMPOSE` setting used to start locally. F
 - [Architecture and event flow](docs/architecture.md)
 - [Future quickstart-to-lab path](docs/future-lab-path.md)
 
-This is a synthetic educational quickstart, not proof of reduced MTTR, fewer truck rolls, production readiness, or hardware acceleration. An amd64 test image was published to a private Quay repository and passed an isolated OpenShift smoke test. Optional Qwen3-14B wording passed a [limited direct-model review](docs/model-validation-2026-09-22.md) on two synthetic incidents; tenant-gateway access, broader model quality, and contributor-organization review remain open.
+This is a synthetic educational quickstart, not proof of reduced MTTR, fewer truck rolls, production readiness, or hardware acceleration. An amd64 test image was published to a private Quay repository and passed an isolated OpenShift smoke test. Optional CPU-labeled Granite 8B wording passed a [limited direct-model review](docs/model-validation-2026-09-22.md) on two synthetic incidents; backend CPU placement, tenant-gateway access, broader model quality, and contributor-organization review remain open.
 
 ## License
 
