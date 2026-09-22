@@ -57,9 +57,23 @@ class LabHandler(BaseHTTPRequestHandler):
             tools = [MCPDiagnosticTool(scope, endpoint) for scope in (
                 "network", "openshift_platform", "hardware"
             )]
-            self._json(200, investigate(scenario_id, tools=tools))
+            result = investigate(scenario_id, tools=tools)
         else:
-            self._json(200, investigate(scenario_id))
+            result = investigate(scenario_id)
+        if any(os.environ.get(key) for key in (
+            "NETWORK_OPS_MODEL_BASE_URL", "NETWORK_OPS_MODEL_NAME", "NETWORK_OPS_MODEL_API_KEY"
+        )):
+            from .model import OpenAICompatibleModel, add_model_draft
+            try:
+                model = OpenAICompatibleModel(
+                    os.environ["NETWORK_OPS_MODEL_BASE_URL"],
+                    os.environ["NETWORK_OPS_MODEL_NAME"],
+                    os.environ["NETWORK_OPS_MODEL_API_KEY"],
+                )
+                result = add_model_draft(result, model)
+            except (KeyError, ValueError):
+                result = dict(result, model_draft={"status": "unavailable_or_rejected"})
+        self._json(200, result)
 
 
 def serve(host: str = "127.0.0.1", port: int = 8080) -> None:

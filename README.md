@@ -4,7 +4,7 @@ Explore a synthetic telco timing incident, compare current diagnostics with hist
 
 Network operations teams need to distinguish current observations from past incidents before attributing an alarm to a platform or hardware fault. This quickstart candidate teaches that decision using two contrasting synthetic scenarios. India Mobile Congress (IMC) is an audience profile, not a vendor dependency.
 
-**Status:** container-packaged synthetic proof with working MCP transport, not an orderable quickstart or deployed lab. No live network diagnostics, model inference, vector RAG, or remediation exists yet.
+**Status:** container-packaged synthetic proof with working MCP transport and an optional model client. It is not an orderable quickstart or deployed lab. No live network diagnostics, model-quality validation, vector RAG, or remediation exists yet.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ The learner investigates a synthetic network alarm, reviews network, platform, a
 
 ## Detailed description
 
-The local runner assembles an evidence ledger with identifiers and provenance. Fixture providers are replaceable behind bounded interfaces; an official-SDK MCP server and client now exercise the synthetic diagnostics over Streamable HTTP. Historical excerpts are labeled context, never live telemetry. The two scenarios point to different hypotheses.
+The local runner assembles an evidence ledger with identifiers and provenance. Fixture providers are replaceable behind bounded interfaces; an official-SDK MCP server and client exercise synthetic diagnostics over Streamable HTTP. Historical excerpts are labeled context, never live telemetry. The two scenarios point to different hypotheses. An optional OpenAI-compatible model client can draft wording, but cannot alter the hypothesis or authorize an action; its text is always labeled unverified.
 
 ### Architecture diagrams
 
@@ -66,6 +66,14 @@ in another terminal, then start the web app with
 `NETWORK_OPS_MCP_URL=http://127.0.0.1:8095/mcp make run-local PYTHON=.venv/bin/python`.
 The MCP tools still read synthetic fixtures. The MCP server has no user
 authentication; keep it on loopback and do not expose it through a public Route.
+
+For optional model wording, the runtime supplies `NETWORK_OPS_MODEL_BASE_URL`
+(HTTPS URL ending in `/v1`, or loopback HTTP), `NETWORK_OPS_MODEL_NAME`, and
+`NETWORK_OPS_MODEL_API_KEY`. See [.env.example](.env.example) for names only.
+The lab must receive an assigned tenant-scoped key from its provisioner; do
+not invent a key, commit it, or expose the endpoint or key in Showroom. The
+model response is checked for references to supporting evidence IDs but its
+prose is **not** semantically verified. It remains subject to human review.
 `make build-container` builds the fixture-only UBI Python image; no registry push or cluster deployment is implied.
 
 ### Validating the deployment
@@ -88,6 +96,7 @@ Stop the local process with Ctrl-C. No participant state or secrets are stored.
 - `docs/`: architecture and proof gates.
 - `Containerfile`: UBI-based packaging for the synthetic proof; not a published image.
 - `requirements-mcp.txt`: pinned Python MCP SDK dependency.
+- `.env.example`: runtime variable names without credentials.
 
 ## References
 

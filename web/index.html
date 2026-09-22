@@ -61,6 +61,15 @@
         element('p', `Next test: ${result.next_discriminating_test}`, summary);
         element('p', `Proposed action: ${result.proposed_action}`, summary);
         element('p', 'Human approval required. No action executed.', summary);
+        if (result.model_draft) {
+          const draft = section('Optional AI wording — unverified');
+          element('p', `Status: ${result.model_draft.status}`, draft);
+          if (result.model_draft.summary) {
+            element('p', result.model_draft.summary, draft);
+            element('p', `Cited IDs: ${result.model_draft.evidence_ids.join(', ')}`, draft);
+          }
+          element('p', 'The AI text does not determine the hypothesis or authorize an action. Review every claim against the evidence below.', draft);
+        }
         const current = section('Current diagnostic observations');
         for (const item of result.current_observations_with_tool_provenance) {
           element('p', `${item.evidence_id}: ${item.signal} = ${item.state} (${item.scope}; ${item.observed_at}; ${item.provenance})`, current);

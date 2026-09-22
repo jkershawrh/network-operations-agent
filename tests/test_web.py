@@ -1,6 +1,7 @@
 import json
 import threading
 import unittest
+from unittest.mock import patch
 from http.server import ThreadingHTTPServer
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
@@ -45,6 +46,15 @@ class WebTests(unittest.TestCase):
             with self.assertRaises(HTTPError) as caught:
                 self.post(payload)
             self.assertEqual(caught.exception.code, 400)
+
+    def test_partial_model_configuration_does_not_expose_it(self):
+        with patch.dict("os.environ", {"NETWORK_OPS_MODEL_API_KEY": "private-test-secret"}, clear=True):
+            with self.post({"scenario_id": "ptp-platform"}) as response:
+                raw = response.read().decode()
+        result = json.loads(raw)
+        self.assertEqual(result["model_draft"], {"status": "unavailable_or_rejected"})
+        self.assertEqual(result["primary_hypothesis"]["cause"], "platform_timing")
+        self.assertNotIn("private-test-secret", raw)
 
 
 if __name__ == "__main__":

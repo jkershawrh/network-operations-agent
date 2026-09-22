@@ -20,7 +20,8 @@ stages:
     criteria:
       http_journey: "Local page and API serve synthetic investigations."
       mcp_transport: "Synthetic diagnostics pass through official SDK Streamable HTTP locally."
-      live_tools_and_model: "Live authorized diagnostics and model flow tested without credential exposure."
+      model_client: "Mock OpenAI-compatible response may only add unverified wording citing supporting evidence."
+      live_tools_and_model: "Live authorized diagnostics and target-model quality tested without credential exposure."
   stage_4_benchmarks:
     state: not_run
     criteria:

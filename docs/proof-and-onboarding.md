@@ -6,7 +6,9 @@ scenario, empty diagnostics, cross-scope signals, conflicting evidence, and
 the approved-tool adapter pass. A local UBI image build and CLI smoke test
 also pass. The base image resolves to amd64 on this arm64 host, so native
 arm64 support is unverified. The synthetic MCP tools pass in-process and
-over local Streamable HTTP. All live network diagnostics, model, cluster
+over local Streamable HTTP. A mocked OpenAI-compatible response passes the
+model client and evidence-ID checks; no actual model has been called. All live
+network diagnostics, target-model quality, cluster
 deployment, Showroom, and learner gates remain RED / not run.
 
 ## Next integration boundary

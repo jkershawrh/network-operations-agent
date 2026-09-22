@@ -21,7 +21,11 @@ The current build includes a synthetic read-only MCP server and client using
 Streamable HTTP. The local web process selects that path only when
 `NETWORK_OPS_MCP_URL` is configured; otherwise it uses direct fixtures. The
 MCP server is unauthenticated and must remain on loopback for development.
-No live diagnostic connector, model client, or vector retrieval is connected.
+An optional OpenAI-compatible model client can draft an explanation after the
+deterministic hypothesis is selected. Missing/invalid model output cannot
+change the hypothesis or execute an action. The text remains unverified for
+human review even if its cited evidence IDs pass structural checks. No live
+diagnostic connector, target-model quality proof, or vector retrieval is connected.
 
 ## Reference event flow
 
