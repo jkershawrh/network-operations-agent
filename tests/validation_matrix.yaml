@@ -5,8 +5,9 @@ stages:
       output_fields: "Every result contains lab contract output fields."
       evidence_provenance: "Accepted observations have timestamp, scope, signal, and provenance."
   stage_1_infrastructure:
-    state: not_run
+    state: local_image_only
     criteria:
+      local_image: "UBI image builds and fixture CLI runs; native arm64 image not verified."
       cluster_deployment: "Image, route, namespace, health, and cleanup verified on target cluster."
   stage_2_unit:
     state: passing_local

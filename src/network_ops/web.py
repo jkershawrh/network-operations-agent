@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -54,8 +55,10 @@ class LabHandler(BaseHTTPRequestHandler):
 
 
 def serve(host: str = "127.0.0.1", port: int = 8080) -> None:
-    if host not in {"127.0.0.1", "localhost"}:
-        raise ValueError("Local proof binds only to loopback")
+    if host not in {"127.0.0.1", "localhost"} and not (
+        host == "0.0.0.0" and os.environ.get("NETWORK_OPS_CONTAINER_MODE") == "1"
+    ):
+        raise ValueError("Non-loopback binding requires explicit container mode")
     with ThreadingHTTPServer((host, port), LabHandler) as server:
         print(f"Local lab: http://{host}:{server.server_port}", flush=True)
         server.serve_forever()

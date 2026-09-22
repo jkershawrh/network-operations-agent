@@ -4,7 +4,7 @@ Explore a synthetic telco timing incident, compare current diagnostics with hist
 
 Network operations teams need to distinguish current observations from past incidents before attributing an alarm to a platform or hardware fault. This quickstart candidate teaches that decision using two contrasting synthetic scenarios. India Mobile Congress (IMC) is an audience profile, not a vendor dependency.
 
-**Status:** local fixture proof, not an orderable quickstart or deployed lab. No live MCP connection, model inference, vector RAG, or remediation exists yet.
+**Status:** container-packaged fixture proof, not an orderable quickstart or deployed lab. No live MCP connection, model inference, vector RAG, or remediation exists yet.
 
 ## Table of Contents
 
@@ -39,6 +39,7 @@ For the fixture proof: a computer able to run Python and a loopback service. Clu
 ### Minimum software requirements
 
 Python 3.10 or newer. The local application uses only the Python standard library.
+Building the optional image requires Podman or an equivalent container builder.
 
 ### Required user permissions
 
@@ -53,6 +54,7 @@ Use a local checkout of this directory. Do not provide credentials: fixture mode
 ### Installation
 
 Run `make test-unit`, then `make run-local`. Open `http://127.0.0.1:8080`, choose either scenario, and select **Investigate**. For a terminal run, use `PYTHONPATH=src python3 -m network_ops ptp-hardware` or `ptp-platform`.
+`make build-container` builds the fixture-only UBI Python image; no registry push or cluster deployment is implied.
 
 ### Validating the deployment
 
@@ -70,6 +72,7 @@ Stop the local process with Ctrl-C. No participant state or secrets are stored.
 - `tests/`: behavior and HTTP checks.
 - `contracts/`: proposed lab interface contract.
 - `docs/`: architecture and proof gates.
+- `Containerfile`: UBI-based packaging for the synthetic proof; not a published image.
 
 ## References
 

@@ -1,6 +1,7 @@
 """Run one synthetic scenario without credentials or cluster access."""
 
 import argparse
+import os
 
 from .investigation import investigate, to_json
 
@@ -11,7 +12,8 @@ def main() -> None:
     args = parser.parse_args()
     if args.scenario == "serve":
         from .web import serve
-        serve()
+        host = "0.0.0.0" if os.environ.get("NETWORK_OPS_CONTAINER_MODE") == "1" else "127.0.0.1"
+        serve(host)
     else:
         print(to_json(investigate(args.scenario)))
 
