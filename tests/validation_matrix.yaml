@@ -1,0 +1,29 @@
+stages:
+  stage_0_contracts:
+    state: local_partial
+    criteria:
+      output_fields: "Every result contains lab contract output fields."
+      evidence_provenance: "Accepted observations have timestamp, scope, signal, and provenance."
+  stage_1_infrastructure:
+    state: not_run
+    criteria:
+      cluster_deployment: "Image, route, namespace, health, and cleanup verified on target cluster."
+  stage_2_unit:
+    state: passing_local
+    criteria:
+      distinct_causes: "Hardware and platform scenarios lead to distinct supported hypotheses."
+      abstention: "Missing, cross-scope, or conflicting diagnostics cannot produce a confident cause."
+      human_review: "Every result requires approval and never executes an action."
+  stage_3_integration:
+    state: local_fixture_only
+    criteria:
+      http_journey: "Local page and API serve synthetic investigations."
+      mcp_and_model: "Real MCP and model flows tested without credential exposure."
+  stage_4_benchmarks:
+    state: not_run
+    criteria:
+      target_capacity: "Measure inference quality and workshop concurrency on target environment."
+  stage_5_publication:
+    state: draft
+    criteria:
+      ownership_and_intake: "Reviewed source repo and intake output with confirmed owner and license."

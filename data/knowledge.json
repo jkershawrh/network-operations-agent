@@ -1,0 +1,5 @@
+[
+  {"source_id": "ptp-runbook", "source_revision": "synthetic-v1", "excerpt": "Compare alarm time, lock-state changes, platform events, and NIC timestamp health before assigning a cause."},
+  {"source_id": "ptp-case-hardware", "source_revision": "synthetic-v1", "excerpt": "A past simulated timing alarm coincided with a NIC timestamp anomaly; platform timing checks were normal."},
+  {"source_id": "ptp-case-platform", "source_revision": "synthetic-v1", "excerpt": "A past simulated timing alarm coincided with a platform timing-service fault; NIC timestamp checks were normal."}
+]

@@ -1,0 +1,8 @@
+benchmark_rubric:
+  version: "0.1"
+  description: "No performance benchmark applies to the deterministic fixture proof."
+  verification_policy:
+    verified_means: "Measured in the target environment with recorded workload and model."
+    public_claim_rules:
+      - "Do not publish scale, latency, or hardware acceleration claims from fixture tests."
+  benchmarks: {}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="240" viewBox="0 0 920 240" role="img" aria-labelledby="title desc">
+  <title id="title">Network alarm investigation flow</title>
+  <desc id="desc">A synthetic alarm feeds read-only diagnostics and historical context into an evidence ledger, then a human-reviewed recommendation.</desc>
+  <rect width="920" height="240" fill="#f5f7fa"/>
+  <g fill="#fff" stroke="#0066a1" stroke-width="2">
+    <rect x="16" y="80" width="150" height="75" rx="8"/>
+    <rect x="220" y="22" width="190" height="75" rx="8"/>
+    <rect x="220" y="142" width="190" height="75" rx="8"/>
+    <rect x="464" y="80" width="170" height="75" rx="8"/>
+    <rect x="688" y="80" width="210" height="75" rx="8"/>
+  </g>
+  <g fill="#17212b" font-family="sans-serif" font-size="16" text-anchor="middle">
+    <text x="91" y="112">Synthetic alarm</text><text x="91" y="134">and KPI snapshot</text>
+    <text x="315" y="52">Read-only diagnostics</text><text x="315" y="74">network · platform · hardware</text>
+    <text x="315" y="172">Historical context</text><text x="315" y="194">source ID and revision</text>
+    <text x="549" y="110">Evidence ledger</text><text x="549" y="132">facts ≠ precedent</text>
+    <text x="793" y="110">Human-reviewed</text><text x="793" y="132">recommendation only</text>
+  </g>
+  <g stroke="#0066a1" stroke-width="3" fill="none">
+    <path d="M166 117 H190 V59 H220"/><path d="M190 117 V180 H220"/>
+    <path d="M410 59 H438 V117 H464"/><path d="M410 180 H438 V117"/>
+    <path d="M634 117 H688"/>
+  </g>
+</svg>

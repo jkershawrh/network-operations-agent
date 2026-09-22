@@ -1,0 +1,82 @@
+api_version: network-operations-agent.lab/v0.1
+status: local-fixture-proof
+identity:
+  source_name: network-operations-agent
+  audience_profile: core-network-ops
+  first_event_profile: imc-telco
+  catalog_id: null  # Assigned during Launchpad draft intake; never reuse 201.
+
+learner_contract:
+  objective: >-
+    Investigate a synthetic network alarm using live-like MCP diagnostics and
+    cited RAG context, then submit a human-reviewed recommendation.
+  expected_duration_minutes: 35  # Planning target, not a measured completion time.
+  steps:
+    - inspect_alarm_and_kpis
+    - discover_and_call_diagnostic_tools
+    - retrieve_runbook_and_incident_context
+    - compare_evidence_and_generate_hypotheses
+    - review_recommended_next_action
+  output_required:
+    - investigation_id
+    - alarm_id
+    - current_observations_with_tool_provenance
+    - historical_context_with_source_revision
+    - primary_hypothesis
+    - alternate_hypotheses
+    - unknowns_and_conflicts
+    - next_discriminating_test
+    - proposed_action
+    - action_requires_human_approval
+  forbidden_claims:
+    - autonomous_resolution
+    - measured_mttr_improvement_without_comparison
+    - measured_truck_roll_reduction_without_comparison
+    - customer_specific_sizing_or_performance_without_evidence
+
+interfaces:
+  alarm_provider:
+    request: scenario_id
+    response: [alarm_id, occurred_at, domain, severity, kpis, fixture_revision]
+  diagnostic_tool:
+    transport: mcp
+    request: [investigation_id, alarm_id, scope]
+    response: [tool_id, status, observed_at, observations, provenance]
+    scopes: [network, openshift_platform, hardware]
+    mutation_allowed: false
+  knowledge_provider:
+    request: [investigation_id, query, source_allowlist]
+    response: [source_id, source_revision, excerpt, relevance]
+    approved_sources_only: true
+  model_client:
+    protocol: openai-compatible
+    runtime_secret_required: true
+    swappable: true
+  review_decision:
+    values: [approve_recommendation, request_more_evidence, reject]
+    executes_action: false
+
+deployment_constraints:
+  default_scope: namespace-isolated-seat
+  cluster_scoped_access: false
+  real_network_access: false
+  customer_data: false
+  remediation_execution: false
+  model_hosting: shared_external_service
+  model_name: null  # Select only after quality and tool-use testing.
+  resources: unmeasured
+  images: unbuilt
+
+profiles:
+  core-network-ops:
+    may_change: [narrative, examples, vocabulary, synthetic_fixtures]
+  imc-telco:
+    derives_from: core-network-ops
+    may_change: [narrative, examples, vocabulary, synthetic_fixtures]
+    must_not_change: [permissions, model, images, resource_envelope, action_authority]
+
+integration_candidates:
+  david_kypuros:
+    source: unknown
+    reuse_terms: unknown
+    status: await_source_and_review

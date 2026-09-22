@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Operations Agent — Local Proof</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #17212b; background: #f5f7fa; }
+    body { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    header, section { background: white; border: 1px solid #d9e2ea; border-radius: 8px; padding: 1rem 1.4rem; margin-bottom: 1rem; }
+    h1 { margin-bottom: .3rem; } h2 { margin-top: .3rem; }
+    .notice { border-left: 5px solid #c36b00; padding-left: .7rem; }
+    button { background: #0066a1; color: white; border: 0; padding: .7rem 1rem; border-radius: 4px; cursor: pointer; }
+    select { padding: .6rem; margin-right: .5rem; }
+    li { margin: .45rem 0; } code { overflow-wrap: anywhere; }
+    .tag { display: inline-block; background: #e9f1f6; border-radius: 4px; padding: .1rem .35rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Network Operations Agent</h1>
+    <p>Investigate a synthetic telco timing alarm across network, OpenShift platform, and hardware evidence.</p>
+    <p class="notice">Local teaching proof only. Diagnostics and historical documents are fixtures. No model inference, live MCP tools, or remediation runs.</p>
+  </header>
+  <section>
+    <h2>Choose an incident</h2>
+    <label for="scenario">Synthetic scenario</label>
+    <select id="scenario">
+      <option value="ptp-hardware">Timing alarm — hardware signal</option>
+      <option value="ptp-platform">Timing alarm — platform signal</option>
+    </select>
+    <button id="run">Investigate</button>
+  </section>
+  <main id="result" aria-live="polite"></main>
+  <script>
+    const target = document.getElementById('result');
+    function element(tag, text, parent) {
+      const node = document.createElement(tag);
+      node.textContent = text;
+      parent.appendChild(node);
+      return node;
+    }
+    function section(title) {
+      const node = document.createElement('section');
+      element('h2', title, node);
+      target.appendChild(node);
+      return node;
+    }
+    document.getElementById('run').addEventListener('click', async () => {
+      target.replaceChildren();
+      try {
+        const response = await fetch('/api/investigate', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({scenario_id: document.getElementById('scenario').value})
+        });
+        if (!response.ok) throw new Error('Investigation request failed');
+        const result = await response.json();
+        const summary = section('Recommendation');
+        element('p', `Hypothesis: ${result.primary_hypothesis.cause}`, summary);
+        element('p', `Supporting current evidence: ${result.primary_hypothesis.supporting_evidence_ids.join(', ') || 'none'}`, summary);
+        element('p', `Next test: ${result.next_discriminating_test}`, summary);
+        element('p', `Proposed action: ${result.proposed_action}`, summary);
+        element('p', 'Human approval required. No action executed.', summary);
+        const current = section('Current diagnostic observations');
+        for (const item of result.current_observations_with_tool_provenance) {
+          element('p', `${item.evidence_id}: ${item.signal} = ${item.state} (${item.scope}; ${item.observed_at}; ${item.provenance})`, current);
+        }
+        const history = section('Historical context — not current state');
+        for (const item of result.historical_context_with_source_revision) {
+          element('p', `${item.source_id}@${item.source_revision}: ${item.excerpt}`, history);
+        }
+        const gaps = section('Unknowns and alternatives');
+        element('p', `Alternatives: ${result.alternate_hypotheses.join(', ')}`, gaps);
+        element('p', result.unknowns_and_conflicts.join('; ') || 'No diagnostic gaps in this fixture', gaps);
+      } catch (error) {
+        element('p', 'Unable to complete the local investigation.', target);
+      }
+    });
+  </script>
+</body>
+</html>
