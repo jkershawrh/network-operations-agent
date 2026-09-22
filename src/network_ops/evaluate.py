@@ -33,7 +33,10 @@ def main() -> int:
         print("Model evaluation needs an assigned endpoint, model name, and runtime key.")
         return 2
     try:
-        model = OpenAICompatibleModel(*(os.environ[name] for name in names))
+        model = OpenAICompatibleModel(
+            *(os.environ[name] for name in names),
+            non_thinking=os.environ.get("NETWORK_OPS_MODEL_NON_THINKING") == "1",
+        )
     except ValueError:
         print("Model runtime configuration is invalid.")
         return 2

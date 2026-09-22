@@ -25,10 +25,15 @@ confident diagnoses on incomplete or conflicting data. Record the model ID,
 endpoint owner, evaluation date, and reviewer; do not record keys or raw
 bearer headers.
 
+On 2026-09-22, the two cases also passed a limited [direct RACMaaS Qwen3-14B
+review](model-validation-2026-09-22.md). The tenant-keyed LiteMaaS gateway
+was not validated, and no performance or broader quality claim follows from
+two fixtures.
+
 ## Publication and environment gates
 
-- Confirm repository owner, contributor organization, and license before
-  public release. Do not infer a license from dependencies or related repos.
+- The repository owner chose MIT; see `LICENSE`. Confirm contributor
+  organization and complete intake before public release.
 - Build and pin an immutable image digest. The UBI image has built and run on
   an arm64 development host by emulating amd64; native arm64 is not verified.
   Obtain the digest from a fresh pull of the registry tag, since the local

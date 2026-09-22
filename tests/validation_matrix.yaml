@@ -17,16 +17,16 @@ stages:
       abstention: "Missing, cross-scope, or conflicting diagnostics cannot produce a confident cause."
       human_review: "Every result requires approval and never executes an action."
   stage_3_integration:
-    state: local_mcp_synthetic_only
+    state: local_mcp_and_direct_model_synthetic_only
     criteria:
       http_journey: "Local page and API serve synthetic investigations."
       mcp_transport: "Synthetic diagnostics pass through official SDK Streamable HTTP locally."
       retrieval: "Approved excerpts rank from present MCP observations rather than scenario preselection."
       human_review: "Simulated review returns a decision without persistence or action."
       model_client: "Mock OpenAI-compatible response may only add unverified wording citing supporting evidence."
-      live_tools_and_model: "Live authorized diagnostics and target-model quality tested without credential exposure."
+      live_tools_and_model: "Synthetic MCP diagnostics tested locally and on OpenShift. Direct RACMaaS Qwen3-14B reviewed on both fixtures; tenant gateway and live network tools not tested."
   stage_4_benchmarks:
-    state: no_performance_claims
+    state: two_fixture_model_review_no_performance_claims
     criteria:
       target_model: "Run assigned model against both scenarios and human-review its wording."
       target_capacity: "No throughput, latency, or concurrency claim until measured."

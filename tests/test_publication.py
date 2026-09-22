@@ -7,6 +7,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class PublicationTests(unittest.TestCase):
+    def test_mit_license_is_present(self):
+        license_text = (ROOT / "LICENSE").read_text()
+        self.assertTrue(license_text.startswith("MIT License\n"))
+        self.assertIn("Copyright (c) 2026 Jonathan Kershaw", license_text)
+
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()
         title = text.splitlines()[0]

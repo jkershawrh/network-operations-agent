@@ -87,7 +87,15 @@ class ModelTests(unittest.TestCase):
             self.assertEqual(observed["path"], "/v1/chat/completions")
             self.assertEqual(observed["authorization"], "Bearer test-key")
             self.assertEqual(observed["request"]["model"], "fixture-model")
+            self.assertNotIn("chat_template_kwargs", observed["request"])
             self.assertNotIn("test-key", str(result))
+            non_thinking = OpenAICompatibleModel(
+                f"http://127.0.0.1:{server.server_port}/v1", "qwen3-14b", "test-key",
+                non_thinking=True,
+            )
+            add_model_draft(investigate("ptp-hardware"), non_thinking)
+            self.assertEqual(observed["request"]["chat_template_kwargs"],
+                             {"enable_thinking": False})
         finally:
             server.shutdown()
             server.server_close()
