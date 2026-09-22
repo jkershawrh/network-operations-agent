@@ -82,6 +82,7 @@ The runtime variables are listed without values in [.env.example](.env.example).
 
 With an assigned endpoint, `make test-model PYTHON=.venv/bin/python` exercises both synthetic cases and prints drafts for review. Apply the [model-quality rubric](docs/model-quality-rubric.md); a passing structural check is not a factual-quality result.
 The intended model for this quickstart is CPU-hosted. A direct route labeled `granite-3-2-8b-instruct-cpu` passed the two synthetic explanation checks; see the [limited CPU-targeted review](docs/model-validation-2026-09-22.md). Its backend placement still needs cluster-side confirmation. Do not substitute an accelerator-backed model for this quickstart.
+An independent [Oberon CPU-only check](docs/oberon-cpu-validation-2026-09-22.md) passed with a temporary Granite 8B serving pod at a 16-CPU limit; the smaller Granite 2B model did not meet the evidence-quality gate. Oberon and RACMaaS are separate environments.
 
 ### Validating the deployment
 

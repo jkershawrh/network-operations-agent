@@ -24,7 +24,7 @@ stages:
       retrieval: "Approved excerpts rank from present MCP observations rather than scenario preselection."
       human_review: "Simulated review returns a decision without persistence or action."
       model_client: "Mock OpenAI-compatible response may only add unverified wording citing supporting evidence."
-      live_tools_and_model: "Synthetic MCP diagnostics tested locally and on OpenShift. Direct RACMaaS CPU-labeled Granite 8B reviewed on both fixtures; backend CPU placement, tenant gateway, and live network tools not verified."
+      live_tools_and_model: "Synthetic MCP diagnostics tested locally and on OpenShift. Direct RACMaaS CPU-labeled Granite 8B reviewed on both fixtures; separate Oberon CPU-only Granite 8B path checked. RACMaaS backend CPU placement, tenant gateway, and live network tools not verified."
   stage_4_benchmarks:
     state: two_fixture_model_review_no_performance_claims
     criteria:

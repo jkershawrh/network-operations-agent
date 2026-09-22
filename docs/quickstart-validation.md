@@ -29,6 +29,9 @@ On 2026-09-22, the two cases also passed a limited [direct RACMaaS
 CPU-labeled Granite 8B review](model-validation-2026-09-22.md). Backend CPU
 placement and the tenant-keyed LiteMaaS gateway were not independently
 validated; no performance or broader quality claim follows from two fixtures.
+An independent [Oberon CPU-only check](oberon-cpu-validation-2026-09-22.md)
+validated the same quickstart path on a node with no GPU or Gaudi resources;
+it does not establish the backend placement of the separate RACMaaS route.
 
 ## Publication and environment gates
 
