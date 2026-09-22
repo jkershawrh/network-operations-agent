@@ -29,12 +29,19 @@ bearer headers.
 
 - Confirm repository owner, contributor organization, and license before
   public release. Do not infer a license from dependencies or related repos.
-- Build and pin an immutable image digest. The local UBI image has built and
-  run on an arm64 development host by emulating amd64; native arm64 is not
-  verified, and no registry image is published.
-- On OpenShift, verify image pull, readiness, internal MCP NetworkPolicy,
-  the existing Secret reference, port-forward access, and uninstall cleanup.
-  The chart deliberately creates no public Route or model Secret.
+- Build and pin an immutable image digest. The UBI image has built and run on
+  an arm64 development host by emulating amd64; native arm64 is not verified.
+  Obtain the digest from a fresh pull of the registry tag, since the local
+  build's manifest digest can differ from the digest served by Quay.
+- On 2026-09-22, the amd64 image was pushed to private Quay and deployed by
+  digest in an isolated OpenShift namespace. Both Deployments became ready;
+  port-forwarded smoke checks passed for both incidents, and no Route was
+  created. A namespace-local pull Secret was needed for the private image.
+  An unrelated probe pod could not connect to the protected diagnostics
+  service, while the app could. The Helm release, probe pod, and namespace-
+  local pull Secret were removed after testing. The target-cluster image
+  pull, readiness, HTTP journey, ingress isolation, and uninstall path are
+  therefore verified. The chart creates no public Route or model Secret.
 - Avoid MTTR, truck-roll, hardware-acceleration, latency, or capacity claims
   until measured in the target environment. The two synthetic incidents are
   instructional examples, not evidence of operational performance.

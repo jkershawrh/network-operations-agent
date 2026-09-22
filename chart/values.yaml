@@ -4,6 +4,8 @@ image:
   tag: local
   digest: ""
   pullPolicy: IfNotPresent
+  # Optional existing namespace-local Secret for a private registry image.
+  pullSecret: ""
 
 model:
   # Optional pre-existing Secret containing NETWORK_OPS_MODEL_BASE_URL,

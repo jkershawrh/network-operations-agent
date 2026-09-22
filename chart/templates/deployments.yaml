@@ -22,6 +22,10 @@ spec:
         app.kubernetes.io/component: {{ $component }}
     spec:
       automountServiceAccountToken: false
+{{- if $.Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ $.Values.image.pullSecret | quote }}
+{{- end }}
       containers:
         - name: {{ $component }}
 {{- if $.Values.image.digest }}

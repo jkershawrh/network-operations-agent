@@ -73,6 +73,7 @@ oc -n YOUR_NAMESPACE port-forward svc/network-ops-app 8080:8080
 ```
 
 Open `http://127.0.0.1:8080` and run the same two investigations. No public Route is created. To enable optional model wording, have your environment owner provide an **existing Secret** with `NETWORK_OPS_MODEL_BASE_URL`, `NETWORK_OPS_MODEL_NAME`, and `NETWORK_OPS_MODEL_API_KEY`, then set `model.existingSecret` on Helm install. The chart does not create or print that Secret.
+If the registry image is private, create an image-pull Secret in the namespace through your approved credential process and set `image.pullSecret` to its name. Do not add registry credentials to this repository.
 
 ### Optional model wording
 
@@ -105,7 +106,7 @@ Run `make compose-down` with the same `COMPOSE` setting used to start locally. F
 - [Architecture and event flow](docs/architecture.md)
 - [Future quickstart-to-lab path](docs/future-lab-path.md)
 
-This is a synthetic educational quickstart, not proof of reduced MTTR, fewer truck rolls, production readiness, or hardware acceleration. The image has not been published to a registry, the target model has not been quality-tested, and licensing/ownership review remains open before public release.
+This is a synthetic educational quickstart, not proof of reduced MTTR, fewer truck rolls, production readiness, or hardware acceleration. An amd64 test image was published to a private Quay repository and passed an isolated OpenShift smoke test. The target model has not been quality-tested, and licensing/ownership review remains open before public release.
 
 ## Tags
 

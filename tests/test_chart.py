@@ -15,12 +15,14 @@ class ChartTests(unittest.TestCase):
             "--set", "image.repository=quay.io/example/network-operations-agent",
             "--set", "image.tag=sha-test",
             "--set", "model.existingSecret=assigned-model-key",
+            "--set", "image.pullSecret=approved-quay-pull",
         ], text=True)
         self.assertEqual(rendered.count("kind: Deployment"), 2)
         self.assertEqual(rendered.count("kind: Service"), 2)
         self.assertIn("kind: NetworkPolicy", rendered)
         self.assertNotIn("kind: Route", rendered)
         self.assertIn('name: "assigned-model-key"', rendered)
+        self.assertEqual(rendered.count('name: "approved-quay-pull"'), 2)
         self.assertNotIn("NETWORK_OPS_MODEL_API_KEY\n", rendered)
         self.assertEqual(rendered.count("readOnlyRootFilesystem: true"), 2)
         self.assertEqual(rendered.count("automountServiceAccountToken: false"), 2)

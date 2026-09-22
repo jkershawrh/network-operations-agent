@@ -5,11 +5,11 @@ stages:
       output_fields: "Every result contains quickstart contract output fields."
       evidence_provenance: "Accepted observations have timestamp, scope, signal, and provenance."
   stage_1_infrastructure:
-    state: local_stack_passed_cluster_pending
+    state: cluster_smoke_isolation_cleanup_passed
     criteria:
       local_image: "UBI image builds and fixture CLI runs; native arm64 image not verified."
       local_stack: "Two-service Compose stack and both end-to-end scenarios pass."
-      cluster_deployment: "Image digest, namespace, health, NetworkPolicy, and cleanup verified on target cluster."
+      cluster_deployment: "Pinned Quay image pulled in isolated OpenShift namespace; both pods ready and both scenarios pass through port-forward. Unrelated pod denied by NetworkPolicy; Helm uninstall and pull Secret cleanup passed."
   stage_2_unit:
     state: passing_local
     criteria:
