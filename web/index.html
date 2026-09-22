@@ -31,9 +31,22 @@
     </select>
     <button id="run">Investigate</button>
   </section>
+  <section>
+    <h2>Human review simulation</h2>
+    <p>After investigating, choose how you would handle the recommendation. This choice is not saved and never runs remediation.</p>
+    <label for="decision">Review decision</label>
+    <select id="decision">
+      <option value="approve_recommendation">Approve recommendation for follow-up</option>
+      <option value="request_more_evidence">Request more evidence</option>
+      <option value="reject">Reject recommendation</option>
+    </select>
+    <button id="review" disabled>Simulate review</button>
+    <p id="review-result" aria-live="polite"></p>
+  </section>
   <main id="result" aria-live="polite"></main>
   <script>
     const target = document.getElementById('result');
+    let currentInvestigation = null;
     function element(tag, text, parent) {
       const node = document.createElement(tag);
       node.textContent = text;
@@ -48,6 +61,9 @@
     }
     document.getElementById('run').addEventListener('click', async () => {
       target.replaceChildren();
+      currentInvestigation = null;
+      document.getElementById('review').disabled = true;
+      document.getElementById('review-result').textContent = '';
       try {
         const response = await fetch('/api/investigate', {
           method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -55,6 +71,9 @@
         });
         if (!response.ok) throw new Error('Investigation request failed');
         const result = await response.json();
+        currentInvestigation = {scenario_id: document.getElementById('scenario').value,
+                                investigation_id: result.investigation_id};
+        document.getElementById('review').disabled = false;
         const summary = section('Recommendation');
         element('p', `Hypothesis: ${result.primary_hypothesis.cause}`, summary);
         element('p', `Supporting current evidence: ${result.primary_hypothesis.supporting_evidence_ids.join(', ') || 'none'}`, summary);
@@ -83,6 +102,22 @@
         element('p', result.unknowns_and_conflicts.join('; ') || 'No diagnostic gaps in this fixture', gaps);
       } catch (error) {
         element('p', 'Unable to complete the local investigation.', target);
+      }
+    });
+    document.getElementById('review').addEventListener('click', async () => {
+      if (!currentInvestigation) return;
+      const output = document.getElementById('review-result');
+      try {
+        const response = await fetch('/api/review', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({...currentInvestigation,
+                                decision: document.getElementById('decision').value})
+        });
+        if (!response.ok) throw new Error('Review request failed');
+        const review = await response.json();
+        output.textContent = `Simulated decision: ${review.decision}. No action executed or saved.`;
+      } catch (error) {
+        output.textContent = 'Review simulation failed; no action was executed.';
       }
     });
   </script>

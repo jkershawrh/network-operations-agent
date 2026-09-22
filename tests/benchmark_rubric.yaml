@@ -1,8 +1,20 @@
 benchmark_rubric:
   version: "0.1"
-  description: "No performance benchmark applies to the deterministic fixture proof."
+  description: "No performance benchmark claim; model wording needs manual quality review."
   verification_policy:
     verified_means: "Measured in the target environment with recorded workload and model."
     public_claim_rules:
       - "Do not publish scale, latency, or hardware acceleration claims from fixture tests."
-  benchmarks: {}
+  benchmarks:
+    hardware_explanation:
+      scenario: ptp-hardware
+      review_document: docs/model-quality-rubric.md
+      proposed_minimum_score: 7
+      maximum_score: 8
+      status: unmeasured
+    platform_explanation:
+      scenario: ptp-platform
+      review_document: docs/model-quality-rubric.md
+      proposed_minimum_score: 7
+      maximum_score: 8
+      status: unmeasured

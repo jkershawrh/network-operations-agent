@@ -1,0 +1,163 @@
+openapi: 3.1.0
+info:
+  title: Network Operations Agent quickstart API
+  version: 0.1.0
+  description: Synthetic investigation and non-persistent human review.
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /health:
+    get:
+      summary: Process liveness
+      responses:
+        '200':
+          description: Process is running; this does not prove MCP or model access.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, mode]
+                properties:
+                  status: {type: string, const: ok}
+                  mode: {type: string, const: synthetic_local_proof}
+  /ready:
+    get:
+      summary: Core investigation readiness
+      responses:
+        '200':
+          description: The app can reach approved MCP tools, or direct fixtures are configured.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Readiness'}
+        '503':
+          description: Configured MCP tools are unavailable.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Readiness'}
+  /api/investigate:
+    post:
+      summary: Investigate an approved synthetic scenario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ScenarioRequest'}
+      responses:
+        '200':
+          description: Evidence-separated investigation; a model draft is optional.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Investigation'}
+        '400':
+          description: Invalid or unsupported scenario.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
+  /api/review:
+    post:
+      summary: Simulate human review without persistence or operational action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ReviewRequest'}
+      responses:
+        '200':
+          description: Simulated decision only.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ReviewResult'}
+        '400':
+          description: Invalid investigation or review decision.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
+components:
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: {type: string}
+    Readiness:
+      type: object
+      required: [status]
+      properties:
+        status: {type: string, enum: [ready, unavailable]}
+    ScenarioRequest:
+      type: object
+      additionalProperties: false
+      required: [scenario_id]
+      properties:
+        scenario_id: {type: string, enum: [ptp-hardware, ptp-platform]}
+    ReviewRequest:
+      type: object
+      additionalProperties: false
+      required: [scenario_id, investigation_id, decision]
+      properties:
+        scenario_id: {type: string, enum: [ptp-hardware, ptp-platform]}
+        investigation_id: {type: string}
+        decision: {type: string, enum: [approve_recommendation, request_more_evidence, reject]}
+    ReviewResult:
+      type: object
+      required: [investigation_id, decision, mode, action_executed]
+      properties:
+        investigation_id: {type: string}
+        decision: {type: string, enum: [approve_recommendation, request_more_evidence, reject]}
+        mode: {type: string, const: review_simulation_no_persistence}
+        action_executed: {type: boolean, const: false}
+    Observation:
+      type: object
+      required: [evidence_id, scope, signal, state, observed_at, provenance]
+      properties:
+        evidence_id: {type: string}
+        scope: {type: string, enum: [network, openshift_platform, hardware]}
+        signal: {type: string}
+        state: {type: string, enum: [present, absent]}
+        observed_at: {type: string}
+        provenance: {type: string}
+    HistoricalContext:
+      type: object
+      required: [evidence_id, source_id, source_revision, excerpt, matching_signals]
+      properties:
+        evidence_id: {type: string}
+        source_id: {type: string}
+        source_revision: {type: string}
+        excerpt: {type: string}
+        retrieval_score: {type: [integer, 'null']}
+        matching_signals: {type: array, items: {type: string}}
+    Hypothesis:
+      type: object
+      required: [cause, supporting_evidence_ids]
+      properties:
+        cause: {type: string, enum: [hardware_timing, platform_timing, inconclusive]}
+        supporting_evidence_ids: {type: array, items: {type: string}}
+    ModelDraft:
+      type: object
+      required: [status]
+      properties:
+        status: {type: string, enum: [unverified_draft_for_human_review, unavailable_or_rejected, skipped_inconclusive]}
+        summary: {type: string}
+        evidence_ids: {type: array, items: {type: string}}
+    Investigation:
+      type: object
+      required: [schema_version, investigation_id, alarm_id, current_observations_with_tool_provenance, historical_context_with_source_revision, primary_hypothesis, alternate_hypotheses, unknowns_and_conflicts, next_discriminating_test, proposed_action, action_requires_human_approval, action_executed, mode]
+      properties:
+        schema_version: {type: string}
+        investigation_id: {type: string}
+        alarm_id: {type: string}
+        current_observations_with_tool_provenance:
+          type: array
+          items: {$ref: '#/components/schemas/Observation'}
+        historical_context_with_source_revision:
+          type: array
+          items: {$ref: '#/components/schemas/HistoricalContext'}
+        primary_hypothesis: {$ref: '#/components/schemas/Hypothesis'}
+        alternate_hypotheses: {type: array, items: {type: string}}
+        unknowns_and_conflicts: {type: array, items: {type: string}}
+        next_discriminating_test: {type: string}
+        proposed_action: {type: string}
+        action_requires_human_approval: {type: boolean, const: true}
+        action_executed: {type: boolean, const: false}
+        mode: {type: string, const: deterministic_fixture_proof}
+        model_draft: {$ref: '#/components/schemas/ModelDraft'}

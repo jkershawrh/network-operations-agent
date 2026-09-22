@@ -18,6 +18,18 @@ APPROVED_TOOLS = {
 }
 
 
+def approved_tools_available(endpoint: str | object) -> bool:
+    async def check() -> bool:
+        async with Client(endpoint) as client:
+            listed = await client.list_tools()
+            return set(APPROVED_TOOLS.values()).issubset({tool.name for tool in listed.tools})
+
+    try:
+        return asyncio.run(check())
+    except Exception:
+        return False
+
+
 class MCPDiagnosticTool:
     def __init__(self, scope: str, endpoint: str | object):
         if scope not in APPROVED_TOOLS:

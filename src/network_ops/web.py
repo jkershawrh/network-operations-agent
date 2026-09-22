@@ -31,11 +31,19 @@ class LabHandler(BaseHTTPRequestHandler):
             self._send(200, INDEX.read_bytes(), "text/html; charset=utf-8")
         elif self.path == "/health":
             self._json(200, {"status": "ok", "mode": "synthetic_local_proof"})
+        elif self.path == "/ready":
+            endpoint = os.environ.get("NETWORK_OPS_MCP_URL")
+            if endpoint:
+                from .mcp_client import approved_tools_available
+                ready = approved_tools_available(endpoint)
+            else:
+                ready = True
+            self._json(200 if ready else 503, {"status": "ready" if ready else "unavailable"})
         else:
             self._json(404, {"error": "Not found"})
 
     def do_POST(self) -> None:
-        if self.path != "/api/investigate":
+        if self.path not in {"/api/investigate", "/api/review"}:
             self._json(404, {"error": "Not found"})
             return
         try:
@@ -43,13 +51,31 @@ class LabHandler(BaseHTTPRequestHandler):
             if not 1 <= length <= 1024:
                 raise ValueError("Invalid request size")
             request = json.loads(self.rfile.read(length))
-            if not isinstance(request, dict) or set(request) != {"scenario_id"}:
-                raise ValueError("Expected scenario_id only")
+            expected = {"scenario_id"} if self.path == "/api/investigate" else {
+                "scenario_id", "investigation_id", "decision"
+            }
+            if not isinstance(request, dict) or set(request) != expected:
+                raise ValueError("Unexpected request fields")
             scenario_id = request["scenario_id"]
             if not isinstance(scenario_id, str) or scenario_id not in SCENARIOS:
                 raise ValueError("Unknown synthetic scenario")
         except (ValueError, TypeError, UnicodeDecodeError):
             self._json(400, {"error": "Select an approved synthetic scenario"})
+            return
+        if self.path == "/api/review":
+            known = investigate(scenario_id)["investigation_id"]
+            if (request["investigation_id"] != known or
+                    not isinstance(request["decision"], str) or request["decision"] not in {
+                "approve_recommendation", "request_more_evidence", "reject"
+            }):
+                self._json(400, {"error": "Invalid review decision"})
+                return
+            self._json(200, {
+                "investigation_id": known,
+                "decision": request["decision"],
+                "mode": "review_simulation_no_persistence",
+                "action_executed": False,
+            })
             return
         endpoint = os.environ.get("NETWORK_OPS_MCP_URL")
         if endpoint:

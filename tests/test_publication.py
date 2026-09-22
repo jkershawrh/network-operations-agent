@@ -16,7 +16,7 @@ class PublicationTests(unittest.TestCase):
                         "Repository structure", "References", "Tags"):
             self.assertIn(f"## {heading}", text)
         self.assertIn("Telecommunications", text)
-        self.assertIn("fixture proof", text)
+        self.assertIn("synthetic data", text)
 
     def test_relative_links_exist(self):
         text = (ROOT / "README.md").read_text()

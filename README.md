@@ -1,10 +1,8 @@
 # Investigate Network Alarms with an Evidence-Backed Agent
 
-Explore a synthetic telco timing incident, compare current diagnostics with historical context, and recommend a human-reviewed next step.
+Build a read-only telco incident investigator that separates current diagnostics from historical context and proposes a human-reviewed next step.
 
-Network operations teams need to distinguish current observations from past incidents before attributing an alarm to a platform or hardware fault. This quickstart candidate teaches that decision using two contrasting synthetic scenarios. India Mobile Congress (IMC) is an audience profile, not a vendor dependency.
-
-**Status:** container-packaged synthetic proof with working MCP transport and an optional model client. It is not an orderable quickstart or deployed lab. No live network diagnostics, model-quality validation, vector RAG, or remediation exists yet.
+Network operations engineers often have to determine whether a timing alarm reflects a platform event or a hardware timestamp fault. This quickstart teaches a bounded investigation pattern with synthetic data, MCP diagnostic tools, source-aware retrieval, and an optional model-written explanation. India Mobile Congress is an audience profile, not a dependency; no Ericsson implementation or customer network data is included.
 
 ## Table of Contents
 
@@ -18,99 +16,103 @@ Network operations teams need to distinguish current observations from past inci
 
 ## Overview
 
-The learner investigates a synthetic network alarm, reviews network, platform, and hardware observations, compares approved historical excerpts, and proposes a diagnostic step for human review. Missing or contradictory diagnostics lead to abstention, never automatic resolution.
+Run two incidents with different causes: one has a NIC timestamp fault; the other has a platform timing fault. The investigator calls three read-only MCP tools, records their timestamps and provenance, retrieves only approved synthetic runbook/case excerpts relevant to the observed signals, and returns a cited hypothesis, alternatives, unknowns, and a next diagnostic test. It never executes remediation. Missing or conflicting observations lead to abstention.
+
+The core experience runs without an LLM so a participant can see which decisions came from evidence. An optional OpenAI-compatible client adds a clearly labeled, **unverified** explanation. The model cannot change the deterministic hypothesis or action boundary; drafts citing nonexistent or irrelevant evidence IDs are rejected. Structural citation checks do not establish that the prose is factually correct.
 
 ## Detailed description
 
-The local runner assembles an evidence ledger with identifiers and provenance. Fixture providers are replaceable behind bounded interfaces; an official-SDK MCP server and client exercise synthetic diagnostics over Streamable HTTP. Historical excerpts are labeled context, never live telemetry. The two scenarios point to different hypotheses. An optional OpenAI-compatible model client can draft wording, but cannot alter the hypothesis or authorize an action; its text is always labeled unverified.
-
 ### Architecture diagrams
 
-![Synthetic alarm feeds read-only diagnostics and historical context into an evidence ledger and human-reviewed recommendation](docs/images/architecture.svg)
+![A synthetic alarm flows through read-only MCP diagnostics and approved historical retrieval into an evidence ledger and human-reviewed recommendation](docs/images/architecture.svg)
 
-See the [architecture and event flow](docs/architecture.md), [lab contract](contracts/lab-contract.yaml), and [proof and onboarding gates](docs/proof-and-onboarding.md). The network data is vendor-neutral. Red Hat OpenShift and Intel hardware are reference integration boundaries, not claims of tested acceleration. Ericsson systems and branding are outside this implementation.
+The diagnostic server and client use the MCP Python SDK over Streamable HTTP. The retrieval provider ranks approved excerpts from *observed* tool signals; fixture files no longer preselect the matching incident. The quickstart therefore illustrates MCP for present state and retrieval for historical context. Retrieval is tag-based, not vector search. See the [architecture and event flow](docs/architecture.md), [quickstart contract](contracts/quickstart-contract.yaml), and [HTTP API contract](contracts/openapi/openapi.yaml).
 
 ## Requirements
 
 ### Minimum hardware requirements
 
-For the fixture proof: a computer able to run Python and a loopback service. Cluster sizing and concurrency remain unmeasured.
+For the local synthetic stack: a workstation capable of running two small containers. No measured CPU, memory, latency, concurrency, or Intel hardware minimum is claimed. The OpenShift chart contains starter resource requests, not validated capacity guidance.
 
 ### Minimum software requirements
 
-Python 3.11 or newer. The fixture-only page uses the Python standard library;
-MCP mode additionally requires `requirements-mcp.txt`. Building the optional
-image requires Podman or an equivalent container builder.
+- Docker Compose, or Podman with a Compose provider, for the two-service path.
+- Python 3.11 or newer for development/tests; install [development dependencies](requirements-dev.txt).
+- Optional: Helm 3 and the `oc` CLI for the OpenShift path.
+- Optional model: an assigned OpenAI-compatible `/v1` endpoint, model identifier, and runtime-injected API key.
 
 ### Required user permissions
 
-Permission to run a local process bound to loopback. No cluster-scoped or remediation permissions are required.
+Local container access is sufficient for the primary path. The optional OpenShift path needs permission to deploy namespaced workloads and services, apply a NetworkPolicy, pull an image, and port-forward the app. No cluster-scoped access or network-remediation permission is required.
 
 ## Deploy
 
 ### Prerequisites
 
-Use a local checkout of this directory. Do not provide credentials: fixture mode never calls an external service.
+Clone this repository. The default path uses only synthetic alarms and approved synthetic documents; do not supply real network data or credentials. The MCP server is unauthenticated and is never exposed as a public service by the provided Compose file or Helm chart.
 
-### Installation
+### Installation — local quickstart
 
-Create a virtual environment with Python 3.11 and install
-`requirements-mcp.txt`. Run `make test-all PYTHON=.venv/bin/python`, then
-`make run-local PYTHON=.venv/bin/python`. Open `http://127.0.0.1:8080`, choose
-either scenario, and select **Investigate**. For a terminal-only fixture run,
-use `PYTHONPATH=src .venv/bin/python -m network_ops ptp-hardware` or
-`ptp-platform`.
+1. Start both services with `make compose-up`. For a Podman installation without a Compose provider, use `make compose-up COMPOSE='uvx podman-compose'` (or install `podman-compose` and set `COMPOSE=podman-compose`).
+2. Open `http://127.0.0.1:8080`. Select **Timing alarm — hardware signal**, investigate, then repeat with **Timing alarm — platform signal**.
+3. Compare the three current observations and their provenance with the separately labeled historical excerpts. The matching case changes, while the runbook remains general.
+4. Use the **Human review simulation** to approve the recommendation for follow-up, request more evidence, or reject it. The response is not stored and executes nothing.
+5. Run `make smoke`. It checks both causes, all three tool observations, retrieved source IDs, and the no-action boundary.
 
-To exercise real MCP transport locally, start `make run-mcp PYTHON=.venv/bin/python`
-in another terminal, then start the web app with
-`NETWORK_OPS_MCP_URL=http://127.0.0.1:8095/mcp make run-local PYTHON=.venv/bin/python`.
-The MCP tools still read synthetic fixtures. The MCP server has no user
-authentication; keep it on loopback and do not expose it through a public Route.
+The Compose app binds to localhost. The diagnostics container is reachable only by the app on the internal network. To develop without containers, create a Python 3.11 environment, install `requirements-dev.txt`, run `make run-mcp PYTHON=.venv/bin/python` and then `NETWORK_OPS_MCP_URL=http://127.0.0.1:8095/mcp make run-local PYTHON=.venv/bin/python` in a second terminal.
 
-For optional model wording, the runtime supplies `NETWORK_OPS_MODEL_BASE_URL`
-(HTTPS URL ending in `/v1`, or loopback HTTP), `NETWORK_OPS_MODEL_NAME`, and
-`NETWORK_OPS_MODEL_API_KEY`. See [.env.example](.env.example) for names only.
-The lab must receive an assigned tenant-scoped key from its provisioner; do
-not invent a key, commit it, or expose the endpoint or key in Showroom. The
-model response is checked for references to supporting evidence IDs but its
-prose is **not** semantically verified. It remains subject to human review.
-`make build-container` builds the fixture-only UBI Python image; no registry push or cluster deployment is implied.
+### Installation — optional OpenShift path
+
+Build and publish the [UBI-based image](Containerfile) to a registry accessible to your namespace; record its immutable digest. Render and review the [Helm chart](chart/Chart.yaml) before installing. The chart creates only two Deployments, two Services, and an ingress NetworkPolicy protecting MCP. Supply `image.repository` and `image.digest`; the defaults are local placeholders and cannot be pulled by a cluster. For example, once you have an approved image and existing namespace:
+
+```sh
+helm upgrade --install network-ops chart -n YOUR_NAMESPACE \
+  --set image.repository=YOUR_REGISTRY/network-operations-agent \
+  --set image.digest=sha256:YOUR_APPROVED_DIGEST
+oc -n YOUR_NAMESPACE port-forward svc/network-ops-app 8080:8080
+```
+
+Open `http://127.0.0.1:8080` and run the same two investigations. No public Route is created. To enable optional model wording, have your environment owner provide an **existing Secret** with `NETWORK_OPS_MODEL_BASE_URL`, `NETWORK_OPS_MODEL_NAME`, and `NETWORK_OPS_MODEL_API_KEY`, then set `model.existingSecret` on Helm install. The chart does not create or print that Secret.
+
+### Optional model wording
+
+The runtime variables are listed without values in [.env.example](.env.example). A model endpoint must use HTTPS, except for loopback HTTP during local development. The key is supplied by the endpoint owner or provisioner; this repository never assigns one. The model only drafts an explanation after a supported hypothesis exists. A missing, malformed, or unsupported model response leaves the evidence-based investigation intact. Review every model sentence against the cited IDs; no target-model quality claim has been made.
+
+With an assigned endpoint, `make test-model PYTHON=.venv/bin/python` exercises both synthetic cases and prints drafts for review. Apply the [model-quality rubric](docs/model-quality-rubric.md); a passing structural check is not a factual-quality result.
 
 ### Validating the deployment
 
-`make test-all PYTHON=.venv/bin/python` runs behavior, HTTP, and MCP checks.
-`/health` reports `synthetic_local_proof`, not model or MCP connectivity.
-Confirm distinct hypotheses and `action_executed: false`.
+Create a Python 3.11 virtual environment, install `requirements-dev.txt`, and run `make test-all PYTHON=.venv/bin/python`. `helm lint chart` checks chart syntax. `make smoke` exercises a running local or port-forwarded app; the two cases must produce different hypotheses. See [quickstart validation](docs/quickstart-validation.md) for the full proof and open release gates.
 
 ### Delete
 
-Stop the local process with Ctrl-C. No participant state or secrets are stored.
+Run `make compose-down` with the same `COMPOSE` setting used to start locally. For OpenShift, run `helm uninstall network-ops -n YOUR_NAMESPACE`; the pre-existing model Secret and namespace remain untouched. Stop any port-forward with Ctrl-C.
 
 ## Repository structure
 
-- `src/network_ops/`: investigation logic, providers, CLI, and local web service.
-- `web/`: learner page for the synthetic proof.
-- `data/`: synthetic scenarios and historical excerpts.
-- `tests/`: behavior and HTTP checks.
-- `contracts/`: proposed lab interface contract.
-- `docs/`: architecture and proof gates.
-- `Containerfile`: UBI-based packaging for the synthetic proof; not a published image.
-- `requirements-mcp.txt`: pinned Python MCP SDK dependency.
-- `.env.example`: runtime variable names without credentials.
+- `src/network_ops/`: orchestration, MCP tools/client, retrieval, optional model client, web API, and smoke check.
+- `data/`: synthetic alarm scenarios and approved historical excerpts.
+- `web/`: learner-facing page.
+- `tests/`: contract, behavior, MCP, model, retrieval, HTTP, chart, and publication checks.
+- `chart/`: optional namespace-scoped OpenShift packaging; no Route or credentials.
+- `compose.yaml` and `Containerfile`: local two-service deployment on Red Hat UBI.
+- `contracts/`: quickstart output and interface contract.
+- `docs/`: architecture, validation, and a separate [future lab path](docs/future-lab-path.md).
 
 ## References
 
-- [Proof and Launchpad onboarding plan](docs/proof-and-onboarding.md)
-- [Integration decision for later source reuse](docs/architecture.md)
+- [Quickstart validation and open gates](docs/quickstart-validation.md)
+- [Architecture and event flow](docs/architecture.md)
+- [Future quickstart-to-lab path](docs/future-lab-path.md)
 
-A separate lab catalog item must not reuse the existing 201 item or unrelated RAG lab. David Kypuros's work remains an integration candidate pending source and reuse review.
+This is a synthetic educational quickstart, not proof of reduced MTTR, fewer truck rolls, production readiness, or hardware acceleration. The image has not been published to a registry, the target model has not been quality-tested, and licensing/ownership review remains open before public release.
 
 ## Tags
 
 - **Title:** Investigate Network Alarms with an Evidence-Backed Agent
-- **Description:** Synthetic telco incident investigation with current diagnostics, historical context, and human review
+- **Description:** Synthetic telco incident investigation with current MCP diagnostics, retrieved context, and human review
 - **Industry:** Telecommunications
 - **Product:** Red Hat OpenShift; Intel hardware as an optional reference integration
 - **Use case:** Network operations incident investigation
-- **Partner:** Intel (reference integration, not required by fixture mode)
-- **Contributor org:** Draft; ownership to be confirmed during intake
+- **Partner:** Intel (reference integration, not required by synthetic mode)
+- **Contributor org:** Draft; ownership to be confirmed before public release

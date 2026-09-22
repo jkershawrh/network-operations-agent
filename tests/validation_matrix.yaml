@@ -1,14 +1,15 @@
 stages:
   stage_0_contracts:
-    state: local_partial
+    state: passing_local
     criteria:
-      output_fields: "Every result contains lab contract output fields."
+      output_fields: "Every result contains quickstart contract output fields."
       evidence_provenance: "Accepted observations have timestamp, scope, signal, and provenance."
   stage_1_infrastructure:
-    state: local_image_only
+    state: local_stack_passed_cluster_pending
     criteria:
       local_image: "UBI image builds and fixture CLI runs; native arm64 image not verified."
-      cluster_deployment: "Image, route, namespace, health, and cleanup verified on target cluster."
+      local_stack: "Two-service Compose stack and both end-to-end scenarios pass."
+      cluster_deployment: "Image digest, namespace, health, NetworkPolicy, and cleanup verified on target cluster."
   stage_2_unit:
     state: passing_local
     criteria:
@@ -20,13 +21,16 @@ stages:
     criteria:
       http_journey: "Local page and API serve synthetic investigations."
       mcp_transport: "Synthetic diagnostics pass through official SDK Streamable HTTP locally."
+      retrieval: "Approved excerpts rank from present MCP observations rather than scenario preselection."
+      human_review: "Simulated review returns a decision without persistence or action."
       model_client: "Mock OpenAI-compatible response may only add unverified wording citing supporting evidence."
       live_tools_and_model: "Live authorized diagnostics and target-model quality tested without credential exposure."
   stage_4_benchmarks:
-    state: not_run
+    state: no_performance_claims
     criteria:
-      target_capacity: "Measure inference quality and workshop concurrency on target environment."
+      target_model: "Run assigned model against both scenarios and human-review its wording."
+      target_capacity: "No throughput, latency, or concurrency claim until measured."
   stage_5_publication:
     state: draft
     criteria:
-      ownership_and_intake: "Reviewed source repo and intake output with confirmed owner and license."
+      ownership_and_intake: "Reviewed source repo, confirmed owner and license, and completed quickstart intake."

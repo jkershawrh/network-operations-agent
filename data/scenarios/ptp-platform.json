@@ -6,7 +6,6 @@
   "domain": "telco-network",
   "severity": "major",
   "kpis": {"master_offset_microseconds": 95, "lock_state": "flapping"},
-  "knowledge_source_ids": ["ptp-runbook", "ptp-case-platform"],
   "diagnostics": {
     "network": {"status": "ok", "observed_at": "2026-09-22T08:31:00Z", "provenance": "synthetic-network-fixture-v1", "observations": [{"signal": "timing_alarm", "state": "present"}]},
     "openshift_platform": {"status": "ok", "observed_at": "2026-09-22T08:31:00Z", "provenance": "synthetic-platform-fixture-v1", "observations": [{"signal": "platform_timing_fault", "state": "present"}]},

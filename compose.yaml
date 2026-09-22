@@ -1,0 +1,33 @@
+name: network-operations-agent
+
+services:
+  diagnostics:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: localhost/network-operations-agent:local
+    command: ["python3", "-m", "network_ops.mcp_server"]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+  app:
+    build:
+      context: .
+      dockerfile: Containerfile
+    image: localhost/network-operations-agent:local
+    environment:
+      NETWORK_OPS_MCP_URL: http://diagnostics:8095/mcp
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on: [diagnostics]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/ready', timeout=2)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3

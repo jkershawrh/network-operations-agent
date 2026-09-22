@@ -1,15 +1,14 @@
-api_version: network-operations-agent.lab/v0.1
-status: local-fixture-proof
+api_version: network-operations-agent.quickstart/v0.1
+status: local-and-container-proof
 identity:
   source_name: network-operations-agent
   audience_profile: core-network-ops
   first_event_profile: imc-telco
-  catalog_id: null  # Assigned during Launchpad draft intake; never reuse 201.
 
-learner_contract:
+user_journey:
   objective: >-
-    Investigate a synthetic network alarm using live-like MCP diagnostics and
-    cited RAG context, then submit a human-reviewed recommendation.
+    Investigate a synthetic network alarm using read-only MCP diagnostics and
+    retrieved historical context, then review a recommendation.
   expected_duration_minutes: 35  # Planning target, not a measured completion time.
   steps:
     - inspect_alarm_and_kpis
@@ -57,15 +56,15 @@ interfaces:
     executes_action: false
 
 deployment_constraints:
-  default_scope: namespace-isolated-seat
+  default_scope: local-container-or-namespace
   cluster_scoped_access: false
   real_network_access: false
   customer_data: false
   remediation_execution: false
-  model_hosting: shared_external_service
+  model_hosting: optional_external_service
   model_name: null  # Select only after quality and tool-use testing.
   resources: unmeasured
-  images: unbuilt
+  images: local_ubi_build_only
 
 profiles:
   core-network-ops:

@@ -5,22 +5,26 @@
 | Role | Baseline responsibility | Replaceable boundary |
 | --- | --- | --- |
 | Alarm source | Emit a versioned, synthetic network event and KPI snapshot | `AlarmProvider` |
-| Orchestrator | Plan bounded diagnostic calls and compose an evidence record | `InvestigationRunner` |
+| Orchestrator | Call bounded diagnostics and compose an evidence record | `investigate` |
 | MCP tools | Return current network, platform, and hardware observations | `DiagnosticTool` |
-| Retrieval | Return approved runbook and historical incident excerpts | `KnowledgeProvider` |
+| Retrieval | Rank approved synthetic excerpts from present tool signals | `KnowledgeProvider` |
 | Model client | Help interpret evidence and draft the explanation | `ModelClient` |
-| Human reviewer | Accept, revise, or reject the proposed next action | `ReviewDecision` |
+| Human reviewer | Simulate approval, request more evidence, or reject; no persistence or action | `/api/review` |
 
-The orchestrator must not treat an MCP tool as an LLM, or a RAG excerpt as a
+The orchestrator must not treat an MCP tool as an LLM, or a retrieved excerpt as a
 live observation. Tool names and schemas are versioned so a different platform
 agent, hardware agent, or RAN vendor can be connected without rewriting the
-learner journey. The model endpoint and key are runtime configuration, not
-learner-facing source files or rendered Showroom values.
+quickstart journey. The model endpoint and key are runtime configuration, not
+source files or rendered UI values.
 
 The current build includes a synthetic read-only MCP server and client using
 Streamable HTTP. The local web process selects that path only when
 `NETWORK_OPS_MCP_URL` is configured; otherwise it uses direct fixtures. The
-MCP server is unauthenticated and must remain on loopback for development.
+MCP server is unauthenticated. Compose keeps it on an internal network; the
+OpenShift chart restricts ingress to the application pod. It must not receive
+a public Route. Retrieval is tag-based over approved synthetic excerpts and
+uses only observations accepted from tools, not a preselected answer in the
+alarm fixture.
 An optional OpenAI-compatible model client can draft an explanation after the
 deterministic hypothesis is selected. Missing/invalid model output cannot
 change the hypothesis or execute an action. The text remains unverified for
@@ -33,11 +37,11 @@ diagnostic connector, target-model quality proof, or vector retrieval is connect
 Synthetic alarm + KPI snapshot
   -> normalize event and assign investigation ID
   -> ask bounded MCP tools for current network, platform, hardware evidence
-  -> retrieve runbook and similar-incident excerpts by source/revision
+  -> retrieve approved runbook and case excerpts matching present tool signals
   -> compare current observations with historical precedent
   -> produce evidence ledger, hypothesis, alternatives, and unknowns
-  -> propose one next diagnostic or remediation step
-  -> human reviews; baseline records decision but executes nothing
+  -> propose one next diagnostic test
+  -> human simulates review; no decision is stored and nothing executes
 ```
 
 For the first scenario, a radio-site timing alarm can lead to a cross-layer
@@ -71,7 +75,5 @@ that changes those properties requires separate certification.
 ## Separation from adjacent work
 
 The existing `aiops-copilot` quickstart is a possible source of ideas, not
-evidence that this lab is implemented. The live “Building Intelligent
-Applications with Python and RAG” Showroom demonstrates retrieval and data
-pipeline concepts but is a different lab. David Kypuros's implementation
-remains an integration candidate until its source and terms are reviewed.
+proof of this quickstart's behavior. David Kypuros's implementation remains
+an integration candidate until its source and reuse terms are reviewed.

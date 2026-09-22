@@ -21,7 +21,7 @@ class DiagnosticTool(Protocol):
 
 
 class KnowledgeProvider(Protocol):
-    def retrieve(self, alarm: dict) -> list[dict]: ...
+    def retrieve(self, alarm: dict, observations: list[dict]) -> list[dict]: ...
 
 
 class FixtureAlarmProvider:
@@ -72,7 +72,17 @@ class ApprovedDiagnosticAdapter:
 
 
 class FixtureKnowledgeProvider:
-    def retrieve(self, alarm: dict) -> list[dict]:
+    def retrieve(self, alarm: dict, observations: list[dict]) -> list[dict]:
+        """Return approved synthetic excerpts relevant to present tool signals."""
         docs = json.loads((DATA / "knowledge.json").read_text())
-        allowed = set(alarm["knowledge_source_ids"])
-        return [doc for doc in docs if doc["source_id"] in allowed]
+        signals = {item["signal"] for item in observations if item["state"] == "present"}
+        ranked = []
+        for doc in docs:
+            if not doc.get("approved") or not doc.get("source_revision"):
+                continue
+            if doc.get("requires_signal") and doc["requires_signal"] not in signals:
+                continue
+            matched = sorted(signals.intersection(doc.get("tags", [])))
+            if matched:
+                ranked.append(dict(doc, retrieval_score=len(matched), matching_signals=matched))
+        return sorted(ranked, key=lambda item: (-item["retrieval_score"], item["source_id"]))[:2]

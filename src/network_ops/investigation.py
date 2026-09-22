@@ -62,15 +62,22 @@ def investigate(
         seen_scopes.add(scope)
         try:
             result = tool.inspect(alarm)
+            if not isinstance(result, dict):
+                raise ValueError("Diagnostic result must be an object")
             if result.get("status") != "ok":
                 raise ValueError("Diagnostic status is not ok")
-            if not result.get("observed_at") or not result.get("provenance"):
+            if (not isinstance(result.get("observed_at"), str) or
+                    not result["observed_at"] or
+                    not isinstance(result.get("provenance"), str) or
+                    not result["provenance"]):
                 raise ValueError("Diagnostic provenance is missing")
             findings = result.get("observations")
             if not isinstance(findings, list) or len(findings) != 1:
                 raise ValueError("Expected one bounded diagnostic observation")
             for index, finding in enumerate(findings, 1):
-                if finding.get("signal") != expected_signals[scope] or finding.get("state") not in {"present", "absent"}:
+                if (not isinstance(finding, dict) or
+                        finding.get("signal") != expected_signals[scope] or
+                        finding.get("state") not in {"present", "absent"}):
                     raise ValueError("Diagnostic observation is unsupported")
                 evidence_id = f"{scope}-{index}"
                 observations.append({
@@ -94,16 +101,23 @@ def investigate(
             unknowns.append(f"{scope} diagnostics not supplied")
 
     try:
-        retrieved = (knowledge_provider or FixtureKnowledgeProvider()).retrieve(alarm)
+        retrieved = (knowledge_provider or FixtureKnowledgeProvider()).retrieve(alarm, observations)
+        if not isinstance(retrieved, list):
+            raise ValueError("Knowledge result must be a list")
         context = [
             {
                 "evidence_id": f"knowledge-{index}",
                 "source_id": doc["source_id"],
                 "source_revision": doc["source_revision"],
                 "excerpt": doc["excerpt"],
+                "retrieval_score": doc.get("retrieval_score"),
+                "matching_signals": doc.get("matching_signals", []),
             }
-            for index, doc in enumerate(retrieved, 1)
-            if doc.get("source_id") and doc.get("source_revision") and doc.get("excerpt")
+            for index, doc in enumerate(retrieved[:5], 1)
+            if (isinstance(doc, dict) and
+                isinstance(doc.get("source_id"), str) and doc["source_id"] and
+                isinstance(doc.get("source_revision"), str) and doc["source_revision"] and
+                isinstance(doc.get("excerpt"), str) and doc["excerpt"])
         ]
         if not context:
             unknowns.append("No approved historical context retrieved")

@@ -1,0 +1,19 @@
+image:
+  # Replace with an immutable image reference that your cluster can pull.
+  repository: network-operations-agent
+  tag: local
+  digest: ""
+  pullPolicy: IfNotPresent
+
+model:
+  # Optional pre-existing Secret containing NETWORK_OPS_MODEL_BASE_URL,
+  # NETWORK_OPS_MODEL_NAME, and NETWORK_OPS_MODEL_API_KEY.
+  existingSecret: ""
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

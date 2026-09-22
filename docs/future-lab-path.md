@@ -1,4 +1,8 @@
-# Proof and Launchpad onboarding plan
+# Future lab path (not part of this quickstart release)
+
+This is a deferred quickstart-to-lab planning note. The current repository is
+a standalone quickstart; Showroom, Launchpad, seats, and catalog ordering are
+not release gates for the quickstart itself.
 
 This file is a proposed gate sequence, not a certification report. The local
 fixture tests for two distinct causes, timeout, retrieval miss, unknown

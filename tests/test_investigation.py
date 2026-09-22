@@ -35,7 +35,7 @@ class InvestigationTests(unittest.TestCase):
 
     def test_missing_retrieval_is_not_mistaken_for_current_evidence(self):
         class EmptyKnowledge:
-            def retrieve(self, alarm):
+            def retrieve(self, alarm, observations):
                 return []
 
         result = investigate("ptp-platform", knowledge_provider=EmptyKnowledge())
@@ -105,6 +105,33 @@ class InvestigationTests(unittest.TestCase):
             MislabelledHardware(),
         ])
         self.assertEqual(result["primary_hypothesis"]["cause"], "inconclusive")
+
+    def test_malformed_tool_result_abstains_instead_of_crashing(self):
+        from network_ops.providers import FixtureDiagnosticTool
+
+        class MalformedHardware:
+            scope = "hardware"
+
+            def inspect(self, alarm):
+                return ["not a diagnostic object"]
+
+        result = investigate("ptp-hardware", tools=[
+            FixtureDiagnosticTool("network"),
+            FixtureDiagnosticTool("openshift_platform"),
+            MalformedHardware(),
+        ])
+        self.assertEqual(result["primary_hypothesis"]["cause"], "inconclusive")
+        self.assertIn("hardware diagnostics unavailable: ValueError", result["unknowns_and_conflicts"])
+
+    def test_malformed_knowledge_is_a_gap_not_current_evidence(self):
+        class MalformedKnowledge:
+            def retrieve(self, alarm, observations):
+                return ["untrusted text", {"source_id": "no-revision"}]
+
+        result = investigate("ptp-platform", knowledge_provider=MalformedKnowledge())
+        self.assertEqual(result["historical_context_with_source_revision"], [])
+        self.assertEqual(result["primary_hypothesis"]["cause"], "platform_timing")
+        self.assertIn("No approved historical context retrieved", result["unknowns_and_conflicts"])
 
     def test_approved_adapter_limits_arguments_and_tool_name(self):
         from network_ops.providers import ApprovedDiagnosticAdapter, FixtureAlarmProvider
