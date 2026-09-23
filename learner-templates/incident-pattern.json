@@ -1,0 +1,21 @@
+{
+  "schema_version": "network-operations-agent.pattern/v1",
+  "pattern_id": "replace-me",
+  "title": "Replace with a synthetic incident title",
+  "synthetic_only": true,
+  "alarm": {
+    "domain": "timing",
+    "signal": "replace-me",
+    "severity": "warning"
+  },
+  "required_current_evidence": [
+    "network.replace-me",
+    "openshift_platform.replace-me",
+    "hardware.replace-me"
+  ],
+  "approved_historical_sources": ["ptp-runbook"],
+  "expected_hypothesis": "Replace with a provisional hypothesis",
+  "next_discriminating_test": "Replace with a read-only diagnostic test",
+  "action_requires_human_approval": true,
+  "action_executed": false
+}

@@ -1,0 +1,21 @@
+site:
+  title: Evidence-Backed Network Operations Agent
+  url: https://github.com/jkershawrh/network-operations-agent
+  start_page: network-operations-agent::index.adoc
+
+content:
+  sources:
+    - url: .
+      start_path: showroom
+
+ui:
+  bundle:
+    url: https://github.com/rhpds/rhdp_showroom_theme/releases/download/patternfly-6/ui-bundle.zip
+    snapshot: true
+
+asciidoc:
+  attributes:
+    showroom-collection-version: v1.6.8
+
+output:
+  dir: ./www

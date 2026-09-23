@@ -1,0 +1,85 @@
+= Show and Explain the Investigation
+:navtitle: Show and Explain
+
+== Show: confirm the isolated seat
+
+Launchpad selects the namespace assigned to your seat. Confirm that you can
+inspect namespaced resources but cannot list cluster nodes.
+
+[source,sh,role="execute",subs=attributes+]
+----
+oc whoami
+oc project -q
+test "$(oc project -q)" = "{project_name}"
+oc auth can-i get pods -n "{project_name}"
+oc auth can-i get nodes
+----
+
+The namespace check and pod permission must succeed. The final command should
+return `no`; learners do not need cluster-wide access.
+
+== Show: find the participant workspace
+
+[source,sh,role="execute",subs=attributes+]
+----
+APP_HOST="$(oc get route -n "{project_name}" \
+  -l app.kubernetes.io/name=network-operations-agent \
+  -o jsonpath='{.items[0].spec.host}')"
+APP_URL="https://$APP_HOST"
+test -n "$APP_HOST"
+curl -fsS "$APP_URL/ready" | python3 -m json.tool
+----
+
+Open the *Network Operations Workspace* tab. Run *Timing alarm — hardware
+signal*, then *Timing alarm — platform signal*.
+
+== Tell: inspect the evidence boundary
+
+Run both cases through the stable API and save the responses.
+
+[source,sh,role="execute"]
+----
+for scenario in ptp-hardware ptp-platform; do
+  curl -fsS -X POST "$APP_URL/api/investigate" \
+    -H 'Content-Type: application/json' \
+    -d "{\"scenario_id\":\"${scenario}\"}" \
+    | tee "/tmp/${scenario}.json" | python3 -m json.tool
+done
+----
+
+Compare these fields:
+
+* `current_observations_with_tool_provenance` records present-state MCP data;
+* `historical_context_with_source_revision` records retrieved precedent;
+* `primary_hypothesis` cites the current evidence supporting the cause;
+* `unknowns_and_conflicts` forces abstention when evidence is incomplete; and
+* `action_executed` remains `false`.
+
+== Verify
+
+[source,sh,role="execute"]
+----
+python3 - <<'PY'
+import json
+
+hardware = json.load(open("/tmp/ptp-hardware.json", encoding="utf-8"))
+platform = json.load(open("/tmp/ptp-platform.json", encoding="utf-8"))
+
+assert hardware["primary_hypothesis"]["cause"] == "hardware_timing"
+assert platform["primary_hypothesis"]["cause"] == "platform_timing"
+for result in (hardware, platform):
+    assert len(result["current_observations_with_tool_provenance"]) == 3
+    assert result["action_requires_human_approval"] is True
+    assert result["action_executed"] is False
+print("Evidence-backed investigation: PASS")
+PY
+----
+
+== Key takeaway
+
+MCP supplies current observations, retrieval supplies historical context, and
+the model may explain—but never replace—the deterministic evidence or human
+decision.
+
+[.next-nav]
+xref:02-build-pattern.adoc[Build a reusable incident pattern ->]

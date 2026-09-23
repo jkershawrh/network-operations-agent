@@ -1,8 +1,10 @@
-# Future lab path (not part of this quickstart release)
+# Launchpad quickstart-to-lab handoff
 
-This is a deferred quickstart-to-lab planning note. The current repository is
-a standalone quickstart; Showroom, Launchpad, seats, and catalog ordering are
-not release gates for the quickstart itself.
+This repository remains the canonical standalone quickstart. It now also owns
+the Antora learner journey, Helm deployment contract, and portable learner
+artifact needed for Launchpad onboarding. Launchpad owns environment binding,
+seat certification, catalog lifecycle, and ordering; those are not quickstart
+release gates.
 
 This file is a proposed gate sequence, not a certification report. The local
 fixture tests for two distinct causes, timeout, retrieval miss, unknown
@@ -10,10 +12,11 @@ scenario, empty diagnostics, cross-scope signals, conflicting evidence, and
 the approved-tool adapter pass. A local UBI image build and CLI smoke test
 also pass. The base image resolves to amd64 on this arm64 host, so native
 arm64 support is unverified. The synthetic MCP tools pass in-process and
-over local Streamable HTTP. A mocked OpenAI-compatible response passes the
-model client and evidence-ID checks; no actual model has been called. All live
-network diagnostics, target-model quality, cluster
-deployment, Showroom, and learner gates remain RED / not run.
+over local Streamable HTTP. The application has been deployed and exercised
+on the Oberon OpenShift cluster, and its optional model wording was validated
+against CPU-labelled Granite 8B inference. That evidence does not establish
+the placement of an external inference backend. Antora source is present, but
+the ordered Launchpad journey and multi-seat gates remain RED / not run.
 
 ## Next integration boundary
 
@@ -85,12 +88,12 @@ deployment, Showroom, and learner gates remain RED / not run.
 6. Promote only after human review. IMC audience wording does not justify a
    second runtime or duplicate catalog item.
 
-## Decision gates before implementation
+## Remaining decisions before catalog promotion
 
-- Identify the owning standalone repository and maintainers.
-- Obtain David Kypuros's source URL and reuse terms; compare against the
-  contract before importing code.
-- Agree on the target model and quality criteria after testing tool calls
-  and grounded answers on representative synthetic scenarios.
+- Confirm maintainers and the immutable source revision used by intake.
+- Bind a Launchpad-provided model Secret using `endpoint`, `name`, and
+  `api-key`; never put those values in source or rendered Showroom content.
+- Record target-model quality against both synthetic scenarios in the actual
+  participant environment.
 - Decide whether Ansible is an optional later module. If so, it needs a
   separate approval, authorization, rollback, and live certification track.

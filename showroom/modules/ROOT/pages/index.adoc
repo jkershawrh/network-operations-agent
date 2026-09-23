@@ -1,0 +1,30 @@
+= Evidence-Backed Network Operations Agent
+:navtitle: Welcome
+
+== The telco operations problem
+
+A timing alarm can originate in the network, the OpenShift platform, or the
+underlying hardware. Operators need a fast investigation without allowing an
+AI-generated explanation to become an unreviewed remediation action.
+
+In this guided build you will inspect a completed evidence-backed workflow,
+compare two synthetic incidents, and create a reusable third incident-pattern
+bundle. India Mobile Congress is an audience profile, not a dependency; the
+pattern is reusable for other telco operations scenarios.
+
+== What you will show, explain, build, and keep
+
+* *Show:* run two completed investigations with different root-cause signals.
+* *Explain:* separate current MCP diagnostics from historical context and
+  optional CPU-model wording.
+* *Build:* complete a new clock-holdover incident-pattern bundle.
+* *Keep:* download or copy the validated JSON bundle for later adaptation.
+
+== Safety boundary
+
+Use only the supplied synthetic data. The agent calls read-only diagnostic
+tools, proposes a next test, requires human review, and executes no network or
+platform change.
+
+[.next-nav]
+xref:01-investigate.adoc[Start with the working solution ->]

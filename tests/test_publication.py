@@ -1,3 +1,4 @@
+import json
 import re
 import unittest
 from pathlib import Path
@@ -16,6 +17,23 @@ class PublicationTests(unittest.TestCase):
         text = (ROOT / "README.md").read_text()
         self.assertIn("granite-3-2-8b-instruct-cpu", text)
         self.assertIn("backend placement still needs cluster-side confirmation", text)
+
+    def test_launchpad_guided_journey_and_learner_artifact(self):
+        showroom = ROOT / "showroom" / "modules" / "ROOT"
+        antora = (ROOT / "showroom" / "antora.yml").read_text()
+        nav = (showroom / "nav.adoc").read_text()
+        pages = list((showroom / "pages").glob("*.adoc"))
+        combined = "\n".join(path.read_text() for path in pages)
+        self.assertIn("name: network-operations-agent", antora)
+        for page in ("index.adoc", "01-investigate.adoc", "02-build-pattern.adoc",
+                     "conclusion.adoc"):
+            self.assertIn(page, nav)
+        self.assertGreaterEqual(combined.count('role="execute"'), 6)
+        self.assertIn("Leave with something", combined)
+        template = json.loads((ROOT / "learner-templates" / "incident-pattern.json").read_text())
+        self.assertEqual(template["schema_version"], "network-operations-agent.pattern/v1")
+        self.assertTrue(template["action_requires_human_approval"])
+        self.assertFalse(template["action_executed"])
 
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()

@@ -41,9 +41,21 @@ spec:
             - name: NETWORK_OPS_MCP_URL
               value: "http://{{ $name }}-diagnostics:8095/mcp"
 {{- if $.Values.model.existingSecret }}
-          envFrom:
-            - secretRef:
-                name: {{ $.Values.model.existingSecret | quote }}
+            - name: NETWORK_OPS_MODEL_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.model.existingSecret | quote }}
+                  key: {{ $.Values.model.secretKeys.endpoint | quote }}
+            - name: NETWORK_OPS_MODEL_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.model.existingSecret | quote }}
+                  key: {{ $.Values.model.secretKeys.name | quote }}
+            - name: NETWORK_OPS_MODEL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.model.existingSecret | quote }}
+                  key: {{ $.Values.model.secretKeys.apiKey | quote }}
 {{- end }}
 {{- end }}
           ports:

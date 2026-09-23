@@ -8,9 +8,18 @@ image:
   pullSecret: ""
 
 model:
-  # Optional pre-existing Secret containing NETWORK_OPS_MODEL_BASE_URL,
-  # NETWORK_OPS_MODEL_NAME, and NETWORK_OPS_MODEL_API_KEY.
+  # Optional pre-existing Secret. Launchpad creates this per seat.
   existingSecret: ""
+  secretKeys:
+    endpoint: endpoint
+    name: name
+    apiKey: api-key
+
+route:
+  # Keep the portable quickstart private by default. Launchpad enables this
+  # for the participant workspace after applying its exposure policy.
+  enabled: false
+  name: ""
 
 resources:
   requests:

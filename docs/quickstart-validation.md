@@ -49,10 +49,11 @@ it does not establish the backend placement of the separate RACMaaS route.
   service, while the app could. The Helm release, probe pod, and namespace-
   local pull Secret were removed after testing. The target-cluster image
   pull, readiness, HTTP journey, ingress isolation, and uninstall path are
-  therefore verified. The chart creates no public Route or model Secret.
+  therefore verified. The chart creates no model Secret and keeps its Route
+  disabled unless a delivery platform explicitly enables it.
 - Avoid MTTR, truck-roll, hardware-acceleration, latency, or capacity claims
   until measured in the target environment. The two synthetic incidents are
   instructional examples, not evidence of operational performance.
 
-The [future lab path](future-lab-path.md) is separate from these quickstart
-gates.
+The source-owned Antora journey implements the Launchpad guided-build path;
+Launchpad discovery and live seat certification remain separate gates.

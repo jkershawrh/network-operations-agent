@@ -1,5 +1,5 @@
 api_version: network-operations-agent.quickstart/v0.1
-status: local-and-container-proof
+status: launchpad-source-ready-draft
 identity:
   source_name: network-operations-agent
   audience_profile: core-network-ops
@@ -62,9 +62,14 @@ deployment_constraints:
   customer_data: false
   remediation_execution: false
   model_hosting: optional_external_service
-  model_name: null  # Select only after quality and tool-use testing.
+  model_name: null  # Launchpad supplies the selected model through a Secret.
   resources: unmeasured
-  images: local_ubi_build_only
+  images: source_build_and_private_registry_proof
+  launchpad:
+    guided_content: showroom
+    application_route: opt_in
+    model_secret_keys: [endpoint, name, api-key]
+    ordered_seat_certification: not_run
 
 profiles:
   core-network-ops:
@@ -73,9 +78,3 @@ profiles:
     derives_from: core-network-ops
     may_change: [narrative, examples, vocabulary, synthetic_fixtures]
     must_not_change: [permissions, model, images, resource_envelope, action_authority]
-
-integration_candidates:
-  david_kypuros:
-    source: unknown
-    reuse_terms: unknown
-    status: await_source_and_review

@@ -1,0 +1,90 @@
+= Build a Reusable Incident Pattern
+:navtitle: Build a Pattern
+
+== Build: complete a clock-holdover pattern
+
+Create a learner-owned JSON bundle in your persistent terminal home. Set a
+concise hypothesis and a safe next diagnostic test in the first two lines.
+You may keep the example values or change them based on your investigation.
+Do not add an automated remediation command.
+
+[source,sh,role="execute"]
+----
+HYPOTHESIS="The upstream timing source is unavailable; local timing services and NIC timestamping remain healthy."
+NEXT_TEST="Inspect the approved upstream grandmaster lock and reachability signals."
+
+cat > "$HOME/clock-holdover-pattern.json" <<JSON
+{
+  "schema_version": "network-operations-agent.pattern/v1",
+  "pattern_id": "clock-holdover",
+  "title": "PTP clock entered holdover",
+  "synthetic_only": true,
+  "alarm": {
+    "domain": "timing",
+    "signal": "clock_holdover",
+    "severity": "warning"
+  },
+  "required_current_evidence": [
+    "network.clock_holdover",
+    "openshift_platform.timing_service_health",
+    "hardware.nic_timestamp_health"
+  ],
+  "approved_historical_sources": ["ptp-runbook"],
+  "expected_hypothesis": "${HYPOTHESIS}",
+  "next_discriminating_test": "${NEXT_TEST}",
+  "action_requires_human_approval": true,
+  "action_executed": false
+}
+JSON
+----
+
+Suggested direction: determine whether holdover is caused by loss of an
+upstream timing source or by a local platform/hardware fault, and inspect
+current lock state before proposing any change.
+
+== Verify: validate the portable contract
+
+[source,sh,role="execute"]
+----
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+path = Path.home() / "clock-holdover-pattern.json"
+pattern = json.loads(path.read_text(encoding="utf-8"))
+
+required = {
+    "schema_version", "pattern_id", "title", "synthetic_only", "alarm",
+    "required_current_evidence", "approved_historical_sources",
+    "expected_hypothesis", "next_discriminating_test",
+    "action_requires_human_approval", "action_executed",
+}
+assert set(pattern) == required
+assert pattern["schema_version"] == "network-operations-agent.pattern/v1"
+assert pattern["synthetic_only"] is True
+assert len(pattern["required_current_evidence"]) >= 3
+assert pattern["approved_historical_sources"]
+assert pattern["expected_hypothesis"] not in {"", "TODO"}
+assert pattern["next_discriminating_test"] not in {"", "TODO"}
+assert pattern["action_requires_human_approval"] is True
+assert pattern["action_executed"] is False
+print(f"Incident pattern valid: {path}")
+PY
+----
+
+== Leave with something
+
+Display the completed artifact and copy or download it from the terminal:
+
+[source,sh,role="execute"]
+----
+python3 -m json.tool "$HOME/clock-holdover-pattern.json"
+sha256sum "$HOME/clock-holdover-pattern.json"
+----
+
+The bundle is intentionally vendor-neutral. A solution team can later map its
+evidence names to approved network, platform, and hardware MCP tools without
+changing the human-approval boundary.
+
+[.next-nav]
+xref:conclusion.adoc[Review what you proved ->]

@@ -1,0 +1,27 @@
+= Review and Next Steps
+:navtitle: Conclusion
+
+== What you proved
+
+You ran two evidence-backed telco investigations, distinguished current MCP
+diagnostics from retrieved historical context, confirmed that no remediation
+was executed, and created a validated third incident-pattern bundle.
+
+== What you leave with
+
+`$HOME/clock-holdover-pattern.json` is your reusable artifact. It captures the
+alarm, required evidence, approved source boundary, expected hypothesis, next
+test, and mandatory human review. Adapt the pattern only with synthetic or
+approved data until the relevant network, security, privacy, and operations
+owners approve a real integration.
+
+== The reusable architecture
+
+The learner experience is telco-specific; the control pattern is not:
+
+* collect bounded current evidence;
+* retrieve approved historical context;
+* make uncertainty visible;
+* use CPU inference only for optional wording;
+* require human review; and
+* export a testable pattern rather than an automated change.

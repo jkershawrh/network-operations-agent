@@ -1,0 +1,19 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ default (printf "%s-app" (include "network-operations-agent.fullname" .)) .Values.route.name }}
+  labels:
+    app.kubernetes.io/name: network-operations-agent
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: app
+spec:
+  to:
+    kind: Service
+    name: {{ include "network-operations-agent.fullname" . }}-app
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}

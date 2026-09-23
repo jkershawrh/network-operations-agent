@@ -1,0 +1,4 @@
+* xref:index.adoc[Welcome]
+* xref:01-investigate.adoc[Show and explain]
+* xref:02-build-pattern.adoc[Build an incident pattern]
+* xref:conclusion.adoc[Take the pattern with you]

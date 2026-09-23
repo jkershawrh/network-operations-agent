@@ -1,0 +1,15 @@
+name: network-operations-agent
+version: main
+title: Evidence-Backed Network Operations Agent
+start_page: index.adoc
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    user: '%user%'
+    guid: '%guid%'
+    project_name: '%namespace%'
+    cluster_display_name: '%cluster_display_name%'
+    openshift_console_url: '%openshift_console_url%'
+    model_name: '%maas_model%'

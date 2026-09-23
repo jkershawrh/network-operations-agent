@@ -73,7 +73,7 @@ helm upgrade --install network-ops chart -n YOUR_NAMESPACE \
 oc -n YOUR_NAMESPACE port-forward svc/network-ops-app 8080:8080
 ```
 
-Open `http://127.0.0.1:8080` and run the same two investigations. No public Route is created. To enable optional model wording, have your environment owner provide an **existing Secret** with `NETWORK_OPS_MODEL_BASE_URL`, `NETWORK_OPS_MODEL_NAME`, and `NETWORK_OPS_MODEL_API_KEY`, then set `model.existingSecret` on Helm install. The chart does not create or print that Secret.
+Open `http://127.0.0.1:8080` and run the same two investigations. No public Route is created by default. Launchpad can explicitly set `route.enabled=true` for its participant workspace. To enable optional model wording, have your environment owner provide an **existing Secret** with keys `endpoint`, `name`, and `api-key`, then set `model.existingSecret` on Helm install. The chart maps those keys to the application environment and never creates or prints the Secret.
 If the registry image is private, create an image-pull Secret in the namespace through your approved credential process and set `image.pullSecret` to its name. Do not add registry credentials to this repository.
 
 ### Optional model wording
@@ -98,10 +98,12 @@ Run `make compose-down` with the same `COMPOSE` setting used to start locally. F
 - `data/`: synthetic alarm scenarios and approved historical excerpts.
 - `web/`: learner-facing page.
 - `tests/`: contract, behavior, MCP, model, retrieval, HTTP, chart, and publication checks.
-- `chart/`: optional namespace-scoped OpenShift packaging; no Route or credentials.
+- `chart/`: namespace-scoped OpenShift packaging with an opt-in participant Route and existing-Secret integration.
+- `showroom/` and `site.yml`: source-owned Antora guided journey for Launchpad.
+- `learner-templates/`: reusable incident-pattern artifact starter.
 - `compose.yaml` and `Containerfile`: local two-service deployment on Red Hat UBI.
 - `contracts/`: quickstart output and interface contract.
-- `docs/`: architecture, validation, and a separate [future lab path](docs/future-lab-path.md).
+- `docs/`: architecture, validation, and Launchpad conversion notes.
 
 ## References
 

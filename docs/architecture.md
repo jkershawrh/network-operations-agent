@@ -22,7 +22,8 @@ Streamable HTTP. The local web process selects that path only when
 `NETWORK_OPS_MCP_URL` is configured; otherwise it uses direct fixtures. The
 MCP server is unauthenticated. Compose keeps it on an internal network; the
 OpenShift chart restricts ingress to the application pod. It must not receive
-a public Route. Retrieval is tag-based over approved synthetic excerpts and
+any Route. The chart can expose only the learner-facing application through an
+opt-in Launchpad participant Route. Retrieval is tag-based over approved synthetic excerpts and
 uses only observations accepted from tools, not a preselected answer in the
 alarm fixture.
 An optional OpenAI-compatible model client can draft an explanation after the
