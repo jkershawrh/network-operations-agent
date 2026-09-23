@@ -1,5 +1,15 @@
 name: Local proof
 on:
+  workflow_dispatch:
+    inputs:
+      publish_candidate:
+        description: Publish a signed, non-production Launchpad candidate to GHCR
+        type: boolean
+        default: false
+      expected_revision:
+        description: Exact 40-character source commit to publish
+        type: string
+        required: false
   push:
   pull_request:
 jobs:
@@ -26,3 +36,108 @@ jobs:
       - run: make smoke
       - if: always()
         run: docker compose -f compose.yaml down
+
+  publish_candidate:
+    name: Signed Launchpad intake candidate
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_candidate == true && github.ref == 'refs/heads/main' }}
+    needs: tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    env:
+      IMAGE_REPOSITORY: ghcr.io/jkershawrh/network-operations-agent
+      EXPECTED_REVISION: ${{ inputs.expected_revision }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Fail closed before registry writes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$EXPECTED_REVISION" =~ ^[0-9a-f]{40}$ || "$EXPECTED_REVISION" != "$GITHUB_SHA" ]]; then
+            echo "Expected revision must equal the dispatched source commit" >&2
+            exit 1
+          fi
+          if [[ "$GITHUB_REPOSITORY" != jkershawrh/network-operations-agent ]]; then
+            echo "Candidate publication is restricted to the reviewed source repository" >&2
+            exit 1
+          fi
+          echo "IMAGE_TAG=intake-${GITHUB_SHA:0:12}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_ENV"
+      - name: Build and smoke-test the exact linux/amd64 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          podman build --platform linux/amd64 \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
+            -t "localhost/network-operations-agent:$IMAGE_TAG" -f Containerfile .
+          cid="$(podman run -d --platform linux/amd64 -p 18080:8080 "localhost/network-operations-agent:$IMAGE_TAG")"
+          trap 'podman rm -f "$cid" >/dev/null 2>&1 || true' EXIT
+          for attempt in {1..30}; do
+            curl -fsS http://127.0.0.1:18080/ready >/dev/null && break
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:18080/ready | jq -e '.ready == true'
+          for scenario in ptp-hardware ptp-platform; do
+            curl -fsS -X POST http://127.0.0.1:18080/api/investigate \
+              -H 'Content-Type: application/json' \
+              -d "{\"scenario_id\":\"$scenario\"}" | jq -e '.action_executed == false'
+          done
+      - name: Authenticate to GHCR
+        shell: bash
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$RUNNER_TEMP/registry-auth"
+          printf '%s' "$REGISTRY_TOKEN" | podman login \
+            --authfile "$RUNNER_TEMP/registry-auth/config.json" \
+            --username "$GITHUB_ACTOR" --password-stdin ghcr.io
+          echo "REGISTRY_AUTH_FILE=$RUNNER_TEMP/registry-auth/config.json" >> "$GITHUB_ENV"
+      - name: Push uniquely tagged candidate and capture digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          podman tag "localhost/network-operations-agent:$IMAGE_TAG" "$IMAGE_REPOSITORY:$IMAGE_TAG"
+          podman push --authfile "$REGISTRY_AUTH_FILE" \
+            --digestfile "$RUNNER_TEMP/image.digest" "$IMAGE_REPOSITORY:$IMAGE_TAG"
+          digest="$(< "$RUNNER_TEMP/image.digest")"
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "IMAGE_REF=$IMAGE_REPOSITORY@$digest" >> "$GITHUB_ENV"
+      - uses: sigstore/cosign-installer@ba7bc0a3fef59531c69a25acd34668d6d3fe6f22
+      - name: Generate candidate SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610
+        with:
+          image: ${{ env.IMAGE_REF }}
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          output-file: ${{ runner.temp }}/candidate.spdx.json
+          format: spdx-json
+          upload-artifact: false
+          upload-release-assets: false
+      - name: Sign, attest, and verify the immutable digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          jq -n --arg repository "https://github.com/$GITHUB_REPOSITORY" \
+            --arg revision "$GITHUB_SHA" --arg image "$IMAGE_REF" \
+            --arg workflow "https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            '{source_repository:$repository,source_revision:$revision,subject_image:$image,workflow_run:$workflow,build_platform:"linux/amd64"}' \
+            > "$RUNNER_TEMP/source-provenance.json"
+          cosign sign --yes "$IMAGE_REF"
+          cosign attest --yes --type spdxjson --predicate "$RUNNER_TEMP/candidate.spdx.json" "$IMAGE_REF"
+          cosign attest --yes --type custom --predicate "$RUNNER_TEMP/source-provenance.json" "$IMAGE_REF"
+          identity="https://github.com/$GITHUB_REPOSITORY/.github/workflows/ci.yaml@refs/heads/main"
+          issuer="https://token.actions.githubusercontent.com"
+          cosign verify --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$IMAGE_REF" >/dev/null
+          cosign verify-attestation --type spdxjson --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$IMAGE_REF" >/dev/null
+          cosign verify-attestation --type custom --certificate-identity="$identity" --certificate-oidc-issuer="$issuer" "$IMAGE_REF" >/dev/null
+          {
+            echo "Candidate image: $IMAGE_REF"
+            echo "Source revision: $GITHUB_SHA"
+            echo "Status: signed one-seat candidate; no catalog activation"
+          } >> "$GITHUB_STEP_SUMMARY"
