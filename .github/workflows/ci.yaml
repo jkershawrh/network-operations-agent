@@ -74,13 +74,28 @@ jobs:
             --label "org.opencontainers.image.revision=$GITHUB_SHA" \
             --label "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
             -t "localhost/network-operations-agent:$IMAGE_TAG" -f Containerfile .
-          cid="$(podman run -d --platform linux/amd64 -p 18080:8080 "localhost/network-operations-agent:$IMAGE_TAG")"
-          trap 'podman rm -f "$cid" >/dev/null 2>&1 || true' EXIT
+          network="candidate-$GITHUB_RUN_ID"
+          podman network create "$network"
+          diagnostics="$(podman run -d --platform linux/amd64 --network "$network" \
+            --name candidate-diagnostics "localhost/network-operations-agent:$IMAGE_TAG" \
+            python3 -m network_ops.mcp_server)"
+          app="$(podman run -d --platform linux/amd64 --network "$network" \
+            -e NETWORK_OPS_MCP_URL=http://candidate-diagnostics:8095/mcp \
+            -p 18080:8080 "localhost/network-operations-agent:$IMAGE_TAG")"
+          cleanup() {
+            podman rm -f "$app" "$diagnostics" >/dev/null 2>&1 || true
+            podman network rm "$network" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
           for attempt in {1..30}; do
             curl -fsS http://127.0.0.1:18080/ready >/dev/null && break
             sleep 2
           done
-          curl -fsS http://127.0.0.1:18080/ready | jq -e '.ready == true'
+          if ! curl -fsS http://127.0.0.1:18080/ready | jq -e '.ready == true'; then
+            podman logs "$diagnostics" || true
+            podman logs "$app" || true
+            exit 1
+          fi
           for scenario in ptp-hardware ptp-platform; do
             curl -fsS -X POST http://127.0.0.1:18080/api/investigate \
               -H 'Content-Type: application/json' \
