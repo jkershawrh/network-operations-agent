@@ -112,6 +112,7 @@ jobs:
           printf '%s' "$REGISTRY_TOKEN" | podman login \
             --authfile "$RUNNER_TEMP/registry-auth/config.json" \
             --username "$GITHUB_ACTOR" --password-stdin ghcr.io
+          echo "DOCKER_CONFIG=$RUNNER_TEMP/registry-auth" >> "$GITHUB_ENV"
           echo "REGISTRY_AUTH_FILE=$RUNNER_TEMP/registry-auth/config.json" >> "$GITHUB_ENV"
       - name: Push uniquely tagged candidate and capture digest
         shell: bash
