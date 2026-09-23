@@ -97,6 +97,12 @@ class ModelTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             OpenAICompatibleModel("http://model.example/v1", "model", "key")
 
+    def test_allows_kubernetes_service_plain_http(self):
+        model = OpenAICompatibleModel(
+            "http://granite.model-serving.svc:8080/v1", "model", "key"
+        )
+        self.assertEqual(model._url, "http://granite.model-serving.svc:8080/v1/chat/completions")
+
 
 if __name__ == "__main__":
     unittest.main()

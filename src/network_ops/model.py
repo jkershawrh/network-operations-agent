@@ -22,10 +22,16 @@ class OpenAICompatibleModel:
 
     def __init__(self, base_url: str, model: str, api_key: str):
         parts = urlsplit(base_url)
+        plain_http_host = parts.hostname or ""
+        plain_http_allowed = (
+            plain_http_host in {"127.0.0.1", "localhost"}
+            or plain_http_host.endswith(".svc")
+            or plain_http_host.endswith(".svc.cluster.local")
+        )
         if (not parts.hostname or parts.username or parts.password or parts.query or
                 parts.fragment or parts.scheme not in {"http", "https"} or
-                (parts.scheme == "http" and parts.hostname not in {"127.0.0.1", "localhost"})):
-            raise ValueError("Model endpoint must be HTTPS or local loopback HTTP")
+                (parts.scheme == "http" and not plain_http_allowed)):
+            raise ValueError("Model endpoint must be HTTPS, loopback HTTP, or Kubernetes service HTTP")
         if not model or not api_key or "%" in base_url or "%" in model or "%" in api_key:
             raise ValueError("Model runtime configuration is incomplete")
         self._url = base_url.rstrip("/") + "/chat/completions"
