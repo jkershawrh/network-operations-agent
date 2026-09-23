@@ -1,36 +1,44 @@
+schema_version: quickstart.redhat.com/validation-matrix/v1
 stages:
-  stage_0_contracts:
+  - id: stage-0-contracts
+    name: Contracts and evidence provenance
+    method: CDD
+    threshold: 100
+    required: true
     state: passing_local
-    criteria:
-      output_fields: "Every result contains quickstart contract output fields."
-      evidence_provenance: "Accepted observations have timestamp, scope, signal, and provenance."
-  stage_1_infrastructure:
+    checks: [output-fields, evidence-provenance, no-action-boundary]
+  - id: stage-1-infrastructure
+    name: Namespace deployment and isolation
+    method: EDD
+    threshold: 100
+    required: true
     state: cluster_smoke_isolation_cleanup_passed
-    criteria:
-      local_image: "UBI image builds and fixture CLI runs; native arm64 image not verified."
-      local_stack: "Two-service Compose stack and both end-to-end scenarios pass."
-      cluster_deployment: "Pinned Quay image pulled in isolated OpenShift namespace; both pods ready and both scenarios pass through port-forward. Unrelated pod denied by NetworkPolicy; Helm uninstall and pull Secret cleanup passed."
-  stage_2_unit:
+    checks: [ubi-image, compose-stack, helm-render, network-policy, cleanup]
+  - id: stage-2-unit
+    name: Deterministic investigation
+    method: TDD
+    threshold: 100
+    required: true
     state: passing_local
-    criteria:
-      distinct_causes: "Hardware and platform scenarios lead to distinct supported hypotheses."
-      abstention: "Missing, cross-scope, or conflicting diagnostics cannot produce a confident cause."
-      human_review: "Every result requires approval and never executes an action."
-  stage_3_integration:
+    checks: [distinct-causes, abstention, human-review]
+  - id: stage-3-integration
+    name: MCP, retrieval, API, and optional model
+    method: EDD
+    threshold: 90
+    required: true
     state: local_mcp_and_direct_model_synthetic_only
-    criteria:
-      http_journey: "Local page and API serve synthetic investigations."
-      mcp_transport: "Synthetic diagnostics pass through official SDK Streamable HTTP locally."
-      retrieval: "Approved excerpts rank from present MCP observations rather than scenario preselection."
-      human_review: "Simulated review returns a decision without persistence or action."
-      model_client: "Mock OpenAI-compatible response may only add unverified wording citing supporting evidence."
-      live_tools_and_model: "Synthetic MCP diagnostics tested locally and on OpenShift. Direct RACMaaS CPU-labeled Granite 8B reviewed on both fixtures; separate Oberon CPU-only Granite 8B path checked. RACMaaS backend CPU placement, tenant gateway, and live network tools not verified."
-  stage_4_benchmarks:
-    state: two_fixture_model_review_no_performance_claims
-    criteria:
-      target_model: "Run assigned model against both scenarios and human-review its wording."
-      target_capacity: "No throughput, latency, or concurrency claim until measured."
-  stage_5_publication:
-    state: draft
-    criteria:
-      ownership_and_intake: "Reviewed source repo, confirmed owner and license, and completed quickstart intake."
+    checks: [http-journey, mcp-transport, retrieval, model-fallback]
+  - id: stage-4-benchmarks
+    name: Target model and capacity evidence
+    method: BDD
+    threshold: 100
+    required: true
+    state: target_capacity_unmeasured
+    checks: [two-scenario-quality-review, one-five-twenty-five-seat-capacity]
+  - id: stage-5-publication
+    name: Publication and guided journey
+    method: CBT
+    threshold: 100
+    required: true
+    state: source_ready_launchpad_draft
+    checks: [business-readme, antora-build, learner-artifact, claim-audit]

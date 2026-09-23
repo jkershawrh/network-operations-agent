@@ -1,7 +1,13 @@
 = Show and Explain the Investigation
 :navtitle: Show and Explain
 
-== Show: confirm the isolated seat
+== What you will learn
+
+* Confirm that a Launchpad seat is namespace-scoped.
+* Compare hardware and platform timing evidence.
+* Explain the boundary between MCP observations, retrieved history, and model wording.
+
+== See: confirm the isolated seat
 
 Launchpad selects the namespace assigned to your seat. Confirm that you can
 inspect namespaced resources but cannot list cluster nodes.

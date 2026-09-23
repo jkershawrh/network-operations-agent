@@ -1,6 +1,18 @@
 = Build a Reusable Incident Pattern
 :navtitle: Build a Pattern
 
+== What you will learn
+
+* Encode a synthetic incident as a portable evidence contract.
+* Preserve read-only diagnostics and mandatory human review.
+* Validate and retain the completed artifact.
+
+== See: the portable pattern contract
+
+The pattern separates an alarm, required current evidence, approved historical
+sources, a provisional hypothesis, and the next read-only test. It deliberately
+contains no remediation command or vendor-specific tool endpoint.
+
 == Build: complete a clock-holdover pattern
 
 Create a learner-owned JSON bundle in your persistent terminal home. Set a
@@ -42,7 +54,7 @@ Suggested direction: determine whether holdover is caused by loss of an
 upstream timing source or by a local platform/hardware fault, and inspect
 current lock state before proposing any change.
 
-== Verify: validate the portable contract
+=== Verify
 
 [source,sh,role="execute"]
 ----
@@ -85,6 +97,11 @@ sha256sum "$HOME/clock-holdover-pattern.json"
 The bundle is intentionally vendor-neutral. A solution team can later map its
 evidence names to approved network, platform, and hardware MCP tools without
 changing the human-approval boundary.
+
+== Key takeaway
+
+A reusable agent pattern is a bounded evidence and decision contract—not a
+prompt that silently gains permission to change the network.
 
 [.next-nav]
 xref:conclusion.adoc[Review what you proved ->]

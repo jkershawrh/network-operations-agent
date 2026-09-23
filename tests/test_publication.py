@@ -38,7 +38,7 @@ class PublicationTests(unittest.TestCase):
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()
         title = text.splitlines()[0]
-        self.assertTrue(title.startswith("# Investigate "))
+        self.assertTrue(title.startswith("# Analyze "))
         self.assertLessEqual(len(title[2:]), 64)
         for heading in ("Overview", "Detailed description", "Requirements", "Deploy",
                         "Repository structure", "References", "Tags"):

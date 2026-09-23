@@ -1,4 +1,4 @@
-# Investigate Network Alarms with an Evidence-Backed Agent
+# Analyze Network Alarms with an Evidence-Backed Agent
 
 Build a read-only telco incident investigator that separates current diagnostics from historical context and proposes a human-reviewed next step.
 
@@ -8,6 +8,7 @@ Network operations engineers often have to determine whether a timing alarm refl
 
 - [Overview](#overview)
 - [Detailed description](#detailed-description)
+- [Architecture](#architecture)
 - [Requirements](#requirements)
 - [Deploy](#deploy)
 - [Repository structure](#repository-structure)
@@ -23,7 +24,7 @@ The core experience runs without an LLM so a participant can see which decisions
 
 ## Detailed description
 
-### Architecture diagrams
+## Architecture
 
 ![A synthetic alarm flows through read-only MCP diagnostics and approved historical retrieval into an evidence ledger and human-reviewed recommendation](docs/images/architecture.svg)
 
@@ -119,7 +120,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Tags
 
-- **Title:** Investigate Network Alarms with an Evidence-Backed Agent
+- **Title:** Analyze Network Alarms with an Evidence-Backed Agent
 - **Description:** Synthetic telco incident investigation with current MCP diagnostics, retrieved context, and human review
 - **Industry:** Telecommunications
 - **Product:** Red Hat OpenShift; Intel hardware as an optional reference integration
