@@ -12,15 +12,15 @@ benchmarks:
     proposed_minimum_score: 7
     maximum_score: 8
     required: true
-    status: limited_direct_model_review
+    status: flightpath_one_seat_passed_8_of_8
   - id: platform-explanation-quality
     scenario: ptp-platform
     review_document: docs/model-quality-rubric.md
     proposed_minimum_score: 7
     maximum_score: 8
     required: true
-    status: limited_direct_model_review
+    status: flightpath_one_seat_passed_8_of_8
   - id: launchpad-seat-capacity
     sequence: [1, 5, 25]
     required: true
-    status: unmeasured
+    status: one_seat_passed_five_and_twenty_five_not_run

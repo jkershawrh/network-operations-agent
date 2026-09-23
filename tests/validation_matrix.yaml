@@ -26,19 +26,19 @@ stages:
     method: EDD
     threshold: 90
     required: true
-    state: local_mcp_and_direct_model_synthetic_only
+    state: flightpath_one_seat_live_passed
     checks: [http-journey, mcp-transport, retrieval, model-fallback]
   - id: stage-4-benchmarks
     name: Target model and capacity evidence
     method: BDD
     threshold: 100
     required: true
-    state: target_capacity_unmeasured
+    state: flightpath_one_seat_quality_passed_scale_promotion_not_run
     checks: [two-scenario-quality-review, one-five-twenty-five-seat-capacity]
   - id: stage-5-publication
     name: Publication and guided journey
     method: CBT
     threshold: 100
     required: true
-    state: source_ready_launchpad_draft
+    state: flightpath_one_seat_guided_journey_passed
     checks: [business-readme, antora-build, learner-artifact, claim-audit]

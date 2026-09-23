@@ -57,3 +57,31 @@ it does not establish the backend placement of the separate RACMaaS route.
 
 The source-owned Antora journey implements the Launchpad guided-build path;
 Launchpad discovery and live seat certification remain separate gates.
+
+## Flightpath one-seat certification
+
+On 2026-09-23, Launchpad provisioned one complete seat on Flightpath from
+source revision `4ae303791d2b0060d0a198852f16dc6ef4ffefa4` and image digest
+`sha256:8595d9a490b6d300ca9d821249e97b5d5634239012c91decede7995f60228bbb`.
+The seat used the Flightpath LiteLLM gateway and the Flightpath CPU vLLM
+deployment for `granite-3.2-8b-tools`; RACMaaS was not part of this path.
+
+The certification proved:
+
+- immutable source and image references, remote source validation, and a full
+  Antora build;
+- ready application, diagnostics, and four-container Showroom pods;
+- admitted workspace and Showroom Routes, with no Route for the internal MCP
+  diagnostics service and a namespace NetworkPolicy protecting that service;
+- rejection of missing and invalid model keys with HTTP 401 and acceptance of
+  the Launchpad-issued virtual key;
+- correct hardware and platform hypotheses, current observations separated
+  from revisioned historical context, accurate evidence citations, explicit
+  human review, and no automatic action;
+- rejection of an unapproved live-input scenario with HTTP 400;
+- an 8/8 human rubric score for each synthetic scenario; and
+- successful reclaim, LiteLLM virtual-key revocation, removal of the tenant
+  namespace, and zero residual Argo CD applications.
+
+This certifies a maximum of one seat on Flightpath. Five- and 25-seat capacity
+promotion remain untested and must not be inferred from this result.
