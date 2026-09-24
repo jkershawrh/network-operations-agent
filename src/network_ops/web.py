@@ -34,7 +34,11 @@ class LabHandler(BaseHTTPRequestHandler):
         if self.path == "/":
             self._send(200, INDEX.read_bytes(), "text/html; charset=utf-8")
         elif self.path == "/health":
-            self._json(200, {"status": "ok", "mode": "synthetic_local_proof"})
+            self._json(200, {
+                "status": "ok",
+                "mode": "synthetic_local_proof",
+                "lab_mode": _lab_enabled(),
+            })
         elif self.path == "/ready":
             endpoint = os.environ.get("NETWORK_OPS_MCP_URL")
             if endpoint:

@@ -1,7 +1,7 @@
 site:
   title: Evidence-Backed Network Operations Lab
   url: https://github.com/jkershawrh/network-operations-agent
-  start_page: network-operations-agent-lab::index.adoc
+  start_page: network-operations-agent::index.adoc
 
 content:
   sources:

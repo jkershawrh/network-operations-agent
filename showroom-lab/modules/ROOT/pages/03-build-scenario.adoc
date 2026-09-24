@@ -68,6 +68,23 @@ jq '{cause:.primary_hypothesis.cause,support:.primary_hypothesis.supporting_evid
 
 Checkpoint: the cause is `upstream_timing`, the support points to `upstream_timing-1`, and no action was executed. Save `/tmp/my-scenario.json`; it is your first take-away artifact.
 
+== Visualize the learner-authored incident
+
+Return to the *Application* workspace. In *Learner scenario workspace*, paste
+the contents of `/tmp/my-scenario.json` and select *Investigate learner
+scenario*. The visible case should now advance beyond the two quickstart
+fixtures and show:
+
+* hypothesis `upstream_timing`;
+* supporting evidence `upstream_timing-1`;
+* the next discriminating test;
+* explicit unknowns; and
+* human approval `true` with action executed `false`.
+
+Expand *Structured evidence* to connect the operator summary to the same JSON
+contract saved in `/tmp/upstream-result.json`. If the two views differ, stop:
+the workspace and API are not representing the same learner artifact.
+
 == What the application validated
 
 The successful request proves more than valid JSON. It proves that the pack stayed below the bounded size, declared synthetic data, included exactly the four supported scopes, supplied one expected signal per diagnostic, used present/absent states, and attached source identity to historical text.

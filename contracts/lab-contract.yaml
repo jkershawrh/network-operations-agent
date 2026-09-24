@@ -40,4 +40,5 @@ qualification:
 deployment:
   helm_flag: lab.enabled=true
   environment_flag: NETWORK_OPS_LAB_MODE=1
+  ui_config: showroom-lab/ui-config.yml
   catalog_and_flightpath_qualification: pending

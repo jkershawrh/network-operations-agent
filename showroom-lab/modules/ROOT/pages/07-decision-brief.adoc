@@ -73,3 +73,9 @@ The transferable asset is not the PTP fixture. It is the contract that requires 
 == Module checkpoint
 
 Open the final brief and ensure that a reviewer can identify the current evidence, historical sources, inference, unknowns, next test, and authority boundary without opening the source code.
+
+Return once more to the *Application* workspace. The learner scenario summary
+is the visual incident record; the decision brief is its portable handoff.
+Compare the hypothesis, evidence ID, unknowns, next test, approval flag, and
+no-execution state across both. The lab closes on the same incident it began
+with—now extended, challenged, qualified, and packaged for review.

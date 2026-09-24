@@ -6,7 +6,7 @@
   <title>Network Operations Agent — Local Proof</title>
   <style>
     :root { font-family: system-ui, sans-serif; color: #17212b; background: #f5f7fa; }
-    body { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    body { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
     header, section { background: white; border: 1px solid #d9e2ea; border-radius: 8px; padding: 1rem 1.4rem; margin-bottom: 1rem; }
     h1 { margin-bottom: .3rem; } h2 { margin-top: .3rem; }
     .notice { border-left: 5px solid #c36b00; padding-left: .7rem; }
@@ -14,6 +14,15 @@
     select { padding: .6rem; margin-right: .5rem; }
     li { margin: .45rem 0; } code { overflow-wrap: anywhere; }
     .tag { display: inline-block; background: #e9f1f6; border-radius: 4px; padding: .1rem .35rem; }
+    .journey { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-top: 1rem; }
+    .journey div { background: #eef5f9; border-bottom: 3px solid #0066a1; padding: .7rem; font-size: .9rem; }
+    textarea { width: 100%; min-height: 240px; box-sizing: border-box; font-family: ui-monospace, monospace; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f3f5f7; padding: .8rem; border-radius: 4px; }
+    .hidden { display: none; }
+    .matrix { width: 100%; border-collapse: collapse; }
+    .matrix th, .matrix td { text-align: left; border-bottom: 1px solid #d9e2ea; padding: .55rem; }
+    .pass { color: #2f7d32; font-weight: 700; }
+    @media (max-width: 700px) { .journey { grid-template-columns: 1fr 1fr; } }
   </style>
 </head>
 <body>
@@ -21,6 +30,12 @@
     <h1>Network Operations Agent</h1>
     <p>Investigate a synthetic telco timing alarm across network, OpenShift platform, and hardware evidence.</p>
     <p class="notice">Local teaching proof only. Diagnostics and historical documents are fixtures. No model inference, live MCP tools, or remediation runs.</p>
+    <div class="journey" aria-label="Lab journey">
+      <div><strong>1 · Observe</strong><br>Compare known incidents</div>
+      <div><strong>2 · Build</strong><br>Add upstream evidence</div>
+      <div><strong>3 · Challenge</strong><br>Inject bounded failures</div>
+      <div><strong>4 · Prove</strong><br>Review qualification</div>
+    </div>
   </header>
   <section>
     <h2>Choose an incident</h2>
@@ -30,6 +45,19 @@
       <option value="ptp-platform">Timing alarm — platform signal</option>
     </select>
     <button id="run">Investigate</button>
+  </section>
+  <section id="lab-workspace" class="hidden">
+    <h2>Learner scenario workspace</h2>
+    <p>Paste the bounded synthetic scenario created in the guide. Investigate it, then qualify the same artifact against the controlled failure matrix.</p>
+    <label for="scenario-pack">Synthetic scenario pack</label>
+    <textarea id="scenario-pack" spellcheck="false" placeholder="Paste /tmp/my-scenario.json here"></textarea>
+    <p>
+      <button id="investigate-pack">Investigate learner scenario</button>
+      <button id="qualify-pack">Run qualification matrix</button>
+    </p>
+    <p id="lab-status" aria-live="polite">Waiting for a learner scenario.</p>
+    <div id="lab-summary"></div>
+    <details><summary>Structured evidence</summary><pre id="lab-json">No learner result yet.</pre></details>
   </section>
   <section>
     <h2>Human review simulation</h2>
@@ -59,6 +87,53 @@
       target.appendChild(node);
       return node;
     }
+    function renderLabInvestigation(result) {
+      const host = document.getElementById('lab-summary');
+      host.replaceChildren();
+      const title = element('h3', `Hypothesis: ${result.primary_hypothesis.cause}`, host);
+      title.className = result.primary_hypothesis.cause === 'inconclusive' ? '' : 'pass';
+      element('p', `Supporting evidence: ${result.primary_hypothesis.supporting_evidence_ids.join(', ') || 'none'}`, host);
+      element('p', `Unknowns: ${result.unknowns_and_conflicts.join('; ') || 'none recorded'}`, host);
+      element('p', `Next test: ${result.next_discriminating_test}`, host);
+      element('p', `Human approval: ${result.action_requires_human_approval}; action executed: ${result.action_executed}`, host);
+    }
+    function renderQualification(result) {
+      const host = document.getElementById('lab-summary');
+      host.replaceChildren();
+      element('h3', `Qualification ${result.qualification_id}: ${result.overall_result.toUpperCase()}`, host)
+        .className = result.overall_result === 'pass' ? 'pass' : '';
+      const table = document.createElement('table'); table.className = 'matrix';
+      const head = document.createElement('tr');
+      ['Failure mode', 'Expected', 'Actual', 'No execution', 'Result'].forEach(v => element('th', v, head));
+      table.appendChild(head);
+      for (const row of result.scenario_results) {
+        const tr = document.createElement('tr');
+        [row.failure_mode, row.expected_cause, row.actual_cause, String(row.safe_no_execution), row.passed ? 'PASS' : 'FAIL']
+          .forEach(v => element('td', v, tr));
+        table.appendChild(tr);
+      }
+      host.appendChild(table);
+    }
+    async function runLab(path, renderer) {
+      const status = document.getElementById('lab-status');
+      try {
+        const scenario = JSON.parse(document.getElementById('scenario-pack').value);
+        status.textContent = 'Running bounded lab scenario…';
+        const response = await fetch(path, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({scenario})});
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || 'Lab request failed');
+        renderer(result);
+        document.getElementById('lab-json').textContent = JSON.stringify(result, null, 2);
+        status.textContent = 'Result ready. Compare this view with the guide checkpoint.';
+      } catch (error) {
+        status.textContent = `Unable to run scenario: ${error.message}`;
+      }
+    }
+    fetch('/health').then(r => r.json()).then(health => {
+      if (health.lab_mode) document.getElementById('lab-workspace').classList.remove('hidden');
+    });
+    document.getElementById('investigate-pack').addEventListener('click', () => runLab('/api/lab/investigate', renderLabInvestigation));
+    document.getElementById('qualify-pack').addEventListener('click', () => runLab('/api/lab/qualify', renderQualification));
     document.getElementById('run').addEventListener('click', async () => {
       target.replaceChildren();
       currentInvestigation = null;

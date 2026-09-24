@@ -40,6 +40,11 @@ The Route name is supplied by the Launchpad environment. If your item exposes th
 
 == Replay two known incidents
 
+Open the *Application* workspace before using the API. The four-step strip at
+the top is your journey map. Run both built-in incidents and keep the hardware
+result visible while you execute the commands below. The workspace is the
+operator view; Terminal supplies the independently checkable evidence.
+
 [source,bash,role="execute"]
 ----
 curl -fsS -X POST "$APP_URL/api/investigate" \
@@ -59,6 +64,11 @@ curl -fsS -X POST "$APP_URL/api/investigate" \
 ----
 
 Compare the evidence arrays, provenance, hypothesis, unknowns, and proposed action.
+
+Return to the *Application* workspace and switch between the two incidents.
+Confirm that the visible hypothesis and supporting evidence change together.
+The page should never show a diagnosis without the current observations,
+unknowns, next test, and human-review boundary beneath it.
 
 [source,bash,role="execute"]
 ----
