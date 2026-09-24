@@ -1,6 +1,43 @@
 = 4. Extend the MCP diagnostics
+:toc:
+:toc-placement: preamble
+:icons: font
 
 The scenario works because a fourth diagnostic has a narrow contract. Inspect that contract and prove it cannot be repurposed as an action tool.
+
+== Learning objectives
+
+* Explain the difference between MCP interoperability and tool authorization.
+* Inspect the scope-to-tool allowlist used by the application.
+* Identify required fields in a diagnostic response.
+* Prove that the learner API rejects an attempted command extension.
+
+== MCP in this application
+
+MCP provides a consistent way for a client to discover a tool's name, description, and input schema and then invoke that tool. That is valuable because the orchestrator does not need a custom client library for every diagnostic domain.
+
+The protocol does not decide whether a tool is appropriate for this agent. The application still needs an allowlist and a semantic contract. In this lab, each scope maps to exactly one tool:
+
+[cols="2,2,3",options="header"]
+|===
+|Scope |Approved tool |Permitted observation
+
+|`network`
+|`network_timing_status`
+|Whether the timing alarm is present
+
+|`openshift_platform`
+|`platform_timing_status`
+|Whether the platform timing service reports a fault
+
+|`hardware`
+|`hardware_timestamp_status`
+|Whether NIC timestamp diagnostics report a fault
+
+|`upstream_timing`
+|`upstream_clock_status`
+|Whether the upstream reference reports a timing fault
+|===
 
 == Inspect the approved mapping
 
@@ -23,6 +60,8 @@ jq '.alarm.diagnostics.upstream_timing' /tmp/my-scenario.json
 
 Its single observation must contain the exact `upstream_timing_fault` signal, a present/absent state, observation time, and provenance. Arbitrary signals and executable fields are rejected.
 
+This validation prevents a confused or compromised tool from returning a different scope's signal. It also prevents an empty “status ok” response from being mistaken for evidence that no fault exists.
+
 [source,bash,role="execute"]
 ----
 jq '.command="restart-grandmaster"' /tmp/my-scenario.json >/tmp/unsafe.json
@@ -32,4 +71,22 @@ jq -n --slurpfile scenario /tmp/unsafe.json '{scenario:$scenario[0]}' \
 cat /tmp/rejected.json | jq
 ----
 
-Checkpoint: the API rejects extra fields. MCP discovery limits which tool names can be invoked; schema validation limits accepted evidence; OpenShift isolation remains an independent boundary.
+The expected status is `400`. The rejection occurs before an investigation is created, and the response does not echo the attempted command. The test is safe because it exercises input validation only; it does not attempt to access a real device.
+
+== Design exercise
+
+Imagine adding a fifth tool for topology. A safe design would answer a narrow read question such as “which synthetic upstream clock is assigned to this site?” It would define one response schema, provenance requirements, and failure behavior. A generic tool named `run_network_command` would be inappropriate because the model could choose arbitrary operations and the application could not validate their meaning.
+
+Before adding any real-world integration, ask:
+
+. Is the operation read-only?
+. Are input fields bounded and necessary?
+. Can output be validated semantically, not just syntactically?
+. Does failure become an explicit unknown?
+. Are credentials scoped to this tool and kept outside prompts and output?
+
+== Module checkpoint
+
+Confirm that the application exposes a fixed four-tool mapping, the upstream response carries time and provenance, the attempted extra command is rejected, and no MCP tool can remediate a network or mutate OpenShift.
+
+Continue to xref:05-break-harden.adoc[break and harden the workflow].

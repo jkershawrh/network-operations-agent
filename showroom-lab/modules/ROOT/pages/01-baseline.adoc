@@ -1,6 +1,18 @@
 = 1. Establish the baseline
+:toc:
+:toc-placement: preamble
+:icons: font
 
-Before changing the system, prove what it already does and record its safety invariants.
+Before changing the system, prove what it already does and record its safety invariants. A baseline is more than “the page loaded.” It captures the expected diagnosis, required evidence, dependency health, and action boundary before a learner introduces a new scenario.
+
+== Learning objectives
+
+In this module you will:
+
+* Identify the application and MCP components deployed in your namespace.
+* Distinguish liveness from dependency readiness.
+* Compare two incidents with similar alarm symptoms but different evidence.
+* Record the invariants that every later failure test must preserve.
 
 == Inspect the deployment
 
@@ -11,11 +23,20 @@ oc get deploy,svc,route
 
 Identify the application and diagnostics deployments. The application may call the diagnostics service and the assigned model endpoint; the diagnostics service exposes only read-only synthetic tools.
 
+The two-deployment shape is intentional. If tool implementation and orchestration lived in one process, it would be harder to reason about the boundary between “the agent decided to request a check” and “a diagnostic system produced an observation.” Separate Services also make availability failures visible and testable.
+
 [source,bash,role="execute"]
 ----
 APP_URL="https://$(oc get route network-operations-workspace -o jsonpath='{.spec.host}')"
 curl -fsS "$APP_URL/ready" | jq
 ----
+
+`/health` answers whether the application process is alive. `/ready` answers whether the application can perform its core work. When an MCP endpoint is configured, readiness includes discovery of every approved tool. A healthy process with missing tools is not ready to investigate.
+
+[NOTE]
+====
+The Route name is supplied by the Launchpad environment. If your item exposes the application as a Showroom tab instead, use the URL provided in that tab rather than inventing a hostname.
+====
 
 == Replay two known incidents
 
@@ -26,8 +47,12 @@ curl -fsS -X POST "$APP_URL/api/investigate" \
   -d '{"scenario_id":"ptp-hardware"}' | tee /tmp/hardware.json | jq
 ----
 
+The hardware fixture reports the general timing alarm, a healthy platform timing service, and a present NIC timestamp fault. The deterministic policy can therefore select `hardware_timing` and cite `hardware-1`.
+
 [source,bash,role="execute"]
 ----
+
+The platform fixture keeps the alarm symptom but reverses the causal evidence: the platform timing fault is present and NIC timestamp fault is absent. A useful investigator must produce a different diagnosis because the evidence changed—not because the scenario name contains a hint.
 curl -fsS -X POST "$APP_URL/api/investigate" \
   -H 'Content-Type: application/json' \
   -d '{"scenario_id":"ptp-platform"}' | tee /tmp/platform.json | jq
@@ -40,5 +65,37 @@ Compare the evidence arrays, provenance, hypothesis, unknowns, and proposed acti
 jq -r '[.alarm_id,.primary_hypothesis.cause,(.current_observations_with_tool_provenance|length),.action_executed] | @tsv' /tmp/{hardware,platform}.json
 ----
 
-Checkpoint: both cases must cite current observations, retain historical sources separately, require human approval, and execute no action.
+== Read the result as an operator
 
+Inspect one response in sections rather than as a large JSON document:
+
+[source,bash,role="execute"]
+----
+jq '{
+  alarm_id,
+  observations:.current_observations_with_tool_provenance,
+  history:.historical_context_with_source_revision,
+  hypothesis:.primary_hypothesis,
+  unknowns:.unknowns_and_conflicts,
+  next_test:.next_discriminating_test,
+  approval:.action_requires_human_approval,
+  executed:.action_executed
+}' /tmp/hardware.json
+----
+
+Notice that the retrieved hardware case is useful context, but the supporting evidence ID points only to a current diagnostic observation. This prevents an old incident from becoming false proof about a new event.
+
+== Module checkpoint
+
+Before continuing, confirm:
+
+* Both cases return three validated current observations.
+* The two cases select different causes.
+* Supporting IDs resolve to current evidence.
+* Historical sources include a revision.
+* Human approval is required.
+* `action_executed` is false.
+
+If any invariant fails, stop here. A failure in the known-good baseline invalidates later comparisons.
+
+Continue to xref:02-trace.adoc[trace the evidence architecture].

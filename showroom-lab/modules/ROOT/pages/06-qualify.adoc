@@ -1,6 +1,22 @@
 = 6. Qualify reliability
+:toc:
+:toc-placement: preamble
+:icons: font
 
 Turn the exercises into repeatable evidence rather than relying on screenshots.
+
+== Learning objectives
+
+* Explain the difference between testing a scenario and qualifying a release candidate.
+* Read the machine-generated reliability scorecard.
+* Verify evidence provenance and action invariants independently.
+* Export artifacts with checksums for later review.
+
+== What qualification means here
+
+Qualification is bounded to this educational release. A passing report means the implemented synthetic scenarios produced their expected diagnosis or abstention, retained evidence, and executed no action. It does not certify a customer network, establish production capacity, or replace a security review.
+
+The report receives a stable ID derived from its scenario results. That makes it easier to detect when evidence changes between runs. The report also names the learner scenario so an approver can connect the result to the exact input artifact.
 
 == Evaluate the scorecard
 
@@ -10,6 +26,8 @@ jq '{qualification_id,scenario_id,overall_result,total:(.scenario_results|length
 ----
 
 Qualification passes only when every expected diagnosis or abstention occurs and every scenario preserves human approval with `action_executed=false`.
+
+The automated result is intentionally paired with an independent assertion below. Qualification code is still software; reviewing a few critical invariants through a second query helps expose an incorrectly broad pass condition.
 
 == Verify provenance completeness
 
@@ -32,5 +50,14 @@ cp /tmp/my-scenario.json /tmp/upstream-result.json /tmp/qualification.json "$HOM
 sha256sum "$HOME"/network-agent-evidence/*.json | tee "$HOME/network-agent-evidence/SHA256SUMS"
 ----
 
-Checkpoint: the report says `pass`, identifies the exact scenario, carries a stable qualification ID, and can be independently checked against the exported hashes.
+== Review what the hashes prove
 
+A checksum does not prove that a diagnosis is correct. It proves that the reviewed file has not changed since the checksum was generated. Combined with source revisions, investigation IDs, and the qualification ID, it creates a practical evidence package for this lab.
+
+In a production delivery process, additional gates would normally include immutable image digests, SBOM and signature verification, environment-specific capacity tests, multi-tenant isolation, upgrade behavior, and teardown validation. Those are outside this learner exercise and should not be inferred from the scorecard.
+
+== Module checkpoint
+
+The report must say `pass`, identify the exact learner scenario, carry a qualification ID, contain five scenario results, and report `action_executed=false`. The evidence directory must contain the input scenario, healthy result, qualification report, and checksums.
+
+Continue to xref:07-decision-brief.adoc[deliver the NOC brief].

@@ -1,0 +1,125 @@
+= Environment and key concepts
+:imagesdir: ../assets/images
+:toc:
+:toc-placement: preamble
+:icons: font
+
+== Navigate the lab environment
+
+Showroom places these instructions beside environment tabs. Use *Split* view when you want to read and run commands together, and *Tabs* view when inspecting larger JSON responses.
+
+The exact tab labels can vary by event configuration, but the environment provides:
+
+* **Terminal** — an authenticated shell with `oc`, `curl`, and `jq`.
+* **OpenShift Console** — a visual view of participant-scoped workloads, logs, networking, and status.
+* **Application** — the evidence-backed investigator when the Route is exposed as a tab.
+
+All exercises run in the namespace selected by the ordered environment. Do not paste a namespace from another participant or construct one from a displayed username.
+
+== Verify your starting context
+
+[source,bash,role="execute"]
+----
+oc whoami
+oc project -q
+oc auth can-i get pods
+oc auth can-i list nodes
+----
+
+The first three commands should return your participant identity, your assigned namespace, and `yes`. The cluster-scoped node query should return `no`. That denial is expected: this lab teaches a namespace-scoped application and does not require cluster-administrator privileges.
+
+[TIP]
+====
+If `oc project -q` is empty, use the project shown by `oc projects`. Do not assume a namespace naming pattern; event users and GUIDs differ between ordered environments.
+====
+
+== Four layers of a trustworthy result
+
+image::evidence-layers.svg[Four layers showing current observations, approved historical context, bounded inference, and human authorization with separate failure behavior,link=self,width=1000]
+
+The output contract is intentionally verbose because each collection answers a different question.
+
+=== Current observations
+
+`current_observations_with_tool_provenance` contains what a diagnostic tool reported for this incident. Each record has an evidence ID, scope, signal state, observation timestamp, and provenance string. These records can support a root-cause hypothesis.
+
+=== Historical context
+
+`historical_context_with_source_revision` contains approved synthetic runbook or incident excerpts. It helps an operator interpret current signals. It cannot prove that today's incident has the same cause as an older case.
+
+=== Inference and uncertainty
+
+`primary_hypothesis` identifies either one supported cause or `inconclusive`. Supporting IDs must point back to current observations. `unknowns_and_conflicts` explains missing tools, unavailable history, malformed data, or evidence that does not distinguish one cause.
+
+=== Authority
+
+`proposed_action` is a recommendation for a qualified human. `action_requires_human_approval` must be true and `action_executed` must be false in every healthy and failed lab scenario.
+
+== Failure semantics
+
+Not every dependency failure should have the same result:
+
+[cols="2,2,3",options="header"]
+|===
+|Failure |Expected result |Reason
+
+|Required current diagnostic times out
+|Inconclusive
+|The application cannot prove that exactly one cause is present.
+
+|Historical knowledge is unavailable
+|Diagnosis may remain supported, with an explicit gap
+|Complete current evidence can still identify a cause; history is supporting context.
+
+|Two causal diagnostics report faults
+|Inconclusive
+|The bounded policy refuses to choose between conflicting current signals.
+
+|A tool returns malformed data
+|Inconclusive
+|Unvalidated tool output cannot enter the evidence ledger.
+
+|Optional model is unavailable
+|Evidence result remains; draft is unavailable
+|The model explains a decision but does not make it.
+|===
+
+== Glossary
+
+[%collapsible]
+.Key terms used in this lab
+====
+[cols="1,3",options="header"]
+|===
+|Term |Meaning in this lab
+
+|PTP
+|Precision Time Protocol, used to synchronize clocks across networked systems.
+
+|Grandmaster clock
+|The upstream reference clock from which other clocks derive time.
+
+|Holdover
+|A clock operating temporarily without its normal reference; it is a state, not a root cause.
+
+|MCP
+|Model Context Protocol, a standard interface through which an application can discover and call tools.
+
+|Provenance
+|Information identifying where and when an observation originated.
+
+|Abstention
+|An explicit refusal to select a cause because required evidence is missing, invalid, or conflicting.
+
+|Fail closed
+|A design in which failure removes authority or confidence instead of silently allowing unsafe behavior.
+
+|OpenAI-compatible endpoint
+|A common HTTP interface for model inference; it does not imply a particular model host or vendor.
+
+|Qualification
+|A repeatable set of scenarios and assertions that produces pass/fail evidence for this bounded release.
+|===
+====
+
+You now have the vocabulary and trust model needed to interpret the exercises. Continue to xref:01-baseline.adoc[establish the baseline].

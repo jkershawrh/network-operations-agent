@@ -1,0 +1,91 @@
+= Mission and architecture
+:imagesdir: ../assets/images
+:toc:
+:toc-placement: preamble
+:icons: font
+
+== The operational story
+
+Precision Time Protocol (PTP) keeps distributed network functions synchronized. In a real telecommunications environment, timing quality can affect radio coordination and service behavior. A timing alarm, however, does not identify its own cause. Similar symptoms can originate in a platform timing service, a network interface card's timestamp function, or an upstream clock source.
+
+A human operator normally correlates several systems: alarm telemetry, platform status, hardware diagnostics, topology, runbooks, and previous incidents. An AI-assisted workflow can reduce that search burden, but only if it preserves the origin of every observation and refuses to hide missing evidence behind confident prose.
+
+In this lab, a synthetic alarm reports that a simulated site has entered *holdover*. Holdover means a local clock is temporarily maintaining time without its normal external reference. It is a symptom and operating state—not proof that any one component failed.
+
+Your initial application knows how to evaluate two causes:
+
+* `platform_timing`: the OpenShift-hosted timing service reports a fault while NIC timestamp health remains normal.
+* `hardware_timing`: NIC timestamp diagnostics report a fault while the platform service remains normal.
+
+You will add `upstream_timing`: both local checks are healthy, but the upstream grandmaster clock reports a fault.
+
+== System architecture
+
+image::lab-architecture.svg[Architecture showing a synthetic alarm flowing through an OpenShift agent orchestrator, four read-only MCP diagnostics, approved historical context, an evidence ledger, optional CPU model wording, and human NOC review,link=self,width=1000]
+
+The architecture deliberately separates responsibilities:
+
+**OpenShift application deployment**:: Receives a scenario, orchestrates approved diagnostics, validates every result, assembles evidence, and returns a bounded recommendation. It has no Kubernetes service-account token and no network-remediation capability.
+
+**MCP diagnostics deployment**:: Exposes named, read-only tools for the synthetic environment. MCP standardizes how the application discovers and invokes tools, but MCP itself does not make a tool safe. Safety comes from the narrow tool implementation, allowlist, schema validation, network placement, and absence of mutation credentials.
+
+**Approved historical knowledge**:: Supplies versioned excerpts from synthetic runbooks and incidents. Historical context can support interpretation, but it never replaces current observations.
+
+**Deterministic evidence policy**:: Selects a supported cause only when every required diagnostic is available and exactly one causal signal is present. Missing, malformed, or conflicting evidence produces an inconclusive result.
+
+**Optional model provider**:: Drafts human-readable wording after the deterministic decision exists. A model response is rejected if it cites unsupported evidence. The model cannot add a cause, execute a tool, or authorize an action.
+
+**NOC operator**:: Reviews evidence, requests another diagnostic test, approves a recommendation for follow-up, or rejects it. The operator remains accountable for operational action.
+
+== Trust boundaries
+
+An agent workflow crosses several boundaries that are easy to blur in a demonstration:
+
+[cols="1,2,2",options="header"]
+|===
+|Boundary |What crosses it |Control used in this lab
+
+|Alarm to application
+|A synthetic scenario identifier or validated learner scenario
+|Strict schema, size limit, synthetic classification, and rejection of extra fields
+
+|Application to MCP
+|Alarm ID, timestamp, and one approved scope
+|Exact tool-name mapping, read-only tools, bounded arguments, and response validation
+
+|History to investigation
+|Approved excerpts and source revisions
+|Source allowlisting and a separate historical-context collection
+
+|Evidence to model
+|Already assembled observations and supported hypothesis
+|Optional provider adapter and evidence-ID validation
+
+|Recommendation to operations
+|Proposed next diagnostic step
+|Human approval flag and invariant that no action is executed
+|===
+
+[IMPORTANT]
+====
+Model reasoning is not authorization. Even a perfectly worded recommendation cannot grant the application permissions that its service account and tools do not possess.
+====
+
+== Red Hat and Intel roles
+
+Red Hat OpenShift supplies the application runtime, namespace isolation, Services, Route, health checks, resource limits, and operational troubleshooting surface. The model interface remains OpenAI-compatible so the workload can use an approved provider without coupling the application to one serving implementation.
+
+Intel is the target CPU inference context for the optional explanation model. This lab demonstrates functional CPU-hosted inference and a portable evidence pattern. It does not claim sub-second latency, autonomous network repair, or a production capacity figure.
+
+== Learning objectives
+
+After completing the lab, you will be able to:
+
+* Explain why current evidence, historical context, model inference, and action authority must remain separate.
+* Identify the role of OpenShift, MCP, deterministic policy, and optional model inference.
+* Extend a bounded diagnostic workflow without opening an arbitrary tool-execution path.
+* Test fail-closed behavior under realistic dependency failures.
+* Produce repeatable evidence for a human reliability review.
+
+Continue to xref:00-environment-and-concepts.adoc[environment and key concepts].
+

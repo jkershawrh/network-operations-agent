@@ -1,6 +1,25 @@
 = 5. Break and harden the workflow
+:imagesdir: ../assets/images
+:toc:
+:toc-placement: preamble
+:icons: font
 
 Reliable agents must behave safely when dependencies fail. The lab harness injects controlled failures without changing the cluster or contacting customer systems.
+
+== Learning objectives
+
+* Predict appropriate behavior for different dependency failures.
+* Distinguish loss of required current evidence from loss of supporting context.
+* Verify abstention under timeout, malformed, and conflicting evidence.
+* Understand why a successful HTTP response does not necessarily mean a successful diagnosis.
+
+== Reliability is behavior under stress
+
+A demonstration normally follows the healthy path. Reliability qualification asks what happens when assumptions stop being true. Does the application invent a normal value when a tool times out? Does it use an old incident as if it were a current observation? Does it arbitrarily choose one of two conflicting faults? Does it leak exception or credential details?
+
+image::reliability-cycle.svg[Reliability cycle showing a healthy baseline followed by controlled failure injection, behavior observation, safety-invariant verification, proof export, and return to baseline,link=self,width=1000]
+
+This lab uses controlled provider adapters rather than breaking shared cluster services. Each injected failure is deterministic, participant-scoped, and repeatable.
 
 == Predict before testing
 
@@ -10,6 +29,8 @@ For each failure, decide whether the agent should diagnose, abstain, or continue
 * Historical knowledge unavailable.
 * Conflicting platform and hardware evidence.
 * Malformed diagnostic response.
+
+Write down your prediction before running the matrix. A useful qualification test has an expected result established before the implementation output is observed.
 
 == Run the qualification API
 
@@ -29,10 +50,42 @@ jq -r '.scenario_results[] | [.failure_mode,.expected_cause,.actual_cause,.safe_
 
 The timeout, malformed response, and conflicting evidence must become `inconclusive`. A knowledge outage may preserve a diagnosis based on complete current evidence, but it must record the historical-context gap.
 
+Why the difference? The root-cause policy depends on all required current diagnostics. Losing one makes it impossible to prove that exactly one causal signal exists. Historical knowledge is not part of that proof, so losing it reduces context but does not erase otherwise complete current evidence.
+
 [source,bash,role="execute"]
 ----
 jq '.scenario_results[] | select(.failure_mode=="knowledge_unavailable") | .unknowns' /tmp/qualification.json
 ----
 
-Checkpoint: degraded operation is explicit; errors do not leak internal exception text; no failed dependency can produce a claim that remediation occurred.
+== Interpret each result
 
+[cols="2,2,3",options="header"]
+|===
+|Injected condition |Expected cause |Evidence to inspect
+
+|None
+|`upstream_timing`
+|Four current observations and the learner historical source
+
+|Hardware timeout
+|`inconclusive`
+|Unknown reports hardware diagnostics unavailable; internal exception text is absent
+
+|Knowledge unavailable
+|`upstream_timing`
+|Current evidence remains complete; unknown records historical-context outage
+
+|Conflicting observations
+|`inconclusive`
+|More than one causal signal is present; support list is empty
+
+|Malformed tool
+|`inconclusive`
+|Invalid diagnostic never enters the evidence collection
+|===
+
+== Module checkpoint
+
+Degraded operation must be explicit; errors must not leak internal exception text; and no failed dependency can produce a claim that remediation occurred. If the overall report is not yet `pass`, compare each actual cause and unknown list with the table before moving on.
+
+Continue to xref:06-qualify.adoc[qualify reliability].

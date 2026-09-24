@@ -1,4 +1,7 @@
 = Conclusion
+:toc:
+:toc-placement: preamble
+:icons: font
 
 You did more than replay the quickstart. You extended an evidence architecture, introduced a new read-only MCP diagnostic, authored a third incident, tested failure behavior, and produced reviewable proof.
 
@@ -12,3 +15,24 @@ The reusable pattern is intentionally industry portable:
 
 Your files are in `$HOME/network-agent-evidence`. They are the “leave with something” outcome for this lab.
 
+== What you learned
+
+You can now explain why an agentic workflow needs more than a model and a collection of tools. Trust comes from the complete system: narrow tool contracts, current evidence with provenance, versioned context, deterministic policy, explicit abstention, platform isolation, and human authority.
+
+You also practiced a repeatable development sequence:
+
+. Establish known-good behavior.
+. Trace component and trust boundaries.
+. Extend one bounded evidence domain.
+. Reject unauthorized input.
+. Inject failures and predict behavior.
+. Qualify the release against explicit expectations.
+. Communicate a supported recommendation without overstating it.
+
+== Claims this lab does not make
+
+The lab does not demonstrate autonomous incident resolution, a measured reduction in mean time to resolution, fewer truck rolls, production capacity, or access to a real telecommunications network. The optional model can improve readability, but the evidence and safety behavior do not depend on model fluency.
+
+== Next steps
+
+Use the exported scenario and brief as a starting point for a design review. When adapting the pattern, define your own approved scopes, source revisions, failure semantics, and authorization boundary before connecting live systems. Add mutation only through a separately reviewed human-approval workflow with platform-enforced permissions—never by widening the diagnostic tool contract.

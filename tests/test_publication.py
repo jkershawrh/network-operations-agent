@@ -46,6 +46,13 @@ class PublicationTests(unittest.TestCase):
         for outcome in ("scenario pack", "qualification report", "NOC decision brief"):
             self.assertIn(outcome, combined)
         self.assertIn("start_path: showroom-lab", (ROOT / "site-lab.yml").read_text())
+        self.assertIn("00-mission-and-architecture.adoc", nav)
+        self.assertIn("00-environment-and-concepts.adoc", nav)
+        self.assertGreaterEqual(len(combined.split()), 5000)
+        self.assertGreaterEqual(combined.count("image::"), 3)
+        assets = root / "assets" / "images"
+        for image in ("lab-architecture.svg", "evidence-layers.svg", "reliability-cycle.svg"):
+            self.assertTrue((assets / image).exists())
 
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()

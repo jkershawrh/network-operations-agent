@@ -1,6 +1,16 @@
 = 2. Trace the evidence architecture
+:toc:
+:toc-placement: preamble
+:icons: font
 
-Follow one request through the system instead of treating the UI as a black box.
+Follow one request through the system instead of treating the UI as a black box. The goal is to understand which component is responsible for each claim and which OpenShift controls reduce the blast radius if an agent or model behaves unexpectedly.
+
+== Learning objectives
+
+* Connect the logical architecture to concrete OpenShift resources.
+* Explain why tool provenance is part of the API contract.
+* Verify that the workload does not receive unnecessary Kubernetes credentials.
+* Distinguish application policy from platform enforcement.
 
 == Discover the tool boundary
 
@@ -11,6 +21,15 @@ oc logs "$MCP_POD" --tail=40
 ----
 
 The approved contract contains four read-only observations: network timing, platform timing, hardware timestamping, and upstream clock health. Tool output is evidence, not authorization.
+
+An MCP server can expose any capability its author implements, including mutation. This lab avoids the common mistake of treating “uses MCP” as a security property. The client accepts only four exact tool names, sends only an alarm ID, occurrence time, and scope, and validates a single bounded observation in each response.
+
+[source,bash,role="execute"]
+----
+oc get svc -l app.kubernetes.io/name=network-operations-agent -o custom-columns=NAME:.metadata.name,PORT:.spec.ports[*].port,TYPE:.spec.type
+----
+
+The diagnostics Service should be internal (`ClusterIP`). The public participant Route points to the application, not directly to MCP. This ensures requests pass through input validation and orchestration policy.
 
 == Trace provenance
 
@@ -26,6 +45,8 @@ Answer these questions before continuing:
 . What happens if a required tool is absent?
 . Why is an LLM-generated explanation not itself evidence?
 
+Suggested reasoning: timestamps and provenance make current observations auditable; revisions make retrieved history reproducible; absent tools create an unknown rather than an assumed healthy state; and generated prose is derived output that must remain traceable to validated records.
+
 == Verify isolation and least privilege
 
 [source,bash,role="execute"]
@@ -38,5 +59,18 @@ oc get deploy -o json | jq -r '.items[] | [.metadata.name,.spec.template.spec.au
 oc get networkpolicy -o yaml
 ----
 
-Checkpoint: the workload does not need a Kubernetes API token, credentials are not rendered into the guide, and the MCP surface contains no mutation tool.
+The controls are layered:
 
+* **Application allowlist** prevents arbitrary tool selection.
+* **Schema validation** prevents malformed or over-broad responses entering the ledger.
+* **Service-account minimization** prevents the workload from turning a model suggestion into Kubernetes API access.
+* **NetworkPolicy** limits which workload can reach the diagnostic Service.
+* **Secret references** keep optional model credentials outside Showroom and Helm values.
+
+No one control replaces the others. For example, RBAC cannot determine whether a diagnostic claim has provenance, while schema validation cannot prevent an otherwise valid pod credential from being used against the cluster API.
+
+== Module checkpoint
+
+You should be able to point to the component that owns each step: alarm validation, tool invocation, diagnostic production, historical retrieval, cause selection, optional wording, and human review. Confirm that the workload does not need a Kubernetes API token, credentials are not rendered into the guide, the MCP surface contains no mutation tool, and the diagnostics Service is not publicly routed.
+
+Continue to xref:03-build-scenario.adoc[build a new incident].

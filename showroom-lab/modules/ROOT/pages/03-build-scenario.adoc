@@ -1,6 +1,22 @@
 = 3. Build a new incident
+:toc:
+:toc-placement: preamble
+:icons: font
 
 Now create evidence that the original quickstart did not contain. Your scenario adds an upstream grandmaster diagnosis rather than modifying either known answer.
+
+== Learning objectives
+
+* Understand the learner scenario contract.
+* Add a genuinely new causal domain rather than relabeling an existing fixture.
+* Preserve provenance and synthetic-data boundaries.
+* Validate the new diagnosis through the same application path used by known scenarios.
+
+== Why add an upstream clock?
+
+The baseline proves that local platform and hardware checks can distinguish two causes. Real incident reasoning often needs another domain. If both local checks are normal while the site remains in holdover, an upstream reference is a reasonable next place to inspect.
+
+Adding this domain demonstrates the reusable engineering pattern: expand the evidence model, add one narrow diagnostic contract, and define how its signal maps to a supported hypothesis. It does not require giving the model a generic HTTP client or shell tool.
 
 == Start from the bounded contract
 
@@ -12,12 +28,29 @@ jq '.scenario_id,.alarm.required_scopes,.expected_cause' /tmp/my-scenario.json
 
 Edit the synthetic timestamp, offset, source revision, and excerpt while preserving the schema and the four diagnostic scopes.
 
+The pack contains five top-level fields:
+
+* `schema_version` pins the contract.
+* `scenario_id` must use the `learner-` prefix.
+* `alarm` contains only synthetic metadata and four diagnostics.
+* `knowledge` contains one to five versioned synthetic records.
+* `expected_cause` declares the healthy-path assertion used by qualification.
+
 [source,bash,role="execute"]
 ----
 jq '.alarm.kpis.master_offset_microseconds=165 | .knowledge[0].source_revision="learner-v2"' \
   /tmp/my-scenario.json > /tmp/my-scenario-v2.json
 mv /tmp/my-scenario-v2.json /tmp/my-scenario.json
 ----
+
+Inspect the four signal states before submitting the scenario:
+
+[source,bash,role="execute"]
+----
+jq -r '.alarm.diagnostics | to_entries[] | [.key,.value.observations[0].signal,.value.observations[0].state,.value.provenance] | @tsv' /tmp/my-scenario.json
+----
+
+You should see the general timing alarm and upstream fault present, with platform and hardware causal faults absent. This is the evidence shape that supports exactly one cause.
 
 == Validate and investigate
 
@@ -34,3 +67,15 @@ jq '{cause:.primary_hypothesis.cause,support:.primary_hypothesis.supporting_evid
 ----
 
 Checkpoint: the cause is `upstream_timing`, the support points to `upstream_timing-1`, and no action was executed. Save `/tmp/my-scenario.json`; it is your first take-away artifact.
+
+== What the application validated
+
+The successful request proves more than valid JSON. It proves that the pack stayed below the bounded size, declared synthetic data, included exactly the four supported scopes, supplied one expected signal per diagnostic, used present/absent states, and attached source identity to historical text.
+
+The API does not accept Python code, arbitrary URLs, credentials, extra commands, or a tool selected by the learner. This keeps authoring useful without turning lab mode into a general execution surface.
+
+== Module checkpoint
+
+Confirm that your saved scenario differs materially from both baseline incidents, produces `upstream_timing`, cites the current upstream observation, retrieves the learner source revision, and preserves the no-action invariant.
+
+Continue to xref:04-extend-mcp.adoc[extend the MCP diagnostics].

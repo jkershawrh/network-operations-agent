@@ -1,6 +1,22 @@
 = 7. Deliver the NOC brief
+:toc:
+:toc-placement: preamble
+:icons: font
 
 Technical evidence becomes useful when an operator can make a bounded decision from it.
+
+== Learning objectives
+
+* Convert structured investigation output into a concise operational handoff.
+* Keep observations, history, inference, and unknowns distinguishable.
+* State a next diagnostic test without implying that remediation occurred.
+* Leave with artifacts that can be adapted to another bounded incident workflow.
+
+== From agent output to operator decision
+
+A NOC lead does not need every implementation detail, but they do need enough evidence to challenge the conclusion. A useful brief avoids two extremes: raw JSON with no interpretation, and polished prose with no traceability.
+
+The brief generated below keeps the supported hypothesis next to its evidence IDs, reduces current observations to their operational fields, pins historical sources to revisions, and carries the unknowns and approval boundary forward.
 
 == Generate the brief inputs
 
@@ -30,6 +46,12 @@ Your handoff must state:
 . Which read-only test should happen next.
 . That a qualified human—not the model—owns the operational decision.
 
+For this scenario, a good verbal handoff would be:
+
+> The simulated site is in holdover. Current platform and NIC diagnostics are normal, while the upstream timing diagnostic reports a fault at the same investigation window. The supported hypothesis is an upstream timing issue, based on evidence `upstream_timing-1`. A versioned synthetic runbook recommends checking the grandmaster assignment and health. No remediation was executed. A qualified operator should validate the upstream source before deciding on action.
+
+Notice the language: “supported hypothesis,” not proven universal truth; “reports a fault,” not “is broken”; and “should validate,” not “the agent fixed it.”
+
 [source,bash,role="execute"]
 ----
 jq -e '.hypothesis.supporting_evidence_ids|length>0' "$HOME/network-agent-evidence/noc-decision-brief.json" && \
@@ -38,3 +60,16 @@ jq -e '.action_requires_human_approval and (.action_executed|not)' "$HOME/networ
 
 You now have a reusable scenario pack, qualification evidence, and decision brief. Continue to xref:conclusion.adoc[the conclusion].
 
+== Apply the pattern elsewhere
+
+The telco story makes the exercise concrete, but the pattern transfers to other domains. Replace the alarm and diagnostic scopes while preserving the separation:
+
+* In application operations, current metrics and deployment status can remain separate from previous incident reports.
+* In security operations, current scanner findings can remain separate from threat intelligence and remediation authority.
+* In manufacturing, live sensor observations can remain separate from maintenance history and control-system actions.
+
+The transferable asset is not the PTP fixture. It is the contract that requires provenance, explicit uncertainty, bounded tools, and human authorization.
+
+== Module checkpoint
+
+Open the final brief and ensure that a reviewer can identify the current evidence, historical sources, inference, unknowns, next test, and authority boundary without opening the source code.

@@ -1,4 +1,6 @@
 * xref:index.adoc[Lab overview]
+* xref:00-mission-and-architecture.adoc[Mission and architecture]
+* xref:00-environment-and-concepts.adoc[Environment and key concepts]
 * xref:01-baseline.adoc[1. Establish the baseline]
 * xref:02-trace.adoc[2. Trace the evidence architecture]
 * xref:03-build-scenario.adoc[3. Build a new incident]
@@ -7,4 +9,3 @@
 * xref:06-qualify.adoc[6. Qualify reliability]
 * xref:07-decision-brief.adoc[7. Deliver the NOC brief]
 * xref:conclusion.adoc[Conclusion]
-
