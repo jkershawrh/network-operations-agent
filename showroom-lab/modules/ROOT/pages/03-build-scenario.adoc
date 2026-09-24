@@ -70,7 +70,7 @@ Checkpoint: the cause is `upstream_timing`, the support points to `upstream_timi
 
 == Visualize the learner-authored incident
 
-Return to the *Application* workspace. In *Learner scenario workspace*, paste
+Return to *Network Operations Workspace*. In *Learner scenario workspace*, paste
 the contents of `/tmp/my-scenario.json` and select *Investigate learner
 scenario*. The visible case should now advance beyond the two quickstart
 fixtures and show:

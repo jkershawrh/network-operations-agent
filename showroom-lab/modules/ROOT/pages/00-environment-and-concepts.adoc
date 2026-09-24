@@ -12,7 +12,8 @@ The exact tab labels can vary by event configuration, but the environment provid
 
 * **Terminal** — an authenticated shell with `oc`, `curl`, and `jq`.
 * **OpenShift Console** — a visual view of participant-scoped workloads, logs, networking, and status.
-* **Application** — the evidence-backed investigator when the Route is exposed as a tab.
+* **Network Operations Workspace** — the evidence-backed investigator, learner
+  scenario workbench, and qualification matrix.
 
 All exercises run in the namespace selected by the ordered environment. Do not paste a namespace from another participant or construct one from a displayed username.
 

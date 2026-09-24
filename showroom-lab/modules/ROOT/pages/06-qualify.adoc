@@ -30,7 +30,7 @@ Qualification passes only when every expected diagnosis or abstention occurs and
 The automated result is intentionally paired with an independent assertion below. Qualification code is still software; reviewing a few critical invariants through a second query helps expose an incorrectly broad pass condition.
 
 Before exporting, compare this compact Terminal scorecard with the matrix in
-the *Application* workspace. Both must show five scenarios, the same
+*Network Operations Workspace*. Both must show five scenarios, the same
 qualification ID, and an overall pass. This deliberate second view connects
 the operator experience to machine-readable release evidence.
 

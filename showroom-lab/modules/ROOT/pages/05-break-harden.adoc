@@ -59,7 +59,7 @@ jq '.scenario_results[] | select(.failure_mode=="knowledge_unavailable") | .unkn
 
 == Observe the failure matrix in the workspace
 
-Return to the *Application* workspace with the same scenario still loaded and
+Return to *Network Operations Workspace* with the same scenario still loaded and
 select *Run qualification matrix*. The table should make the journey visible:
 the healthy row supports `upstream_timing`, the required-evidence failures
 become `inconclusive`, and every row retains no-execution safety.

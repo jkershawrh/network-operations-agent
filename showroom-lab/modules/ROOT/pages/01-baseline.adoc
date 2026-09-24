@@ -40,7 +40,7 @@ The Route name is supplied by the Launchpad environment. If your item exposes th
 
 == Replay two known incidents
 
-Open the *Application* workspace before using the API. The four-step strip at
+Open *Network Operations Workspace* before using the API. The four-step strip at
 the top is your journey map. Run both built-in incidents and keep the hardware
 result visible while you execute the commands below. The workspace is the
 operator view; Terminal supplies the independently checkable evidence.
@@ -54,10 +54,10 @@ curl -fsS -X POST "$APP_URL/api/investigate" \
 
 The hardware fixture reports the general timing alarm, a healthy platform timing service, and a present NIC timestamp fault. The deterministic policy can therefore select `hardware_timing` and cite `hardware-1`.
 
+The platform fixture keeps the alarm symptom but reverses the causal evidence: the platform timing fault is present and NIC timestamp fault is absent. A useful investigator must produce a different diagnosis because the evidence changed—not because the scenario name contains a hint.
+
 [source,bash,role="execute"]
 ----
-
-The platform fixture keeps the alarm symptom but reverses the causal evidence: the platform timing fault is present and NIC timestamp fault is absent. A useful investigator must produce a different diagnosis because the evidence changed—not because the scenario name contains a hint.
 curl -fsS -X POST "$APP_URL/api/investigate" \
   -H 'Content-Type: application/json' \
   -d '{"scenario_id":"ptp-platform"}' | tee /tmp/platform.json | jq
@@ -65,7 +65,7 @@ curl -fsS -X POST "$APP_URL/api/investigate" \
 
 Compare the evidence arrays, provenance, hypothesis, unknowns, and proposed action.
 
-Return to the *Application* workspace and switch between the two incidents.
+Return to *Network Operations Workspace* and switch between the two incidents.
 Confirm that the visible hypothesis and supporting evidence change together.
 The page should never show a diagnosis without the current observations,
 unknowns, next test, and human-review boundary beneath it.

@@ -57,7 +57,7 @@ class PublicationTests(unittest.TestCase):
         assets = root / "assets" / "images"
         for image in ("lab-architecture.svg", "evidence-layers.svg", "reliability-cycle.svg"):
             self.assertTrue((assets / image).exists())
-        self.assertGreaterEqual(combined.count("*Application* workspace"), 4)
+        self.assertGreaterEqual(combined.count("*Network Operations Workspace*"), 6)
         web = (ROOT / "web" / "index.html").read_text()
         for phrase in ("Learner scenario workspace", "Investigate learner scenario", "Run qualification matrix"):
             self.assertIn(phrase, web)
