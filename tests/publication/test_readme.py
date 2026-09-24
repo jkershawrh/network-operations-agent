@@ -40,8 +40,9 @@ class ReadmePublicationTests(unittest.TestCase):
         self.assertIn("Run in terminal", source)
         self.assertIn("pasteToTerminal", source)
 
-        playbook = (ROOT / "site.yml").read_text(encoding="utf-8")
-        self.assertIn("supplemental_files: ./showroom/supplemental-ui", playbook)
+        for playbook_name in ("site.yml", "site-lab.yml"):
+            playbook = (ROOT / playbook_name).read_text(encoding="utf-8")
+            self.assertIn("supplemental_files: ./showroom/supplemental-ui", playbook)
 
 
 if __name__ == "__main__":
