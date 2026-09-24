@@ -30,6 +30,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - run: npm ci
       - run: npm run build:showroom
+      - run: npm run build:lab
       - run: helm lint chart
       - run: make test-all
       - run: docker compose -f compose.yaml up --build --wait --wait-timeout 120
@@ -81,6 +82,7 @@ jobs:
             python3 -m network_ops.mcp_server)"
           app="$(podman run -d --platform linux/amd64 --network "$network" \
             -e NETWORK_OPS_MCP_URL=http://candidate-diagnostics:8095/mcp \
+            -e NETWORK_OPS_LAB_MODE=1 \
             -p 18080:8080 "localhost/network-operations-agent:$IMAGE_TAG")"
           cleanup() {
             podman rm -f "$app" "$diagnostics" >/dev/null 2>&1 || true
@@ -101,6 +103,11 @@ jobs:
               -H 'Content-Type: application/json' \
               -d "{\"scenario_id\":\"$scenario\"}" | jq -e '.action_executed == false'
           done
+          jq -n --slurpfile scenario learner-templates/upstream-clock-scenario.json \
+            '{scenario:$scenario[0]}' \
+            | curl -fsS -X POST http://127.0.0.1:18080/api/lab/qualify \
+                -H 'Content-Type: application/json' -d @- \
+            | jq -e '.overall_result == "pass" and .action_executed == false'
       - name: Authenticate to GHCR
         shell: bash
         env:
