@@ -2,7 +2,8 @@
   "name": "network-operations-agent-showroom",
   "private": true,
   "scripts": {
-    "build:showroom": "antora site.yml"
+    "build:showroom": "antora site.yml",
+    "build:lab": "antora site-lab.yml"
   },
   "devDependencies": {
     "@antora/cli": "3.2.0",

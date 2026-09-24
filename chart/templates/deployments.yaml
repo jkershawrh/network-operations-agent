@@ -40,6 +40,10 @@ spec:
           env:
             - name: NETWORK_OPS_MCP_URL
               value: "http://{{ $name }}-diagnostics:8095/mcp"
+{{- if $.Values.lab.enabled }}
+            - name: NETWORK_OPS_LAB_MODE
+              value: "1"
+{{- end }}
 {{- if $.Values.model.existingSecret }}
             - name: NETWORK_OPS_MODEL_BASE_URL
               valueFrom:

@@ -1,0 +1,43 @@
+api_version: network-operations-agent.lab/v1
+status: source-complete-qualification-pending
+identity:
+  source_name: network-operations-agent
+  catalog_item: separate-from-quickstart
+  audience: [network-operator, platform-engineer, solution-architect]
+user_journey:
+  expected_duration_minutes: 90
+  modules:
+    - establish_baseline
+    - trace_evidence_architecture
+    - build_third_incident
+    - extend_read_only_mcp_diagnostics
+    - inject_and_analyze_failures
+    - qualify_reliability
+    - deliver_noc_decision_brief
+  learner_artifacts:
+    - synthetic_scenario_pack
+    - mcp_tool_contract
+    - qualification_report
+    - noc_decision_brief
+safety_invariants:
+  synthetic_data_only: true
+  remediation_execution: false
+  human_approval_required: true
+  failure_injection_requires_lab_mode: true
+  arbitrary_tools_allowed: false
+qualification:
+  scenarios:
+    - healthy_upstream_timing
+    - hardware_timeout
+    - historical_knowledge_unavailable
+    - conflicting_observations
+    - malformed_tool_response
+  passing_requires:
+    - expected_diagnosis_or_abstention
+    - current_evidence_provenance
+    - explicit_unknowns
+    - no_action_execution
+deployment:
+  helm_flag: lab.enabled=true
+  environment_flag: NETWORK_OPS_LAB_MODE=1
+  catalog_and_flightpath_qualification: pending

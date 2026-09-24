@@ -53,6 +53,17 @@ class ChartTests(unittest.TestCase):
         ], text=True)
         self.assertEqual(rendered.count("quay.io/example/network-operations-agent@sha256:abc123"), 2)
 
+    def test_lab_mode_is_explicitly_opt_in(self):
+        default = subprocess.check_output([
+            "helm", "template", "network-ops", str(ROOT / "chart")
+        ], text=True)
+        enabled = subprocess.check_output([
+            "helm", "template", "network-ops", str(ROOT / "chart"),
+            "--set", "lab.enabled=true",
+        ], text=True)
+        self.assertNotIn("NETWORK_OPS_LAB_MODE", default)
+        self.assertIn("NETWORK_OPS_LAB_MODE", enabled)
+
     def test_lint(self):
         subprocess.run(["helm", "lint", str(ROOT / "chart")], check=True,
                        capture_output=True, text=True)

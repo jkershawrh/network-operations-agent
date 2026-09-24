@@ -1,0 +1,24 @@
+{
+  "schema_version": "network-operations-agent.lab-scenario/v1",
+  "scenario_id": "learner-upstream-holdover",
+  "alarm": {
+    "alarm_id": "synthetic-learner-001",
+    "fixture_revision": "learner-v1",
+    "data_classification": "synthetic",
+    "occurred_at": "2026-09-22T10:00:00Z",
+    "domain": "telco-network",
+    "severity": "major",
+    "required_scopes": ["network", "openshift_platform", "hardware", "upstream_timing"],
+    "kpis": {"master_offset_microseconds": 140, "lock_state": "holdover"},
+    "diagnostics": {
+      "network": {"status": "ok", "observed_at": "2026-09-22T10:01:00Z", "provenance": "learner-network-v1", "observations": [{"signal": "timing_alarm", "state": "present"}]},
+      "openshift_platform": {"status": "ok", "observed_at": "2026-09-22T10:01:00Z", "provenance": "learner-platform-v1", "observations": [{"signal": "platform_timing_fault", "state": "absent"}]},
+      "hardware": {"status": "ok", "observed_at": "2026-09-22T10:01:00Z", "provenance": "learner-hardware-v1", "observations": [{"signal": "nic_timestamp_fault", "state": "absent"}]},
+      "upstream_timing": {"status": "ok", "observed_at": "2026-09-22T10:01:00Z", "provenance": "learner-upstream-v1", "observations": [{"signal": "upstream_timing_fault", "state": "present"}]}
+    }
+  },
+  "knowledge": [
+    {"source_id": "learner-ptp-runbook", "source_revision": "v1", "excerpt": "Check the upstream grandmaster when local platform and NIC timing diagnostics are healthy during holdover.", "tags": ["timing_alarm", "upstream_timing_fault"]}
+  ],
+  "expected_cause": "upstream_timing"
+}

@@ -1,5 +1,6 @@
 [
   {"source_id": "ptp-runbook", "source_revision": "synthetic-v1", "approved": true, "tags": ["timing_alarm"], "excerpt": "Compare alarm time, lock-state changes, platform events, and NIC timestamp health before assigning a cause."},
   {"source_id": "ptp-case-hardware", "source_revision": "synthetic-v1", "approved": true, "tags": ["timing_alarm", "nic_timestamp_fault"], "requires_signal": "nic_timestamp_fault", "excerpt": "A past simulated timing alarm coincided with a NIC timestamp anomaly; platform timing checks were normal."},
-  {"source_id": "ptp-case-platform", "source_revision": "synthetic-v1", "approved": true, "tags": ["timing_alarm", "platform_timing_fault"], "requires_signal": "platform_timing_fault", "excerpt": "A past simulated timing alarm coincided with a platform timing-service fault; NIC timestamp checks were normal."}
+  {"source_id": "ptp-case-platform", "source_revision": "synthetic-v1", "approved": true, "tags": ["timing_alarm", "platform_timing_fault"], "requires_signal": "platform_timing_fault", "excerpt": "A past simulated timing alarm coincided with a platform timing-service fault; NIC timestamp checks were normal."},
+  {"source_id": "ptp-case-upstream", "source_revision": "synthetic-v1", "approved": true, "tags": ["timing_alarm", "upstream_timing_fault"], "requires_signal": "upstream_timing_fault", "excerpt": "A simulated holdover event traced to an unhealthy upstream grandmaster while platform and NIC checks remained normal."}
 ]

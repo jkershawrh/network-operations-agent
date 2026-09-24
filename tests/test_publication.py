@@ -35,6 +35,18 @@ class PublicationTests(unittest.TestCase):
         self.assertTrue(template["action_requires_human_approval"])
         self.assertFalse(template["action_executed"])
 
+    def test_full_lab_is_a_separate_seven_module_build_journey(self):
+        root = ROOT / "showroom-lab" / "modules" / "ROOT"
+        nav = (root / "nav.adoc").read_text()
+        pages = list((root / "pages").glob("*.adoc"))
+        combined = "\n".join(page.read_text() for page in pages)
+        for number in range(1, 8):
+            self.assertIn(f"{number}.", nav)
+        self.assertGreaterEqual(combined.count('role="execute"'), 18)
+        for outcome in ("scenario pack", "qualification report", "NOC decision brief"):
+            self.assertIn(outcome, combined)
+        self.assertIn("start_path: showroom-lab", (ROOT / "site-lab.yml").read_text())
+
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()
         title = text.splitlines()[0]

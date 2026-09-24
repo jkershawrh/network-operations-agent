@@ -1,0 +1,42 @@
+= 2. Trace the evidence architecture
+
+Follow one request through the system instead of treating the UI as a black box.
+
+== Discover the tool boundary
+
+[source,bash,role="execute"]
+----
+MCP_POD=$(oc get pod -l app.kubernetes.io/component=diagnostics -o jsonpath='{.items[0].metadata.name}')
+oc logs "$MCP_POD" --tail=40
+----
+
+The approved contract contains four read-only observations: network timing, platform timing, hardware timestamping, and upstream clock health. Tool output is evidence, not authorization.
+
+== Trace provenance
+
+[source,bash,role="execute"]
+----
+jq '{investigation_id, current: [.current_observations_with_tool_provenance[] | {evidence_id,scope,observed_at,provenance}], history: [.historical_context_with_source_revision[] | {source_id,source_revision}]}' /tmp/hardware.json
+----
+
+Answer these questions before continuing:
+
+. Which fields prove when and where a current observation was produced?
+. Which fields pin historical knowledge to a revision?
+. What happens if a required tool is absent?
+. Why is an LLM-generated explanation not itself evidence?
+
+== Verify isolation and least privilege
+
+[source,bash,role="execute"]
+----
+oc get deploy -o json | jq -r '.items[] | [.metadata.name,.spec.template.spec.automountServiceAccountToken] | @tsv'
+----
+
+[source,bash,role="execute"]
+----
+oc get networkpolicy -o yaml
+----
+
+Checkpoint: the workload does not need a Kubernetes API token, credentials are not rendered into the guide, and the MCP surface contains no mutation tool.
+

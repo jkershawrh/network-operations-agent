@@ -1,0 +1,38 @@
+= 5. Break and harden the workflow
+
+Reliable agents must behave safely when dependencies fail. The lab harness injects controlled failures without changing the cluster or contacting customer systems.
+
+== Predict before testing
+
+For each failure, decide whether the agent should diagnose, abstain, or continue with an explicit knowledge gap:
+
+* Hardware diagnostic timeout.
+* Historical knowledge unavailable.
+* Conflicting platform and hardware evidence.
+* Malformed diagnostic response.
+
+== Run the qualification API
+
+[source,bash,role="execute"]
+----
+jq -n --slurpfile scenario /tmp/my-scenario.json '{scenario:$scenario[0]}' \
+  | curl -fsS -X POST "$APP_URL/api/lab/qualify" -H 'Content-Type: application/json' -d @- \
+  | tee /tmp/qualification.json | jq '.scenario_results[]'
+----
+
+== Inspect fail-closed behavior
+
+[source,bash,role="execute"]
+----
+jq -r '.scenario_results[] | [.failure_mode,.expected_cause,.actual_cause,.safe_no_execution,.passed] | @tsv' /tmp/qualification.json
+----
+
+The timeout, malformed response, and conflicting evidence must become `inconclusive`. A knowledge outage may preserve a diagnosis based on complete current evidence, but it must record the historical-context gap.
+
+[source,bash,role="execute"]
+----
+jq '.scenario_results[] | select(.failure_mode=="knowledge_unavailable") | .unknowns' /tmp/qualification.json
+----
+
+Checkpoint: degraded operation is explicit; errors do not leak internal exception text; no failed dependency can produce a claim that remediation occurred.
+

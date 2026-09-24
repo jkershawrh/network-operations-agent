@@ -4,6 +4,7 @@ WORKDIR /opt/network-operations-agent
 COPY --chown=1001:0 src/ ./src/
 COPY --chown=1001:0 data/ ./data/
 COPY --chown=1001:0 web/ ./web/
+COPY --chown=1001:0 learner-templates/ ./learner-templates/
 COPY --chown=1001:0 requirements-mcp.txt ./requirements-mcp.txt
 RUN pip install --no-cache-dir -r requirements-mcp.txt
 

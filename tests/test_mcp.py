@@ -17,7 +17,8 @@ class MCPTests(unittest.TestCase):
             async with Client(server) as client:
                 tools = await client.list_tools()
                 self.assertEqual({tool.name for tool in tools.tools}, {
-                    "network_timing_status", "platform_timing_status", "hardware_timestamp_status"
+                    "network_timing_status", "platform_timing_status", "hardware_timestamp_status",
+                    "upstream_clock_status",
                 })
                 response = await client.call_tool("hardware_timestamp_status", {
                     "alarm_id": "synthetic-ptp-001",

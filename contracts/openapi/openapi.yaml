@@ -72,6 +72,59 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/Error'}
+  /api/lab/investigate:
+    post:
+      summary: Investigate a validated learner-authored synthetic scenario
+      description: Available only when NETWORK_OPS_LAB_MODE=1.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/LabScenarioRequest'}
+      responses:
+        '200':
+          description: Evidence-separated investigation.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Investigation'}
+        '400':
+          description: Scenario violates the bounded lab contract.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
+        '404':
+          description: Lab mode is disabled.
+  /api/lab/qualify:
+    post:
+      summary: Run the controlled lab reliability matrix
+      description: Available only when NETWORK_OPS_LAB_MODE=1.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/LabScenarioRequest'}
+      responses:
+        '200':
+          description: Machine-readable reliability qualification report.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [schema_version, scenario_id, qualification_id, overall_result, scenario_results, action_executed]
+                properties:
+                  schema_version: {type: string, const: network-operations-agent.qualification/v1}
+                  scenario_id: {type: string}
+                  qualification_id: {type: string}
+                  overall_result: {type: string, enum: [pass, fail]}
+                  scenario_results: {type: array, items: {type: object}}
+                  action_executed: {type: boolean, const: false}
+        '400':
+          description: Scenario violates the bounded lab contract.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
+        '404':
+          description: Lab mode is disabled.
 components:
   schemas:
     Error:
@@ -90,6 +143,12 @@ components:
       required: [scenario_id]
       properties:
         scenario_id: {type: string, enum: [ptp-hardware, ptp-platform]}
+    LabScenarioRequest:
+      type: object
+      additionalProperties: false
+      required: [scenario]
+      properties:
+        scenario: {type: object}
     ReviewRequest:
       type: object
       additionalProperties: false
@@ -111,7 +170,7 @@ components:
       required: [evidence_id, scope, signal, state, observed_at, provenance]
       properties:
         evidence_id: {type: string}
-        scope: {type: string, enum: [network, openshift_platform, hardware]}
+        scope: {type: string, enum: [network, openshift_platform, hardware, upstream_timing]}
         signal: {type: string}
         state: {type: string, enum: [present, absent]}
         observed_at: {type: string}
@@ -130,7 +189,7 @@ components:
       type: object
       required: [cause, supporting_evidence_ids]
       properties:
-        cause: {type: string, enum: [hardware_timing, platform_timing, inconclusive]}
+        cause: {type: string, enum: [hardware_timing, platform_timing, upstream_timing, inconclusive]}
         supporting_evidence_ids: {type: array, items: {type: string}}
     ModelDraft:
       type: object

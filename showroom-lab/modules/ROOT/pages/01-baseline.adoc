@@ -1,0 +1,44 @@
+= 1. Establish the baseline
+
+Before changing the system, prove what it already does and record its safety invariants.
+
+== Inspect the deployment
+
+[source,bash,role="execute"]
+----
+oc get deploy,svc,route
+----
+
+Identify the application and diagnostics deployments. The application may call the diagnostics service and the assigned model endpoint; the diagnostics service exposes only read-only synthetic tools.
+
+[source,bash,role="execute"]
+----
+APP_URL="https://$(oc get route network-operations-workspace -o jsonpath='{.spec.host}')"
+curl -fsS "$APP_URL/ready" | jq
+----
+
+== Replay two known incidents
+
+[source,bash,role="execute"]
+----
+curl -fsS -X POST "$APP_URL/api/investigate" \
+  -H 'Content-Type: application/json' \
+  -d '{"scenario_id":"ptp-hardware"}' | tee /tmp/hardware.json | jq
+----
+
+[source,bash,role="execute"]
+----
+curl -fsS -X POST "$APP_URL/api/investigate" \
+  -H 'Content-Type: application/json' \
+  -d '{"scenario_id":"ptp-platform"}' | tee /tmp/platform.json | jq
+----
+
+Compare the evidence arrays, provenance, hypothesis, unknowns, and proposed action.
+
+[source,bash,role="execute"]
+----
+jq -r '[.alarm_id,.primary_hypothesis.cause,(.current_observations_with_tool_provenance|length),.action_executed] | @tsv' /tmp/{hardware,platform}.json
+----
+
+Checkpoint: both cases must cite current observations, retain historical sources separately, require human approval, and execute no action.
+

@@ -1,0 +1,36 @@
+= 3. Build a new incident
+
+Now create evidence that the original quickstart did not contain. Your scenario adds an upstream grandmaster diagnosis rather than modifying either known answer.
+
+== Start from the bounded contract
+
+[source,bash,role="execute"]
+----
+oc cp "$(oc get pod -l app.kubernetes.io/component=app -o jsonpath='{.items[0].metadata.name}'):/opt/network-operations-agent/learner-templates/upstream-clock-scenario.json" /tmp/my-scenario.json
+jq '.scenario_id,.alarm.required_scopes,.expected_cause' /tmp/my-scenario.json
+----
+
+Edit the synthetic timestamp, offset, source revision, and excerpt while preserving the schema and the four diagnostic scopes.
+
+[source,bash,role="execute"]
+----
+jq '.alarm.kpis.master_offset_microseconds=165 | .knowledge[0].source_revision="learner-v2"' \
+  /tmp/my-scenario.json > /tmp/my-scenario-v2.json
+mv /tmp/my-scenario-v2.json /tmp/my-scenario.json
+----
+
+== Validate and investigate
+
+[source,bash,role="execute"]
+----
+jq -n --slurpfile scenario /tmp/my-scenario.json '{scenario:$scenario[0]}' \
+  | curl -fsS -X POST "$APP_URL/api/lab/investigate" -H 'Content-Type: application/json' -d @- \
+  | tee /tmp/upstream-result.json | jq
+----
+
+[source,bash,role="execute"]
+----
+jq '{cause:.primary_hypothesis.cause,support:.primary_hypothesis.supporting_evidence_ids,unknowns:.unknowns_and_conflicts,executed:.action_executed}' /tmp/upstream-result.json
+----
+
+Checkpoint: the cause is `upstream_timing`, the support points to `upstream_timing-1`, and no action was executed. Save `/tmp/my-scenario.json`; it is your first take-away artifact.

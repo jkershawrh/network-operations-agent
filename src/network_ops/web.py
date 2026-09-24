@@ -13,6 +13,10 @@ INDEX = Path(__file__).resolve().parents[2] / "web" / "index.html"
 SCENARIOS = frozenset({"ptp-hardware", "ptp-platform"})
 
 
+def _lab_enabled() -> bool:
+    return os.environ.get("NETWORK_OPS_LAB_MODE") == "1"
+
+
 class LabHandler(BaseHTTPRequestHandler):
     def _send(self, status: int, body: bytes, content_type: str) -> None:
         self.send_response(status)
@@ -43,14 +47,26 @@ class LabHandler(BaseHTTPRequestHandler):
             self._json(404, {"error": "Not found"})
 
     def do_POST(self) -> None:
-        if self.path not in {"/api/investigate", "/api/review"}:
+        lab_paths = {"/api/lab/investigate", "/api/lab/qualify"}
+        if self.path in lab_paths and not _lab_enabled():
+            self._json(404, {"error": "Not found"})
+            return
+        if self.path not in {"/api/investigate", "/api/review"} | lab_paths:
             self._json(404, {"error": "Not found"})
             return
         try:
             length = int(self.headers.get("Content-Length", "0"))
-            if not 1 <= length <= 1024:
+            if not 1 <= length <= (32768 if self.path in lab_paths else 1024):
                 raise ValueError("Invalid request size")
             request = json.loads(self.rfile.read(length))
+            if self.path in lab_paths:
+                if not isinstance(request, dict) or set(request) != {"scenario"}:
+                    raise ValueError("Unexpected lab request fields")
+                from .lab import qualify_scenario, run_scenario
+                result = (qualify_scenario(request["scenario"]) if self.path.endswith("qualify")
+                          else run_scenario(request["scenario"]))
+                self._json(200, result)
+                return
             expected = {"scenario_id"} if self.path == "/api/investigate" else {
                 "scenario_id", "investigation_id", "decision"
             }

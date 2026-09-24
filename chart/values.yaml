@@ -21,6 +21,11 @@ route:
   enabled: false
   name: ""
 
+lab:
+  # Enables learner-supplied synthetic scenarios and reliability qualification.
+  # Keep false for the short quickstart catalog item.
+  enabled: false
+
 resources:
   requests:
     cpu: 50m

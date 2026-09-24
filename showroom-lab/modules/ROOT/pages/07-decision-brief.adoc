@@ -1,0 +1,40 @@
+= 7. Deliver the NOC brief
+
+Technical evidence becomes useful when an operator can make a bounded decision from it.
+
+== Generate the brief inputs
+
+[source,bash,role="execute"]
+----
+jq '{
+  incident:.alarm_id,
+  hypothesis:.primary_hypothesis,
+  current_evidence:[.current_observations_with_tool_provenance[]|{evidence_id,scope,state,provenance}],
+  historical_sources:[.historical_context_with_source_revision[]|{source_id,source_revision}],
+  unknowns:.unknowns_and_conflicts,
+  next_test:.next_discriminating_test,
+  proposed_action,
+  action_requires_human_approval,
+  action_executed
+}' /tmp/upstream-result.json | tee "$HOME/network-agent-evidence/noc-decision-brief.json"
+----
+
+== Review as the approver
+
+Your handoff must state:
+
+. What is directly observed now.
+. What comes from historical context.
+. What the system infers from those facts.
+. What remains unknown or conflicting.
+. Which read-only test should happen next.
+. That a qualified human—not the model—owns the operational decision.
+
+[source,bash,role="execute"]
+----
+jq -e '.hypothesis.supporting_evidence_ids|length>0' "$HOME/network-agent-evidence/noc-decision-brief.json" && \
+jq -e '.action_requires_human_approval and (.action_executed|not)' "$HOME/network-agent-evidence/noc-decision-brief.json"
+----
+
+You now have a reusable scenario pack, qualification evidence, and decision brief. Continue to xref:conclusion.adoc[the conclusion].
+

@@ -1,0 +1,14 @@
+= Conclusion
+
+You did more than replay the quickstart. You extended an evidence architecture, introduced a new read-only MCP diagnostic, authored a third incident, tested failure behavior, and produced reviewable proof.
+
+The reusable pattern is intentionally industry portable:
+
+* Current tool observations remain separate from historical context.
+* Models may explain evidence but do not create authorization.
+* Missing or conflicting required evidence causes abstention.
+* Human approval and `action_executed=false` remain invariant.
+* Qualification output makes reliability claims repeatable.
+
+Your files are in `$HOME/network-agent-evidence`. They are the “leave with something” outcome for this lab.
+

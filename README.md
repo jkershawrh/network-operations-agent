@@ -22,6 +22,8 @@ Run two incidents with different causes: one has a NIC timestamp fault; the othe
 
 The core experience runs without an LLM so a participant can see which decisions came from evidence. An optional OpenAI-compatible client adds a clearly labeled, **unverified** explanation. The model cannot change the deterministic hypothesis or action boundary; drafts citing nonexistent or irrelevant evidence IDs are rejected. Structural citation checks do not establish that the prose is factually correct.
 
+This repository now contains two deliberately separate journeys. The original 25–35 minute quickstart replays two bounded incidents. The 90-minute lab adds a learner-built upstream-clock scenario, a fourth MCP diagnostic, controlled dependency failures, a reliability qualification report, and a NOC decision brief. Lab APIs are disabled unless `NETWORK_OPS_LAB_MODE=1`; the quickstart default is unchanged.
+
 ## Detailed description
 
 ## Architecture
@@ -77,6 +79,10 @@ oc -n YOUR_NAMESPACE port-forward svc/network-ops-app 8080:8080
 Open `http://127.0.0.1:8080` and run the same two investigations. No public Route is created by default. Launchpad can explicitly set `route.enabled=true` for its participant workspace. To enable optional model wording, have your environment owner provide an **existing Secret** with keys `endpoint`, `name`, and `api-key`, then set `model.existingSecret` on Helm install. The chart maps those keys to the application environment and never creates or prints the Secret.
 If the registry image is private, create an image-pull Secret in the namespace through your approved credential process and set `image.pullSecret` to its name. Do not add registry credentials to this repository.
 
+### Full lab path
+
+The full journey is sourced from `showroom-lab/` and built with `npm run build:lab`. Deploy it as a separate catalog item with `lab.enabled=true`; do not turn the short quickstart item into the lab. The lab adds only bounded synthetic authoring and failure-injection APIs. It still cannot execute remediation or accept arbitrary MCP tools. See the [lab contract](contracts/lab-contract.yaml).
+
 ### Optional model wording
 
 The runtime variables are listed without values in [.env.example](.env.example). A model endpoint must use HTTPS, except for loopback HTTP during local development. The key is supplied by the endpoint owner or provisioner; this repository never assigns one. The model only drafts an explanation after a supported hypothesis exists. A missing, malformed, or unsupported model response leaves the evidence-based investigation intact. Review every model sentence against the cited IDs; no target-model quality claim has been made.
@@ -100,8 +106,9 @@ Run `make compose-down` with the same `COMPOSE` setting used to start locally. F
 - `web/`: learner-facing page.
 - `tests/`: contract, behavior, MCP, model, retrieval, HTTP, chart, and publication checks.
 - `chart/`: namespace-scoped OpenShift packaging with an opt-in participant Route and existing-Secret integration.
-- `showroom/` and `site.yml`: source-owned Antora guided journey for Launchpad.
-- `learner-templates/`: reusable incident-pattern artifact starter.
+- `showroom/` and `site.yml`: the concise quickstart journey.
+- `showroom-lab/` and `site-lab.yml`: the separate seven-module, 90-minute lab journey.
+- `learner-templates/`: reusable quickstart pattern and complete lab scenario starters.
 - `compose.yaml` and `Containerfile`: local two-service deployment on Red Hat UBI.
 - `contracts/`: quickstart output and interface contract.
 - `docs/`: architecture, validation, and Launchpad conversion notes.
@@ -111,6 +118,7 @@ Run `make compose-down` with the same `COMPOSE` setting used to start locally. F
 - [Quickstart validation and open gates](docs/quickstart-validation.md)
 - [Architecture and event flow](docs/architecture.md)
 - [Future quickstart-to-lab path](docs/future-lab-path.md)
+- [Full lab contract](contracts/lab-contract.yaml)
 
 This is a synthetic educational quickstart, not proof of reduced MTTR, fewer truck rolls, production readiness, or hardware acceleration. An amd64 test image was published to a private Quay repository and passed an isolated OpenShift smoke test. Optional CPU-labeled Granite 8B wording passed a [limited direct-model review](docs/model-validation-2026-09-22.md) on two synthetic incidents; backend CPU placement, tenant-gateway access, broader model quality, and contributor-organization review remain open.
 

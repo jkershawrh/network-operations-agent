@@ -1,0 +1,27 @@
+= Evidence-Backed Network Operations Lab
+
+This 90-minute lab moves beyond replaying a quickstart. You will inspect a working telco timing agent, add a new diagnostic domain, build a synthetic incident, inject failures, and produce a qualification report that a NOC lead can review.
+
+== The mission
+
+A timing alarm has moved a radio site into holdover. Existing checks can distinguish an OpenShift platform fault from a NIC timestamp fault, but they cannot prove whether the upstream grandmaster is unhealthy. Your job is to extend the evidence path without giving the agent permission to remediate the network.
+
+You will use Red Hat OpenShift as the operational surface, an MCP-compatible read-only diagnostics service, and an optional OpenAI-compatible model endpoint. Model wording never overrides deterministic policy or evidence requirements.
+
+== Outcomes
+
+By the end you will have:
+
+* A third, learner-authored synthetic incident pack.
+* A contract for an upstream-clock MCP diagnostic.
+* A reliability profile exercised against controlled failures.
+* A machine-readable qualification report.
+* A NOC decision brief that separates facts, history, inference, and unknowns.
+
+[IMPORTANT]
+====
+All incidents are synthetic. No exercise performs remediation. Human approval is always required, and `action_executed` must remain `false`.
+====
+
+Start with xref:01-baseline.adoc[the healthy baseline].
+

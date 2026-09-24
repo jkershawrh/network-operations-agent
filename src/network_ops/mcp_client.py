@@ -15,6 +15,7 @@ APPROVED_TOOLS = {
     "network": "network_timing_status",
     "openshift_platform": "platform_timing_status",
     "hardware": "hardware_timestamp_status",
+    "upstream_timing": "upstream_clock_status",
 }
 
 

@@ -16,8 +16,17 @@ class ContractTests(unittest.TestCase):
         validate(spec)
         self.assertEqual(
             set(spec["paths"]),
-            {"/health", "/ready", "/api/investigate", "/api/review"},
+            {"/health", "/ready", "/api/investigate", "/api/review",
+             "/api/lab/investigate", "/api/lab/qualify"},
         )
+
+    def test_full_lab_contract_is_separate_and_substantial(self):
+        contract = yaml.safe_load((ROOT / "contracts" / "lab-contract.yaml").read_text())
+        self.assertEqual(contract["api_version"], "network-operations-agent.lab/v1")
+        self.assertEqual(contract["identity"]["catalog_item"], "separate-from-quickstart")
+        self.assertGreaterEqual(contract["user_journey"]["expected_duration_minutes"], 75)
+        self.assertGreaterEqual(len(contract["user_journey"]["modules"]), 7)
+        self.assertFalse(contract["safety_invariants"]["remediation_execution"])
 
     def test_contract_parses_and_is_quickstart_scoped(self):
         contract = yaml.safe_load((ROOT / "contracts" / "quickstart-contract.yaml").read_text())

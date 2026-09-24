@@ -15,6 +15,19 @@ from .providers import (
     KnowledgeProvider,
 )
 
+SCOPE_SIGNALS = {
+    "network": "timing_alarm",
+    "openshift_platform": "platform_timing_fault",
+    "hardware": "nic_timestamp_fault",
+    "upstream_timing": "upstream_timing_fault",
+}
+SIGNAL_CAUSES = {
+    "platform_timing_fault": "platform_timing",
+    "nic_timestamp_fault": "hardware_timing",
+    "upstream_timing_fault": "upstream_timing",
+}
+DEFAULT_SCOPES = ("network", "openshift_platform", "hardware")
+
 
 def _stable_id(alarm: dict) -> str:
     source = f"{alarm['alarm_id']}:{alarm['fixture_revision']}"
@@ -41,21 +54,24 @@ def investigate(
     investigation_id = _stable_id(alarm)
     observations: list[dict] = []
     unknowns: list[str] = []
-    scores = {"hardware": 0, "platform": 0}
+    cause_evidence: dict[str, list[str]] = {cause: [] for cause in SIGNAL_CAUSES.values()}
     seen_scopes: set[str] = set()
-    expected_signals = {
-        "network": "timing_alarm",
-        "openshift_platform": "platform_timing_fault",
-        "hardware": "nic_timestamp_fault",
-    }
+    required_scopes = tuple(alarm.get("required_scopes", DEFAULT_SCOPES))
+    if (not required_scopes or len(set(required_scopes)) != len(required_scopes) or
+            any(scope not in SCOPE_SIGNALS for scope in required_scopes)):
+        raise ValueError("Alarm declares unsupported diagnostic scopes")
+    relevant_causes = [
+        SIGNAL_CAUSES[SCOPE_SIGNALS[scope]] for scope in required_scopes
+        if SCOPE_SIGNALS[scope] in SIGNAL_CAUSES
+    ]
     diagnostic_tools = tools if tools is not None else (
         FixtureDiagnosticTool(scope)
-        for scope in ("network", "openshift_platform", "hardware")
+        for scope in required_scopes
     )
 
     for tool in diagnostic_tools:
         scope = tool.scope
-        if scope not in {"network", "openshift_platform", "hardware"}:
+        if scope not in required_scopes:
             raise ValueError("Diagnostic provider has an unsupported scope")
         if scope in seen_scopes:
             raise ValueError("Duplicate diagnostic scope")
@@ -76,7 +92,7 @@ def investigate(
                 raise ValueError("Expected one bounded diagnostic observation")
             for index, finding in enumerate(findings, 1):
                 if (not isinstance(finding, dict) or
-                        finding.get("signal") != expected_signals[scope] or
+                        finding.get("signal") != SCOPE_SIGNALS[scope] or
                         finding.get("state") not in {"present", "absent"}):
                     raise ValueError("Diagnostic observation is unsupported")
                 evidence_id = f"{scope}-{index}"
@@ -88,15 +104,13 @@ def investigate(
                     "observed_at": result["observed_at"],
                     "provenance": result["provenance"],
                 })
-                if finding["state"] == "present":
-                    if finding["signal"] == "platform_timing_fault":
-                        scores["platform"] += 1
-                    elif finding["signal"] == "nic_timestamp_fault":
-                        scores["hardware"] += 1
+                cause = SIGNAL_CAUSES.get(finding["signal"])
+                if finding["state"] == "present" and cause:
+                    cause_evidence[cause].append(evidence_id)
         except (KeyError, TypeError, ValueError, TimeoutError, ConnectionError) as exc:
             unknowns.append(f"{scope} diagnostics unavailable: {type(exc).__name__}")
 
-    for scope in ("network", "openshift_platform", "hardware"):
+    for scope in required_scopes:
         if scope not in seen_scopes:
             unknowns.append(f"{scope} diagnostics not supplied")
 
@@ -126,12 +140,10 @@ def investigate(
         unknowns.append("Historical context unavailable")
 
     complete = not any("diagnostics" in item for item in unknowns)
-    if complete and scores["hardware"] > 0 and scores["platform"] == 0:
-        cause = "hardware_timing"
-        support = [o["evidence_id"] for o in observations if o["signal"] == "nic_timestamp_fault" and o["state"] == "present"]
-    elif complete and scores["platform"] > 0 and scores["hardware"] == 0:
-        cause = "platform_timing"
-        support = [o["evidence_id"] for o in observations if o["signal"] == "platform_timing_fault" and o["state"] == "present"]
+    present_causes = [cause for cause, evidence in cause_evidence.items() if evidence]
+    if complete and len(present_causes) == 1:
+        cause = present_causes[0]
+        support = cause_evidence[cause]
     else:
         cause = "inconclusive"
         support = []
@@ -145,7 +157,10 @@ def investigate(
         "current_observations_with_tool_provenance": observations,
         "historical_context_with_source_revision": context,
         "primary_hypothesis": {"cause": cause, "supporting_evidence_ids": support},
-        "alternate_hypotheses": ["platform_timing", "hardware_timing"] if cause == "inconclusive" else ["platform_timing" if cause == "hardware_timing" else "hardware_timing"],
+        "alternate_hypotheses": (
+            relevant_causes if cause == "inconclusive"
+            else [item for item in relevant_causes if item != cause]
+        ),
         "unknowns_and_conflicts": unknowns,
         "next_discriminating_test": "Compare platform lock-state events with NIC timestamp diagnostics at the same time window",
         "proposed_action": "Have a qualified network operator review the evidence and run the next diagnostic test",

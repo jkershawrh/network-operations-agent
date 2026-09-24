@@ -8,6 +8,8 @@ from urllib.request import Request, urlopen
 
 from network_ops.web import LabHandler
 
+ROOT = __import__("pathlib").Path(__file__).resolve().parents[1]
+
 
 class WebTests(unittest.TestCase):
     @classmethod
@@ -88,6 +90,23 @@ class WebTests(unittest.TestCase):
             with self.assertRaises(HTTPError) as caught:
                 self.post(payload, path="/api/review")
             self.assertEqual(caught.exception.code, 400)
+
+    def test_lab_endpoints_are_off_by_default(self):
+        scenario = json.loads((ROOT / "learner-templates" / "upstream-clock-scenario.json").read_text())
+        with self.assertRaises(HTTPError) as caught:
+            self.post({"scenario": scenario}, path="/api/lab/investigate")
+        self.assertEqual(caught.exception.code, 404)
+
+    def test_lab_mode_investigates_and_qualifies(self):
+        scenario = json.loads((ROOT / "learner-templates" / "upstream-clock-scenario.json").read_text())
+        with patch.dict("os.environ", {"NETWORK_OPS_LAB_MODE": "1"}, clear=True):
+            with self.post({"scenario": scenario}, path="/api/lab/investigate") as response:
+                result = json.load(response)
+            with self.post({"scenario": scenario}, path="/api/lab/qualify") as response:
+                report = json.load(response)
+        self.assertEqual(result["primary_hypothesis"]["cause"], "upstream_timing")
+        self.assertEqual(report["overall_result"], "pass")
+        self.assertFalse(report["action_executed"])
 
 
 if __name__ == "__main__":

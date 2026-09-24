@@ -9,7 +9,7 @@ from .providers import FixtureAlarmProvider
 
 
 server = MCPServer("network-operations-agent-fixtures")
-SCENARIOS = ("ptp-hardware", "ptp-platform")
+SCENARIOS = ("ptp-hardware", "ptp-platform", "ptp-upstream")
 
 
 def _inspect(scope: str, alarm_id: str, occurred_at: str) -> dict:
@@ -40,6 +40,14 @@ def platform_timing_status(alarm_id: str, occurred_at: str, scope: str) -> dict:
 def hardware_timestamp_status(alarm_id: str, occurred_at: str, scope: str) -> dict:
     """Read a synthetic hardware timestamp observation."""
     if scope != "hardware":
+        raise ToolError("Scope mismatch")
+    return _inspect(scope, alarm_id, occurred_at)
+
+
+@server.tool()
+def upstream_clock_status(alarm_id: str, occurred_at: str, scope: str) -> dict:
+    """Read synthetic upstream grandmaster clock health."""
+    if scope != "upstream_timing":
         raise ToolError("Scope mismatch")
     return _inspect(scope, alarm_id, occurred_at)
 

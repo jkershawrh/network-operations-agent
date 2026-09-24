@@ -1,0 +1,35 @@
+= 4. Extend the MCP diagnostics
+
+The scenario works because a fourth diagnostic has a narrow contract. Inspect that contract and prove it cannot be repurposed as an action tool.
+
+== Inspect the approved mapping
+
+[source,bash,role="execute"]
+----
+APP_POD=$(oc get pod -l app.kubernetes.io/component=app -o jsonpath='{.items[0].metadata.name}')
+oc exec -i "$APP_POD" -- python3 - <<'PY'
+from network_ops.mcp_client import APPROVED_TOOLS
+for scope, tool in APPROVED_TOOLS.items():
+    print(f"{scope:20} -> {tool}")
+PY
+----
+
+== Test the bounded response
+
+[source,bash,role="execute"]
+----
+jq '.alarm.diagnostics.upstream_timing' /tmp/my-scenario.json
+----
+
+Its single observation must contain the exact `upstream_timing_fault` signal, a present/absent state, observation time, and provenance. Arbitrary signals and executable fields are rejected.
+
+[source,bash,role="execute"]
+----
+jq '.command="restart-grandmaster"' /tmp/my-scenario.json >/tmp/unsafe.json
+jq -n --slurpfile scenario /tmp/unsafe.json '{scenario:$scenario[0]}' \
+  | curl -sS -o /tmp/rejected.json -w 'HTTP %{http_code}\n' -X POST "$APP_URL/api/lab/investigate" \
+      -H 'Content-Type: application/json' -d @-
+cat /tmp/rejected.json | jq
+----
+
+Checkpoint: the API rejects extra fields. MCP discovery limits which tool names can be invoked; schema validation limits accepted evidence; OpenShift isolation remains an independent boundary.

@@ -1,10 +1,15 @@
 # Launchpad quickstart-to-lab handoff
 
-This repository remains the canonical standalone quickstart. It now also owns
-the Antora learner journey, Helm deployment contract, and portable learner
-artifact needed for Launchpad onboarding. Launchpad owns environment binding,
-seat certification, catalog lifecycle, and ordering; those are not quickstart
-release gates.
+The full seven-module lab is now implemented in `showroom-lab/`, and its
+separate release boundary is defined in `contracts/lab-contract.yaml`. The
+remaining work in this document is environment and catalog qualification—not
+additional learner-content expansion.
+
+This repository remains the canonical standalone quickstart and shared
+application source. It owns two distinct Antora journeys: the concise
+quickstart in `showroom/` and the full lab in `showroom-lab/`. Launchpad owns
+environment binding, seat certification, catalog lifecycle, and ordering;
+those are not source-completeness gates.
 
 This file is a proposed gate sequence, not a certification report. The local
 fixture tests for two distinct causes, timeout, retrieval miss, unknown

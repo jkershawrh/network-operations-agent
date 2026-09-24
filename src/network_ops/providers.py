@@ -26,14 +26,14 @@ class KnowledgeProvider(Protocol):
 
 class FixtureAlarmProvider:
     def load(self, scenario_id: str) -> dict:
-        if scenario_id not in {"ptp-hardware", "ptp-platform"}:
+        if scenario_id not in {"ptp-hardware", "ptp-platform", "ptp-upstream"}:
             raise ValueError("Unknown synthetic scenario")
         return json.loads((DATA / "scenarios" / f"{scenario_id}.json").read_text())
 
 
 class FixtureDiagnosticTool:
     def __init__(self, scope: str):
-        if scope not in {"network", "openshift_platform", "hardware"}:
+        if scope not in {"network", "openshift_platform", "hardware", "upstream_timing"}:
             raise ValueError("Unsupported diagnostic scope")
         self.scope = scope
 
@@ -54,6 +54,7 @@ class ApprovedDiagnosticAdapter:
             "network": "network_timing_status",
             "openshift_platform": "platform_timing_status",
             "hardware": "hardware_timestamp_status",
+            "upstream_timing": "upstream_clock_status",
         }
         if approved.get(scope) != tool_name:
             raise ValueError("Diagnostic tool is not approved for this scope")

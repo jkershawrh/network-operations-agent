@@ -10,11 +10,17 @@ class InvestigationTests(unittest.TestCase):
         self.assertEqual(result["primary_hypothesis"]["supporting_evidence_ids"], ["hardware-1"])
         self.assertTrue(result["action_requires_human_approval"])
         self.assertFalse(result["action_executed"])
+        self.assertNotIn("upstream_timing", result["alternate_hypotheses"])
 
     def test_distinguishes_platform_scenario(self):
         result = investigate("ptp-platform")
         self.assertEqual(result["primary_hypothesis"]["cause"], "platform_timing")
         self.assertEqual(result["primary_hypothesis"]["supporting_evidence_ids"], ["openshift_platform-1"])
+
+    def test_distinguishes_upstream_scenario(self):
+        result = investigate("ptp-upstream")
+        self.assertEqual(result["primary_hypothesis"]["cause"], "upstream_timing")
+        self.assertEqual(result["primary_hypothesis"]["supporting_evidence_ids"], ["upstream_timing-1"])
 
     def test_timeout_abstains_and_preserves_gap(self):
         class BrokenHardware:
