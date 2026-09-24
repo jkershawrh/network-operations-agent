@@ -1,6 +1,5 @@
-name: network-operations-agent-lab
+name: network-operations-agent
 title: Evidence-Backed Network Operations Lab
-version: master
+version: main
 nav:
   - modules/ROOT/nav.adoc
-
