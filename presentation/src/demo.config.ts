@@ -43,7 +43,7 @@ export const demoConfig: DemoConfig = {
     },
     {
       id: 'mechanisms', label: '03', title: 'Why It Worked', scenes: [
-        { id: 'mechanisms', type: 'mechanisms', beat: 'trials', eyebrow: 'The operating mechanisms', title: 'The result is repeatable because the boundaries are explicit', body: 'Explain the machinery inline before moving into guided practice.', mechanisms: [
+        { id: 'mechanisms', type: 'mechanisms', beat: 'trials', eyebrow: 'The operating mechanisms', title: 'The result is repeatable because the boundaries are explicit', mechanisms: [
           { id: 'provenance', label: 'Provenance first', claim: 'Every observation keeps its source.', detail: 'Only validated evidence IDs support a cause.', tone: 'partner' },
           { id: 'abstention', label: 'Fail closed', claim: 'Ambiguity becomes inconclusive.', detail: 'Missing or conflicting evidence blocks a supported cause.', tone: 'primary' },
           { id: 'authority', label: 'Human authority', claim: 'Recommendation is not action.', detail: 'The agent proposes; the operator decides.', tone: 'success' },

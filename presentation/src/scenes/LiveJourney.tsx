@@ -55,7 +55,7 @@ type Result = {
 }
 
 type ScenarioId = 'ptp-hardware' | 'ptp-platform'
-type Phase = 'alarm' | 'investigate' | 'decide' | 'compare' | 'summary'
+type Phase = 'alarm' | 'investigate' | 'policy' | 'decide' | 'compare' | 'summary'
 type Status = 'idle' | 'running' | 'paused' | 'complete' | 'error'
 
 const phases: Array<{
@@ -67,7 +67,8 @@ const phases: Array<{
   lane: 'workload' | 'agent' | 'decision'
 }> = [
   { id: 'alarm', label: 'Alarm', kicker: 'What happened?', explanation: 'One PTP alarm can point to hardware or platform timing.', cta: 'Run live investigation', lane: 'workload' },
-  { id: 'investigate', label: 'Investigate', kicker: 'What did the agent find?', explanation: 'The agent collected current diagnostics and approved history with provenance.', cta: 'Follow the evidence', lane: 'agent' },
+  { id: 'investigate', label: 'Investigate', kicker: 'What did the agent find?', explanation: 'The agent collected current diagnostics and approved history with provenance.', cta: 'Explain the evidence policy', lane: 'agent' },
+  { id: 'policy', label: 'Evidence policy', kicker: 'How did MCP evidence become a supported cause?', explanation: 'Read-only MCP observations are qualified by an explicit evidence contract before any model is called.', cta: 'Apply the policy', lane: 'agent' },
   { id: 'decide', label: 'Decide', kicker: 'What does the first condition support?', explanation: 'Policy supports the cause. CPU inference may explain it. The operator retains authority.', cta: 'Run changed condition', lane: 'decision' },
   { id: 'compare', label: 'Changed condition', kicker: 'What does the second condition support?', explanation: 'The same alarm now enters with a platform fault instead of a NIC fault.', cta: 'Compare outcomes', lane: 'decision' },
   { id: 'summary', label: 'Measured comparison', kicker: 'What changed?', explanation: 'The same alarm produced two evidence-backed causes and no automated action.', cta: '', lane: 'decision' },
@@ -76,9 +77,10 @@ const phases: Array<{
 const audienceActs = [
   { label: 'Alarm', detail: 'Frame the ambiguity', start: 0, end: 0 },
   { label: 'Investigate', detail: 'Collect live evidence', start: 1, end: 1 },
-  { label: 'Decide', detail: 'Bound the conclusion', start: 2, end: 2 },
-  { label: 'Change', detail: 'Run condition two', start: 3, end: 3 },
-  { label: 'Compare', detail: 'Close the proof', start: 4, end: 4 },
+  { label: 'Evidence', detail: 'Qualify MCP results', start: 2, end: 2 },
+  { label: 'Decide', detail: 'Bound the conclusion', start: 3, end: 3 },
+  { label: 'Change', detail: 'Run condition two', start: 4, end: 4 },
+  { label: 'Compare', detail: 'Close the proof', start: 5, end: 5 },
 ]
 
 const titleCase = (value: string) => value.replaceAll('_', ' ')
@@ -111,6 +113,7 @@ const observedTime = (value: string) => value.includes('T') ? `${value.split('T'
 const topologyForPhase: Record<Phase, { active: TopologyNodeId[]; focus: TopologyNodeId[] }> = {
   alarm: { active: ['browser', 'route', 'app-service', 'app'], focus: ['browser', 'route', 'app-service', 'app'] },
   investigate: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history'], focus: ['diagnostics-service', 'mcp', 'history'] },
+  policy: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy'], focus: ['mcp', 'history', 'policy'] },
   decide: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
   compare: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
   summary: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
@@ -136,6 +139,27 @@ function DecisionView({ result, condition }: { result: Result; condition: string
         <section><span>DRAFT OUT</span><strong>{result.model_draft.summary}</strong><small>Cited evidence: {result.model_draft.evidence_ids?.join(', ') ?? 'none'} · unverified wording only</small></section>
       </div> : <div className="llm-not-called"><b>LLM NOT CALLED</b><span>No prompt or draft was produced for this response.</span></div>}
     </motion.div>
+  </div>
+}
+
+function EvidencePolicyView({ result }: { result: Result }) {
+  return <div className="evidence-policy-view" aria-label="MCP evidence qualification">
+    <section>
+      <span>1 · READ-ONLY MCP</span><strong>{result.current_observations_with_tool_provenance.length} bounded diagnostic observations</strong>
+      <div className="policy-observations">{result.current_observations_with_tool_provenance.map((item) => <div key={item.evidence_id}><b>{item.scope === 'openshift_platform' ? 'platform' : item.scope}</b><small>{observationTitle(item)}</small><code>{item.evidence_id} · {item.state}</code><em>{item.provenance}</em></div>)}</div>
+    </section>
+    <section>
+      <span>2 · EVIDENCE CONTRACT</span><strong>Current facts stay separate from retrieved context</strong>
+      <div className="evidence-contract-row"><b>CURRENT</b><small>Timestamped MCP observations with source provenance</small></div>
+      <div className="evidence-contract-row"><b>HISTORY</b><small>{result.historical_context_with_source_revision.length} approved, versioned sources: {result.historical_context_with_source_revision.map((source) => `${source.evidence_id}/${source.source_revision}`).join(', ')}</small></div>
+      <div className="evidence-contract-row"><b>SUPPORT</b><small>Only {result.primary_hypothesis.supporting_evidence_ids.join(', ')} supports the proposed cause</small></div>
+    </section>
+    <section className="policy-rule-card">
+      <span>3 · DETERMINISTIC RULE</span><strong>{result.decision_policy.name}/{result.decision_policy.version}</strong>
+      <p>{result.decision_policy.rule}</p>
+      <small>{result.decision_policy.source} · reviewed application code · fail closed</small>
+      <div><b>QUALIFIED RESULT</b><em>{titleCase(result.primary_hypothesis.cause)}</em></div>
+    </section>
   </div>
 }
 
@@ -270,6 +294,8 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
             <span>APPROVED HISTORY</span><strong>{hardware.historical_context_with_source_revision.length} versioned sources retrieved</strong><small>Context remains separate from current observations.</small>
           </motion.article>
         </div>}
+
+        {phase.id === 'policy' && hardware && <EvidencePolicyView result={hardware} />}
 
         {phase.id === 'decide' && hardware && <DecisionView result={hardware} condition="First condition" />}
         {phase.id === 'compare' && platform && <DecisionView result={platform} condition="Changed condition" />}
