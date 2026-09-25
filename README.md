@@ -26,6 +26,8 @@ This repository contains four depths of one evidence-backed journey: a 15-minute
 
 The `presentation/` application tells the quickstart as a Red Hat × Intel interactive demo story. The built runtime serves it at `/story/`, and the full Showroom exposes it as the *Story* tab beside the live demonstration, guided demo, and hands-on lab. It preserves the same safety and evidence boundaries, calls `POST /api/investigate` for the two approved scenarios, and visibly labels checked-in results as `REHEARSAL` whenever the live endpoint is unavailable. Run it with `npm run presentation:dev` and validate it with `npm run presentation:check`.
 
+A persistent presenter environment, separate from Launchpad seat lifecycle, is deployed in Flightpath's `network-operations-demo` namespace. Reproducible immutable-image values and operational notes are under [`deploy/`](deploy/README.md).
+
 ## Detailed description
 
 ## Architecture
