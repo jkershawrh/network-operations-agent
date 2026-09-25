@@ -5,7 +5,7 @@ const storyAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`
 export const demoConfig: DemoConfig = {
   id: 'network-operations-story',
   title: 'One Alarm. Two Causes. One Evidence Trail.',
-  subtitle: 'Evidence-backed network operations with Red Hat and Intel',
+  subtitle: 'A timing alarm can cross network, platform, and hardware boundaries',
   event: 'Network Operations quickstart',
   audience: 'Network operators, platform teams, and technical decision makers',
   cta: 'Choose the depth that fits the room.',
@@ -17,8 +17,7 @@ export const demoConfig: DemoConfig = {
   acts: [
     {
       id: 'alarm', label: '00', title: 'The Alarm', scenes: [
-        { id: 'intro', type: 'intro', beat: 'ordinary-world', title: 'One Alarm. Two Causes. One Evidence Trail.', subtitle: 'A timing alarm can cross network, platform, and hardware boundaries', speakerPrompt: 'Start with the operator, not the technology: the alarm is real, but it does not identify its own cause.' },
-        { id: 'reframe', type: 'reframe', beat: 'stakes', eyebrow: 'The operational tension', title: 'The first explanation may be wrong', before: 'Ask AI for an answer', after: 'Build a traceable evidence case', detail: 'Current observations, approved history, optional model wording, and human authority must remain distinct. The safety invariant is zero remediation actions executed.', citation: { label: 'Quickstart contract: remediation_execution=false' }, speakerPrompt: 'The value is not autonomous repair. It is a faster, defensible next decision without surrendering operator authority.' },
+        { id: 'reframe', type: 'reframe', beat: 'stakes', eyebrow: 'The operational tension', title: 'The first explanation may be wrong', before: 'Ask AI for an answer', after: 'Build a traceable evidence case', detail: 'Current observations, approved history, optional model wording, and human authority must remain distinct. The safety invariant is zero remediation actions executed.', citation: { label: 'Quickstart contract: remediation_execution=false' }, speakerPrompt: 'Start with the operator, not the technology: the alarm is real, but it does not identify its own cause. The value is a faster, defensible next decision without surrendering operator authority.' },
       ],
     },
     {

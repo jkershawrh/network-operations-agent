@@ -78,7 +78,11 @@ export default function App() {
       setFinale(state.finale)
     }
     const onKey = (event: KeyboardEvent) => {
-      if (['ArrowRight', 'PageDown', ' '].includes(event.key)) { event.preventDefault(); next() }
+      if (['ArrowRight', 'PageDown', ' '].includes(event.key)) {
+        event.preventDefault()
+        if (!started) navigate({ act: 0, scene: 0 }, false, true)
+        else next()
+      }
       if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); previous() }
       if (event.key === 'Home') restart()
       if (event.key.toLowerCase() === 'f') void document.documentElement.requestFullscreen?.()
@@ -87,7 +91,7 @@ export default function App() {
     window.addEventListener('popstate', onPop)
     window.addEventListener('keydown', onKey)
     return () => { window.removeEventListener('popstate', onPop); window.removeEventListener('keydown', onKey) }
-  }, [next, previous, restart])
+  }, [navigate, next, previous, restart, started])
 
   if (!started) return <Opening config={demoConfig} onStart={() => navigate({ act: 0, scene: 0 }, false, true)} />
 

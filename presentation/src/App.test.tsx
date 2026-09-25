@@ -10,6 +10,7 @@ describe('presentation controls', () => {
     expect(screen.getByText('click or press space to begin')).toBeInTheDocument()
     fireEvent.keyDown(window, { key: ' ' })
     expect(new URLSearchParams(window.location.search).get('act')).toBe('0')
+    expect(screen.getByText('The first explanation may be wrong')).toBeInTheDocument()
   })
 
   it('supports deep links', () => {
