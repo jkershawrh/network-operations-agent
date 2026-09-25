@@ -1,6 +1,6 @@
 image:
-  repository: ghcr.io/jkershawrh/network-operations-agent
-  digest: sha256:b240a34670db3009ec827ebe35dcb62bc5ae3ddd423b975fee08b17e114a040d
+  repository: quay.io/rh-ee-jkershaw/network-operations-agent
+  digest: sha256:54decd00b194b29ea1e1fef754caa74687721e3e43abda98f501ffbb7f705a3e
 
 route:
   enabled: true
