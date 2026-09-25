@@ -23,7 +23,13 @@ class ContractTests(unittest.TestCase):
     def test_full_lab_contract_is_separate_and_substantial(self):
         contract = yaml.safe_load((ROOT / "contracts" / "lab-contract.yaml").read_text())
         self.assertEqual(contract["api_version"], "network-operations-agent.lab/v1")
-        self.assertEqual(contract["identity"]["catalog_item"], "separate-from-quickstart")
+        self.assertEqual(contract["identity"]["catalog_item"], "unified-network-operations")
+        self.assertEqual(
+            set(contract["user_journey"]["experience_paths"]),
+            {"presentation", "demonstration", "guided_demo", "hands_on_lab"},
+        )
+        self.assertEqual(contract["deployment"]["story_path"], "/story/")
+        self.assertTrue(contract["deployment"]["shared_runtime_and_evidence_contract"])
         self.assertGreaterEqual(contract["user_journey"]["expected_duration_minutes"], 75)
         self.assertGreaterEqual(len(contract["user_journey"]["modules"]), 7)
         self.assertFalse(contract["safety_invariants"]["remediation_execution"])
@@ -32,6 +38,7 @@ class ContractTests(unittest.TestCase):
         contract = yaml.safe_load((ROOT / "contracts" / "quickstart-contract.yaml").read_text())
         self.assertEqual(contract["api_version"], "network-operations-agent.quickstart/v0.1")
         self.assertTrue(contract["deployment_constraints"]["remediation_execution"] is False)
+        self.assertEqual(contract["deployment_constraints"]["launchpad"]["presentation_path"], "/story/")
 
     def test_result_fields_and_evidence_references(self):
         contract = yaml.safe_load((ROOT / "contracts" / "quickstart-contract.yaml").read_text())

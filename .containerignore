@@ -1,0 +1,12 @@
+.git/
+.github/
+.venv/
+node_modules/
+presentation/node_modules/
+presentation/dist/
+presentation/playwright-report/
+presentation/test-results/
+www/
+www-lab/
+__pycache__/
+*.pyc

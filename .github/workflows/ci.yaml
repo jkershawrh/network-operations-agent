@@ -29,6 +29,8 @@ jobs:
           version: v3.17.3
       - run: python -m pip install -r requirements-dev.txt
       - run: npm ci
+      - run: npm --prefix presentation ci
+      - run: npm run presentation:check
       - run: npm run build:showroom
       - run: npm run build:lab
       - run: helm lint chart
@@ -98,6 +100,11 @@ jobs:
             podman logs "$app" || true
             exit 1
           fi
+          story_html="$(curl -fsS http://127.0.0.1:18080/story/)"
+          grep -q 'id="root"' <<<"$story_html"
+          story_asset="$(sed -n 's/.*src="\([^"]*\.js\)".*/\1/p' <<<"$story_html")"
+          [[ "$story_asset" == /story/assets/*.js ]]
+          curl -fsS "http://127.0.0.1:18080${story_asset}" >/dev/null
           for scenario in ptp-hardware ptp-platform; do
             curl -fsS -X POST http://127.0.0.1:18080/api/investigate \
               -H 'Content-Type: application/json' \

@@ -17,7 +17,7 @@ source_material:
     - ../tests/test_investigation.py
     - ../showroom/modules/ROOT/pages/
   consequential_assumptions:
-    - The presentation is for the 25–35 minute quickstart, not the separate 90-minute lab.
+    - The presentation is the 15-minute opening path in the unified Showroom; the same environment also supports the guided demo and 90-minute lab.
     - The live API is same-origin at /api/investigate when deployed with the application.
 
 architecture:

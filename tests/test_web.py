@@ -38,6 +38,13 @@ class WebTests(unittest.TestCase):
         with urlopen(self.base + "/ready") as response:
             self.assertEqual(json.load(response)["status"], "ready")
 
+    def test_story_is_served_below_a_bounded_path(self):
+        with urlopen(self.base + "/story/?act=0&scene=0") as response:
+            self.assertIn(b'<div id="root"></div>', response.read())
+        with self.assertRaises(HTTPError) as caught:
+            urlopen(self.base + "/story/%2e%2e/README.md")
+        self.assertEqual(caught.exception.code, 404)
+
     def test_investigation_round_trip(self):
         with self.post({"scenario_id": "ptp-platform"}) as response:
             result = json.load(response)

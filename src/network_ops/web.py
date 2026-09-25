@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import json
+import mimetypes
 import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import unquote, urlsplit
 
 from .investigation import investigate
 
 INDEX = Path(__file__).resolve().parents[2] / "web" / "index.html"
+STORY = Path(__file__).resolve().parents[2] / "presentation"
 SCENARIOS = frozenset({"ptp-hardware", "ptp-platform"})
 
 
@@ -30,16 +33,42 @@ class LabHandler(BaseHTTPRequestHandler):
     def _json(self, status: int, data: dict) -> None:
         self._send(status, json.dumps(data).encode(), "application/json; charset=utf-8")
 
+    def _story(self) -> None:
+        """Serve the checked-in presentation build below the stable /story/ path."""
+        request_path = unquote(urlsplit(self.path).path)
+        relative = request_path.removeprefix("/story/")
+        candidate = STORY / (relative or "index.html")
+        try:
+            candidate = candidate.resolve(strict=True)
+            candidate.relative_to(STORY.resolve())
+        except (FileNotFoundError, ValueError):
+            self._json(404, {"error": "Story asset not found"})
+            return
+        if not candidate.is_file():
+            self._json(404, {"error": "Story asset not found"})
+            return
+        content_type = mimetypes.guess_type(candidate.name)[0] or "application/octet-stream"
+        if content_type.startswith("text/") or content_type in {"application/javascript", "image/svg+xml"}:
+            content_type += "; charset=utf-8"
+        self._send(200, candidate.read_bytes(), content_type)
+
     def do_GET(self) -> None:
-        if self.path == "/":
+        request_path = urlsplit(self.path).path
+        if request_path == "/":
             self._send(200, INDEX.read_bytes(), "text/html; charset=utf-8")
-        elif self.path == "/health":
+        elif request_path == "/story":
+            self.send_response(308)
+            self.send_header("Location", "/story/")
+            self.end_headers()
+        elif self.path.startswith("/story/"):
+            self._story()
+        elif request_path == "/health":
             self._json(200, {
                 "status": "ok",
                 "mode": "synthetic_local_proof",
                 "lab_mode": _lab_enabled(),
             })
-        elif self.path == "/ready":
+        elif request_path == "/ready":
             endpoint = os.environ.get("NETWORK_OPS_MCP_URL")
             if endpoint:
                 from .mcp_client import approved_tools_available

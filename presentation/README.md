@@ -1,8 +1,9 @@
 # Network Operations demo story
 
-This standalone React/Vite presentation converts the short Evidence-Backed
-Network Operations Agent quickstart into a Red Hat × Intel hero's-journey demo.
-It does not replace the Showroom quickstart or the separate 90-minute lab.
+This React/Vite presentation converts the Evidence-Backed Network Operations
+Agent into a Red Hat × Intel hero's-journey story. In a built runtime image it
+is served at `/story/` and appears as the *Story* tab beside the live Workspace,
+Terminal, OpenShift Console, and Showroom guide.
 
 ## Run with live proof
 
@@ -18,9 +19,9 @@ In another terminal:
 npm run presentation:dev
 ```
 
-The Vite development server proxies `/api` to `http://127.0.0.1:8080`. A
-deployed presentation must route `/api/investigate` to the same quickstart
-service. If that endpoint is unavailable, the two proof scenes use the
+The Vite development server proxies `/api` to `http://127.0.0.1:8080`. The
+runtime serves the built story and `/api/investigate` from the same origin. If
+that endpoint is unavailable, the two proof scenes use the
 checked-in synthetic fixture and visibly display `REHEARSAL` or `OFFLINE`.
 
 ## Validate

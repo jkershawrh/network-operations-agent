@@ -1,0 +1,52 @@
+= Choose your path
+:navtitle: Choose your path
+
+This single environment supports four connected experiences. They use the same
+bounded application, synthetic scenarios, evidence contract, and participant
+namespace. You can move between paths without ordering another environment.
+
+== Presentation
+
+Use the *Story* tab for a presenter-led Red Hat x Intel narrative. It explains
+the operational problem, trust boundaries, architecture, and value in about
+15 minutes. Its proof scenes call this seat's live investigation API. If that
+API is unavailable, the scene is visibly labeled *REHEARSAL* or *OFFLINE*; a
+fixture is never presented as a live result.
+
+Best for:: opening a workshop, executive context, or a solution overview.
+
+== Demonstration
+
+Use the *Network Operations Workspace* tab to run the two completed synthetic
+incidents. The hardware and platform cases deliberately share an alarm family
+but produce different hypotheses because their current evidence differs.
+
+Best for:: a five-to-ten-minute live proof before participants begin building.
+
+Start with xref:01-baseline.adoc[Establish the baseline], then run the known
+investigations in xref:02-trace.adoc[Trace the evidence architecture].
+
+== Guided demo
+
+Follow the first two exercises with the instructor. The guide explains every
+command, the Workspace displays the structured result, and the OpenShift tab
+shows the namespace-scoped workload. Participants observe and interpret the
+working solution without changing its contract.
+
+Best for:: a 25-to-35-minute guided technical experience.
+
+== Hands-on lab
+
+Complete all seven modules to add an upstream-clock incident, extend a bounded
+read-only MCP diagnostic, inject controlled failures, qualify the behavior, and
+produce a NOC decision brief. The lab never accepts arbitrary tools and never
+executes remediation.
+
+Best for:: the full 90-minute build-and-qualify journey.
+
+[IMPORTANT]
+====
+All four paths use synthetic teaching data. The Story and optional model can
+explain evidence, but deterministic policy and the human reviewer retain the
+decision boundary.
+====

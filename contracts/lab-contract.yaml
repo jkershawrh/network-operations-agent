@@ -2,10 +2,23 @@ api_version: network-operations-agent.lab/v1
 status: source-complete-qualification-pending
 identity:
   source_name: network-operations-agent
-  catalog_item: separate-from-quickstart
+  catalog_item: unified-network-operations
   audience: [network-operator, platform-engineer, solution-architect]
 user_journey:
   expected_duration_minutes: 90
+  experience_paths:
+    presentation:
+      duration_minutes: 15
+      surface: /story/
+    demonstration:
+      duration_minutes: 10
+      surface: network-operations-workspace
+    guided_demo:
+      duration_minutes: 35
+      modules: [establish_baseline, trace_evidence_architecture]
+    hands_on_lab:
+      duration_minutes: 90
+      modules: all
   modules:
     - establish_baseline
     - trace_evidence_architecture
@@ -41,4 +54,6 @@ deployment:
   helm_flag: lab.enabled=true
   environment_flag: NETWORK_OPS_LAB_MODE=1
   ui_config: showroom-lab/ui-config.yml
+  story_path: /story/
+  shared_runtime_and_evidence_contract: true
   catalog_and_flightpath_qualification: pending

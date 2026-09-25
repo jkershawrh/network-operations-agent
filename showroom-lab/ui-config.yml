@@ -6,6 +6,8 @@ view_switcher:
   enabled: true
   default_mode: split
 tabs:
+  - name: Story
+    url: '${WORKSPACE_URL}/story/'
   - name: Network Operations Workspace
     url: '${WORKSPACE_URL}'
   - name: Terminal

@@ -48,8 +48,13 @@ class PublicationTests(unittest.TestCase):
         self.assertIn("start_path: showroom-lab", (ROOT / "site-lab.yml").read_text())
         self.assertIn("start_page: network-operations-agent::index.adoc", (ROOT / "site-lab.yml").read_text())
         ui_config = (ROOT / "showroom-lab" / "ui-config.yml").read_text()
-        for tab in ("Network Operations Workspace", "Terminal", "OpenShift Console"):
+        for tab in ("Story", "Network Operations Workspace", "Terminal", "OpenShift Console"):
             self.assertIn(f"name: {tab}", ui_config)
+        self.assertIn("${WORKSPACE_URL}/story/", ui_config)
+        self.assertIn("journeys.adoc", nav)
+        journeys = (root / "pages" / "journeys.adoc").read_text()
+        for path in ("Presentation", "Demonstration", "Guided demo", "Hands-on lab"):
+            self.assertIn(path, journeys)
         self.assertIn("00-mission-and-architecture.adoc", nav)
         self.assertIn("00-environment-and-concepts.adoc", nav)
         self.assertGreaterEqual(len(combined.split()), 5000)
@@ -61,6 +66,18 @@ class PublicationTests(unittest.TestCase):
         web = (ROOT / "web" / "index.html").read_text()
         for phrase in ("Learner scenario workspace", "Investigate learner scenario", "Run qualification matrix"):
             self.assertIn(phrase, web)
+
+    def test_runtime_image_serves_the_triforce_story(self):
+        containerfile = (ROOT / "Containerfile").read_text()
+        self.assertIn("AS story-builder", containerfile)
+        self.assertIn("RUN npm run build", containerfile)
+        self.assertIn("COPY --from=story-builder", containerfile)
+        web = (ROOT / "src" / "network_ops" / "web.py").read_text()
+        self.assertIn('STORY = Path(__file__).resolve().parents[2] / "presentation"', web)
+        self.assertIn('self.path.startswith("/story/")', web)
+        workflow = (ROOT / ".github" / "workflows" / "ci.yaml").read_text()
+        self.assertIn("npm --prefix presentation ci", workflow)
+        self.assertIn("npm run presentation:check", workflow)
 
     def test_business_story_and_required_sections(self):
         text = (ROOT / "README.md").read_text()

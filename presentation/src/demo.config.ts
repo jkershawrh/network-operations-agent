@@ -1,5 +1,7 @@
 import type { DemoConfig } from './types'
 
+const storyAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`
+
 export const demoConfig: DemoConfig = {
   id: 'network-operations-story',
   title: 'One Alarm. Two Causes. One Evidence Trail.',
@@ -8,8 +10,8 @@ export const demoConfig: DemoConfig = {
   audience: 'Network operators, platform teams, and technical decision makers',
   cta: 'Choose one approved incident and map its evidence boundary.',
   brand: {
-    primary: { name: 'Red Hat', logo: '/logos/redhat.svg', alt: 'Red Hat' },
-    partner: { name: 'Intel', logo: '/logos/intel.png', alt: 'Intel' },
+    primary: { name: 'Red Hat', logo: storyAsset('logos/redhat.svg'), alt: 'Red Hat' },
+    partner: { name: 'Intel', logo: storyAsset('logos/intel.png'), alt: 'Intel' },
     attribution: 'Red Hat × Intel',
   },
   acts: [

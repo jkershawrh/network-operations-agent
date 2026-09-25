@@ -1,4 +1,5 @@
 * xref:index.adoc[Lab overview]
+* xref:journeys.adoc[Choose your path]
 * xref:00-mission-and-architecture.adoc[Mission and architecture]
 * xref:00-environment-and-concepts.adoc[Environment and key concepts]
 * xref:01-baseline.adoc[1. Establish the baseline]

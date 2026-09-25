@@ -8,6 +8,12 @@ AI can help a network operations center correlate alarms, consult diagnostic sys
 
 This 90-minute lab teaches that distinction. You will inspect a working telco timing investigator, trace its evidence path, add a new diagnostic domain, build a synthetic incident, inject failures, and produce a qualification report that a NOC lead can review.
 
+== One environment, four paths
+
+This Showroom combines the presenter story, a live demonstration, a guided
+demo, and the complete hands-on lab. Open xref:journeys.adoc[Choose your path]
+to select the depth that fits your audience and available time.
+
 == The mission
 
 A timing alarm has moved a simulated radio site into holdover. Existing checks can distinguish an OpenShift platform fault from a NIC timestamp fault, but they cannot prove whether the upstream grandmaster clock is unhealthy. Your job is to extend the evidence path without giving the agent permission to remediate the network.
@@ -86,4 +92,3 @@ All incidents are synthetic. No exercise performs remediation. Human approval is
 ====
 
 Start with xref:00-mission-and-architecture.adoc[the mission and architecture].
-

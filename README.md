@@ -22,9 +22,9 @@ Run two incidents with different causes: one has a NIC timestamp fault; the othe
 
 The core experience runs without an LLM so a participant can see which decisions came from evidence. An optional OpenAI-compatible client adds a clearly labeled, **unverified** explanation. The model cannot change the deterministic hypothesis or action boundary; drafts citing nonexistent or irrelevant evidence IDs are rejected. Structural citation checks do not establish that the prose is factually correct.
 
-This repository now contains two deliberately separate journeys. The original 25–35 minute quickstart replays two bounded incidents. The 90-minute lab adds a learner-built upstream-clock scenario, a fourth MCP diagnostic, controlled dependency failures, a reliability qualification report, and a NOC decision brief. Lab APIs are disabled unless `NETWORK_OPS_LAB_MODE=1`; the quickstart default is unchanged.
+This repository contains four depths of one evidence-backed journey: a 15-minute presenter story, a live demonstration, a 25–35 minute guided demo, and a 90-minute hands-on lab. The deeper path adds a learner-built upstream-clock scenario, a fourth MCP diagnostic, controlled dependency failures, a reliability qualification report, and a NOC decision brief. Lab APIs are disabled unless `NETWORK_OPS_LAB_MODE=1`; the bounded demonstration remains the default runtime behavior.
 
-The separate `presentation/` application tells the short quickstart as a Red Hat × Intel interactive demo story. It preserves the same safety and evidence boundaries, calls `POST /api/investigate` for the two approved scenarios, and visibly labels checked-in results as `REHEARSAL` whenever the live endpoint is unavailable. Run it with `npm run presentation:dev` and validate it with `npm run presentation:check`.
+The `presentation/` application tells the quickstart as a Red Hat × Intel interactive demo story. The built runtime serves it at `/story/`, and the full Showroom exposes it as the *Story* tab beside the live demonstration, guided demo, and hands-on lab. It preserves the same safety and evidence boundaries, calls `POST /api/investigate` for the two approved scenarios, and visibly labels checked-in results as `REHEARSAL` whenever the live endpoint is unavailable. Run it with `npm run presentation:dev` and validate it with `npm run presentation:check`.
 
 ## Detailed description
 
@@ -83,7 +83,7 @@ If the registry image is private, create an image-pull Secret in the namespace t
 
 ### Full lab path
 
-The full journey is sourced from `showroom-lab/` and built with `npm run build:lab`. Deploy it as a separate catalog item with `lab.enabled=true`; do not turn the short quickstart item into the lab. The lab adds only bounded synthetic authoring and failure-injection APIs. It still cannot execute remediation or accept arbitrary MCP tools. See the [lab contract](contracts/lab-contract.yaml).
+The unified Showroom journey is sourced from `showroom-lab/` and built with `npm run build:lab`. Deploy it with `lab.enabled=true`; its entry page lets an instructor select Presentation, Demonstration, Guided demo, or Hands-on lab without ordering another environment. The deeper lab path adds only bounded synthetic authoring and failure-injection APIs. It still cannot execute remediation or accept arbitrary MCP tools. See the [lab contract](contracts/lab-contract.yaml).
 
 ### Optional model wording
 
@@ -109,7 +109,7 @@ Run `make compose-down` with the same `COMPOSE` setting used to start locally. F
 - `tests/`: contract, behavior, MCP, model, retrieval, HTTP, chart, and publication checks.
 - `chart/`: namespace-scoped OpenShift packaging with an opt-in participant Route and existing-Secret integration.
 - `showroom/` and `site.yml`: the concise quickstart journey.
-- `showroom-lab/` and `site-lab.yml`: the separate seven-module, 90-minute lab journey.
+- `showroom-lab/` and `site-lab.yml`: the unified four-path Showroom and seven-module lab journey.
 - `learner-templates/`: reusable quickstart pattern and complete lab scenario starters.
 - `compose.yaml` and `Containerfile`: local two-service deployment on Red Hat UBI.
 - `contracts/`: quickstart output and interface contract.

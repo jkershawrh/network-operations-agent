@@ -67,6 +67,7 @@ deployment_constraints:
   images: source_build_and_private_registry_proof
   launchpad:
     guided_content: showroom
+    presentation_path: /story/
     application_route: opt_in
     model_secret_keys: [endpoint, name, api-key]
     ordered_seat_certification: not_run
