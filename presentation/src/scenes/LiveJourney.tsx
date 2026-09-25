@@ -64,6 +64,31 @@ const audienceActs = [
 
 const titleCase = (value: string) => value.replaceAll('_', ' ')
 
+const signalCopy: Record<string, { title: string; fault: string; healthy: string }> = {
+  timing_alarm: {
+    title: 'PTP clock synchronization alarm',
+    fault: 'The network clock is no longer reliably locked to its timing source.',
+    healthy: 'The network timing alarm is clear.',
+  },
+  nic_timestamp_fault: {
+    title: 'NIC hardware timestamping',
+    fault: 'The adapter reports unreliable packet timestamping at the hardware boundary.',
+    healthy: 'The adapter timestamping check is healthy, so the fault is not at the NIC.',
+  },
+  platform_timing_fault: {
+    title: 'Platform timing service',
+    fault: 'The host timing stack reports a synchronization fault above the NIC.',
+    healthy: 'The host timing service is healthy, so the platform path is not implicated.',
+  },
+}
+
+const observationTitle = (item: Observation) => signalCopy[item.signal]?.title ?? titleCase(item.signal)
+const observationMeaning = (item: Observation) => item.state === 'present'
+  ? signalCopy[item.signal]?.fault ?? 'The signal is active in the current evidence.'
+  : signalCopy[item.signal]?.healthy ?? 'The signal is clear in the current evidence.'
+const observationState = (item: Observation) => item.state === 'present' ? 'FAULT DETECTED' : 'CHECK HEALTHY'
+const observedTime = (value: string) => value.includes('T') ? `${value.split('T')[1].replace('Z', '')}Z` : value
+
 const topologyForPhase: Record<Phase, { active: TopologyNodeId[]; focus: TopologyNodeId[] }> = {
   alarm: { active: ['browser', 'route', 'app-service', 'app'], focus: ['browser', 'route', 'app-service', 'app'] },
   investigate: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history'], focus: ['diagnostics-service', 'mcp', 'history'] },
@@ -187,14 +212,14 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
         <p className="workspace-explanation">{phase.explanation}</p>
 
         {phase.id === 'alarm' && <div className="incident-intake">
-          <div><span>ALARM</span><strong>PTP synchronization degraded</strong><small>synthetic-ptp-001 · production-network profile</small></div>
-          <div><span>TWO POSSIBLE CAUSES</span><strong>Hardware timing or platform timing</strong><small>The alarm label cannot distinguish them.</small></div>
-          <div><span>BOUNDARY</span><strong>Read-only investigation</strong><small>The agent can inspect evidence—not change the network.</small></div>
+          <div><span>NOC ALARM</span><strong>PTP synchronization degraded</strong><small>A network clock is no longer reliably locked to its grandmaster timing source.</small></div>
+          <div><span>OPERATIONAL IMPACT</span><strong>Timestamps can no longer be trusted</strong><small>Event ordering, telemetry correlation, and time-sensitive traffic may become unreliable.</small></div>
+          <div><span>THE AMBIGUITY</span><strong>NIC hardware or host timing service?</strong><small>The same alarm appears for two faults that require different operator responses.</small></div>
         </div>}
 
         {phase.id === 'investigate' && hardware && <div className="evidence-list">
           {hardware.current_observations_with_tool_provenance.map((item, index) => <motion.article key={item.evidence_id} className={hardware.primary_hypothesis.supporting_evidence_ids.includes(item.evidence_id) ? 'supporting' : ''} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * .12 }}>
-            <span>LIVE · {item.scope}</span><strong>{titleCase(item.signal)} · {item.state}</strong><small>{item.evidence_id}</small>
+            <span>LIVE · {item.scope}</span><div><strong>{observationTitle(item)}</strong><small>{observationMeaning(item)}</small></div><code className={item.state === 'present' ? 'fault' : 'healthy'}>{observationState(item)} · {observedTime(item.observed_at)}</code>
           </motion.article>)}
           <motion.article className="history-summary supporting" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .36 }}>
             <span>APPROVED HISTORY</span><strong>{hardware.historical_context_with_source_revision.length} versioned sources retrieved</strong><small>Context remains separate from current observations.</small>
@@ -221,7 +246,13 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
         {phase.id === 'compare' && hardwareEvidence && platformEvidence && hardware && platform && <div className="comparison-workspace">
           <div className="comparison-thesis"><span>SAME ALARM</span><strong>PTP synchronization degraded</strong><small>Evidence—not the label—changed the decision.</small></div>
           {[{ label: 'Hardware signal', evidence: hardwareEvidence, result: hardware }, { label: 'Platform signal', evidence: platformEvidence, result: platform }].map((item) => <article key={item.evidence.scenarioId}>
-            <span>{item.label}</span><strong>{titleCase(item.evidence.cause)}</strong><div><b>{item.evidence.observationCount}</b> observations <b>{item.evidence.latencyMs}ms</b> request</div><small>Support: {item.evidence.supportingEvidenceIds.join(', ')} · action executed: {String(item.result.action_executed)}</small>
+            <span>{item.label}</span><strong>{titleCase(item.evidence.cause)}</strong>
+            <div className="comparison-evidence-log" aria-label={`${item.label} evidence records`}>
+              {item.result.current_observations_with_tool_provenance.map((observation) => <code className={item.result.primary_hypothesis.supporting_evidence_ids.includes(observation.evidence_id) ? 'supporting' : ''} key={observation.evidence_id}>
+                <b>{observedTime(observation.observed_at)}</b><span>{observationTitle(observation)}</span><em>{observationState(observation)}</em>
+              </code>)}
+            </div>
+            <small>Supported by {item.evidence.supportingEvidenceIds.join(', ')} · no automated action</small>
           </article>)}
         </div>}
 

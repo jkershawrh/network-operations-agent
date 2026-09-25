@@ -44,7 +44,7 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
       current_observations_with_tool_provenance: [
         { evidence_id: hardware ? 'hardware-1' : 'openshift_platform-1', scope: hardware ? 'hardware' : 'openshift_platform', signal: hardware ? 'nic_timestamp_fault' : 'platform_timing_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
         { evidence_id: 'network-1', scope: 'network', signal: 'timing_alarm', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
-        { evidence_id: 'control-1', scope: 'control', signal: 'alternate_fault', state: 'absent', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
+        { evidence_id: 'control-1', scope: hardware ? 'openshift_platform' : 'hardware', signal: hardware ? 'platform_timing_fault' : 'nic_timestamp_fault', state: 'absent', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
       ],
       historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'runbook', source_revision: 'v1', excerpt: 'Compare current timing signals before assigning a cause.' }],
       primary_hypothesis: { cause: hardware ? 'hardware_timing' : 'platform_timing', supporting_evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
@@ -67,7 +67,8 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   await page.getByRole('button', { name: /Run live investigation/ }).click()
   await expect(page.getByText('What did the agent find?')).toBeVisible()
   await expectActionsAnchored()
-  await expect(page.getByText('nic timestamp fault · present')).toBeVisible()
+  await expect(page.getByText('NIC hardware timestamping')).toBeVisible()
+  await expect(page.getByText(/adapter reports unreliable packet timestamping/)).toBeVisible()
   await page.getByRole('button', { name: /Follow the evidence/ }).click()
   await expectActionsAnchored()
   await expect(page.getByText('hardware timing').first()).toBeVisible()
@@ -88,7 +89,12 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   expect(Math.abs(finalTopologyBox!.x - initialTopologyBox!.x)).toBeLessThanOrEqual(1)
   expect(Math.abs(finalTopologyBox!.y - initialTopologyBox!.y)).toBeLessThanOrEqual(1)
   await expect(page.getByText('platform timing').first()).toBeVisible()
+  await expect(page.getByLabel('Hardware signal evidence records')).toContainText('NIC hardware timestamping')
+  await expect(page.getByLabel('Hardware signal evidence records')).toContainText('FAULT DETECTED')
+  await expect(page.getByLabel('Platform signal evidence records')).toContainText('Platform timing service')
+  await expect(page.getByLabel('Platform signal evidence records')).toContainText('FAULT DETECTED')
   await expect(page.getByText(/Evidence—not the label—changed the decision/)).toBeVisible()
+  await expect(page).toHaveScreenshot('live-journey-comparison.png', { fullPage: true })
   await expect(page).toHaveURL(/act=2/)
   await page.goto('/?act=4&scene=0')
   await expect(page.getByText('THE RESULT')).toBeVisible()
