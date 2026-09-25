@@ -438,7 +438,9 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .source-rehearsal, .source-offline { color: var(--warning); background: var(--warning-dim); }
 .fallback-note, .error-panel { color: var(--warning); font-size: .82rem; }
 
-.finale { cursor: default; }
+.finale { width: 100%; min-height: calc(100vh - 58px); padding: clamp(1.5rem, 4vw, 3.5rem); cursor: default; }
+.finale > div { width: min(920px, 100%); margin: 0 auto; }
+.finale h1 { margin-top: var(--space-4); }
 .guided-handoff { width: min(680px, 100%); display: grid; justify-items: center; gap: .8rem; margin: 2rem auto; padding: 1.5rem; border: 1px solid var(--intel-cyan); border-radius: var(--radius-md); background: var(--intel-cyan-dim); }
 .guided-handoff > strong { color: var(--intel-cyan); font-size: 1.4rem; }
 .guided-handoff > span { max-width: 580px; color: var(--text-secondary); line-height: 1.5; }

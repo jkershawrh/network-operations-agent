@@ -23,6 +23,24 @@ test('core controls are keyboard reachable', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Restart presentation' })).toBeFocused()
 })
 
+test('closing payoff and lab handoff remain visually centered', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'rehearsal-mobile', 'Mobile is a scrollable rehearsal view')
+  await page.goto('/?act=4&scene=0&finale=1')
+  const expectCentered = async (selector: string) => {
+    const box = await page.locator(selector).boundingBox()
+    const viewport = page.viewportSize()!
+    const centerOffset = Math.abs((box!.y + box!.height / 2) - viewport.height / 2)
+    expect(centerOffset).toBeLessThan(viewport.height * 0.1)
+  }
+  await expect(page.getByRole('button', { name: 'Close presentation' })).toBeVisible()
+  await expectCentered('.finale > div')
+  await expect(page).toHaveScreenshot('presentation-close.png', { fullPage: true })
+  await page.getByRole('button', { name: 'Close presentation' }).click()
+  await expect(page.getByRole('heading', { name: 'The lab is the next journey.' })).toBeVisible()
+  await expectCentered('.finale > div')
+  await expect(page).toHaveScreenshot('lab-next-journey.png', { fullPage: true })
+})
+
 test('desktop story acts fit one viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'rehearsal-mobile', 'Mobile is a scrollable rehearsal view')
   for (const act of [0, 1, 2, 3, 4]) {
