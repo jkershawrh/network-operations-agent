@@ -9,5 +9,7 @@ build/
 venv/
 .venv/
 node_modules/
+playwright-report/
+test-results/
 www/
 www-lab/
