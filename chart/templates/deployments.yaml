@@ -45,6 +45,8 @@ spec:
               value: "1"
 {{- end }}
 {{- if $.Values.model.existingSecret }}
+            - name: NETWORK_OPS_MODEL_RUNTIME
+              value: {{ $.Values.model.runtimeLabel | quote }}
             - name: NETWORK_OPS_MODEL_BASE_URL
               valueFrom:
                 secretKeyRef:

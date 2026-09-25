@@ -9,6 +9,10 @@ route:
 lab:
   enabled: true
 
+model:
+  existingSecret: network-operations-demo-model
+  runtimeLabel: Intel Xeon 6767P · 78 CPU cores requested
+
 resources:
   requests:
     cpu: 50m

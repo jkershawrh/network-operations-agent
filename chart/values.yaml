@@ -10,6 +10,8 @@ image:
 model:
   # Optional pre-existing Secret. Launchpad creates this per seat.
   existingSecret: ""
+  # Presenter-visible placement label. Set only after cluster-side verification.
+  runtimeLabel: "placement unverified"
   secretKeys:
     endpoint: endpoint
     name: name

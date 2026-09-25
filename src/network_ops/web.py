@@ -20,6 +20,16 @@ def _lab_enabled() -> bool:
     return os.environ.get("NETWORK_OPS_LAB_MODE") == "1"
 
 
+def _attach_model_metadata(result: dict, model: str, runtime: str) -> dict:
+    """Identify a successful draft without turning deployment labels into evidence."""
+    draft = result.get("model_draft")
+    if not isinstance(draft, dict) or draft.get("status") != "unverified_draft_for_human_review":
+        return result
+    output = dict(result)
+    output["model_draft"] = dict(draft, model=model, runtime=runtime)
+    return output
+
+
 class LabHandler(BaseHTTPRequestHandler):
     def _send(self, status: int, body: bytes, content_type: str) -> None:
         self.send_response(status)
@@ -146,6 +156,11 @@ class LabHandler(BaseHTTPRequestHandler):
                     os.environ["NETWORK_OPS_MODEL_API_KEY"],
                 )
                 result = add_model_draft(result, model)
+                result = _attach_model_metadata(
+                    result,
+                    os.environ["NETWORK_OPS_MODEL_NAME"],
+                    os.environ.get("NETWORK_OPS_MODEL_RUNTIME", "placement unverified"),
+                )
             except (KeyError, ValueError):
                 result = dict(result, model_draft={"status": "unavailable_or_rejected"})
         self._json(200, result)

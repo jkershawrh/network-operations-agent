@@ -7,6 +7,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from network_ops.web import LabHandler
+from network_ops.web import _attach_model_metadata
 
 ROOT = __import__("pathlib").Path(__file__).resolve().parents[1]
 
@@ -66,6 +67,16 @@ class WebTests(unittest.TestCase):
         self.assertEqual(result["model_draft"], {"status": "unavailable_or_rejected"})
         self.assertEqual(result["primary_hypothesis"]["cause"], "platform_timing")
         self.assertNotIn("private-test-secret", raw)
+
+    def test_model_metadata_names_verified_runtime_without_exposing_credentials(self):
+        result = {"model_draft": {"status": "unverified_draft_for_human_review"}}
+        enriched = _attach_model_metadata(result, "granite-3.2-8b-tools", "Intel Xeon 6767P")
+        self.assertEqual(enriched["model_draft"]["model"], "granite-3.2-8b-tools")
+        self.assertEqual(enriched["model_draft"]["runtime"], "Intel Xeon 6767P")
+
+    def test_rejected_model_draft_does_not_claim_runtime(self):
+        result = {"model_draft": {"status": "unavailable_or_rejected"}}
+        self.assertEqual(_attach_model_metadata(result, "granite", "Intel Xeon"), result)
 
     def test_readiness_reports_unavailable_mcp(self):
         with patch.dict("os.environ", {"NETWORK_OPS_MCP_URL": "http://127.0.0.1:1/mcp"}, clear=True):

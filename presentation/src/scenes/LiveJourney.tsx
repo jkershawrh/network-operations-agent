@@ -34,7 +34,7 @@ type Result = {
   proposed_action: string
   action_requires_human_approval: boolean
   action_executed: boolean
-  model_draft?: { status?: string; model?: string; text?: string }
+  model_draft?: { status?: string; model?: string; runtime?: string; summary?: string; evidence_ids?: string[] }
 }
 
 type ScenarioId = 'ptp-hardware' | 'ptp-platform'
@@ -206,7 +206,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
             <span>HUMAN ACTS</span><strong>Review required</strong><small>No remediation executed</small>
           </motion.div>
           <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
-            <span>INTEL CPU TARGET</span><strong>{hardware.model_draft ? 'Optional model returned a draft' : 'Not configured on Flightpath'}</strong><small><b>LLM NOT CALLED</b> · The evidence decision is complete without inference. A future CPU-hosted draft may explain it, never change it.</small>
+            <span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured on Flightpath'}</strong><small>{hardware.model_draft?.runtime ? <><b>{hardware.model_draft.runtime}</b> · Draft checked against {hardware.model_draft.evidence_ids?.length ?? 0} evidence IDs.</> : <><b>LLM NOT CALLED</b> · The evidence decision is complete without inference.</>}</small>
           </motion.div>
         </div>}
 
