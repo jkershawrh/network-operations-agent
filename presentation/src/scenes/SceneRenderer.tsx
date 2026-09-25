@@ -33,13 +33,6 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
   return (
     <SceneFrame scene={scene}>
       <div className="guided-architecture guided-technical" data-testid="guided-architecture">
-        <div className="architecture-map" aria-label="Architecture progress">
-          {scene.layers.map((item, index) => (
-            <div className={`architecture-map-item ${toneClass(item.tone)} ${index < step ? 'done' : ''} ${index === step ? 'active' : ''}`} key={item.id}>
-              <span>{index + 1}</span><strong>{item.component}</strong>
-            </div>
-          ))}
-        </div>
         <AnimatePresence mode="wait">
           {!complete ? (
             <motion.div className="architecture-dialog" key={layer.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>

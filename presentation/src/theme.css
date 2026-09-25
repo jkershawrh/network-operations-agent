@@ -138,14 +138,6 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .architecture-node.tone-partner { border-color: var(--intel-cyan); }
 .architecture-node.tone-success { border-color: var(--success); }
 .guided-architecture { display: grid; grid-template-columns: minmax(180px, .34fr) 1fr; gap: var(--space-5); margin-top: var(--space-4); text-align: left; }
-.architecture-map { display: grid; align-content: start; gap: var(--space-2); }
-.architecture-map-item { display: grid; grid-template-columns: 28px 1fr; align-items: center; gap: var(--space-2); padding: .7rem; color: var(--text-disabled); border-left: 3px solid var(--border); background: var(--surface-1); }
-.architecture-map-item > span { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; background: var(--surface-2); font: 700 .7rem 'Red Hat Mono'; }
-.architecture-map-item.active { color: var(--text); border-color: var(--intel-cyan); }
-.architecture-map-item.done { color: var(--success); border-color: var(--success); }
-.architecture-map-item.tone-primary.active { border-color: var(--rh-red); }
-.architecture-map-item.tone-partner.active { border-color: var(--intel-cyan); }
-.architecture-map-item.tone-success.active { border-color: var(--success); }
 .architecture-dialog { min-height: 360px; display: flex; flex-direction: column; justify-content: center; gap: var(--space-3); padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); }
 .architecture-question span, .architecture-answer span, .journey-meta { color: var(--intel-cyan); font: 700 .68rem 'Red Hat Mono'; letter-spacing: .1em; text-transform: uppercase; }
 .architecture-question h2 { font: 700 clamp(1.5rem, 2.8vw, 2.5rem) 'Red Hat Display'; margin: .45rem 0; }
@@ -198,13 +190,10 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-policy:not(.active) span { color: var(--text-disabled); }
 .topology-optional-path { grid-column: 4 / 6; grid-row: 1; display: flex; justify-content: flex-start; align-items: center; margin-left: .35rem; opacity: .72; }
 .topology-optional-path .topology-node { width: 175px; min-height: 54px; }
-.guided-technical { grid-template-columns: 180px 1fr; gap: .75rem 1rem; margin-top: .5rem; }
+.guided-technical { grid-template-columns: 1fr; gap: .75rem; margin-top: .5rem; }
 .scene:has(.guided-technical) { width: min(1400px, 100%); }
 .scene:has(.guided-technical) > h1 { max-width: 1320px; font-size: clamp(1.8rem, 2.65vw, 2.75rem); }
 .scene:has(.guided-technical) > .lede { margin-bottom: .55rem; }
-.guided-technical .architecture-map { grid-template-columns: repeat(6, 1fr); grid-column: 1 / -1; }
-.guided-technical .architecture-map-item { grid-template-columns: 22px 1fr; padding: .4rem .55rem; font-size: .68rem; }
-.guided-technical .architecture-map-item > span { width: 20px; height: 20px; }
 .guided-technical .architecture-dialog { grid-column: 1 / -1; min-height: 128px; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); grid-template-rows: 1fr auto; align-items: center; gap: .45rem 1.5rem; padding: .8rem 1.25rem; }
 .guided-technical .architecture-question { grid-column: 1; grid-row: 1; }
 .guided-technical .architecture-answer { grid-column: 2; grid-row: 1 / span 2; }
@@ -473,9 +462,6 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .guided-technical .architecture-complete > h2,
   .guided-technical .architecture-complete > p,
   .guided-technical .architecture-complete > .button { grid-column: 1; grid-row: auto; }
-  .architecture-map { grid-template-columns: repeat(5, 1fr); }
-  .architecture-map-item { grid-template-columns: 1fr; text-align: center; font-size: .65rem; border-left: 0; border-bottom: 3px solid var(--border); }
-  .architecture-map-item > span { margin: auto; }
   .journey-status { align-items: flex-start; flex-direction: column; }
   .topology-legend { flex-wrap: wrap; justify-content: flex-start; }
   .topology-graph { display: flex; flex-direction: column; align-items: stretch; }

@@ -94,6 +94,7 @@ describe('SceneRenderer', () => {
   it('guides architecture as operator questions and revealed answers', async () => {
     const scene = scenes.find((item) => item.type === 'guided-architecture')!
     const { container } = render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    expect(screen.queryByLabelText('Architecture progress')).not.toBeInTheDocument()
     expect(screen.getByText('What exactly happened?')).toBeInTheDocument()
     expect(screen.queryByText('A validated event starts the investigation.')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
