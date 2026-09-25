@@ -374,6 +374,10 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .mechanism-card em, .mechanism-card small { color: var(--text-secondary); font-style: normal; line-height: 1.45; }
 .evidence-payoff { display: grid; gap: var(--space-4); }
 .evidence-payoff-status, .evidence-empty { display: flex; align-items: center; justify-content: center; gap: var(--space-3); }
+.payoff-model-proof { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: .65rem; padding: .65rem .85rem; border: 1px solid var(--intel-cyan); border-radius: var(--radius-sm); background: var(--intel-cyan-dim); text-align: left; }
+.payoff-model-proof span { color: var(--intel-cyan); font: 700 .62rem 'Red Hat Mono'; letter-spacing: .08em; }
+.payoff-model-proof strong { font-family: 'Red Hat Mono'; }
+.payoff-model-proof small { color: var(--text-secondary); }
 .proof-equation { display: grid; grid-template-columns: 1fr auto 1fr auto 1.15fr; align-items: center; gap: .7rem; }
 .proof-equation > div { display: grid; gap: .3rem; padding: .85rem 1rem; text-align: left; border-top: 3px solid var(--intel-cyan); background: var(--surface-1); }
 .proof-equation > b { color: var(--text-disabled); font: 700 1.4rem 'Red Hat Mono'; }

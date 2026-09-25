@@ -44,6 +44,7 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
       historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'runbook', source_revision: 'v1', excerpt: 'Compare current timing signals before assigning a cause.' }],
       primary_hypothesis: { cause: hardware ? 'hardware_timing' : 'platform_timing', supporting_evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
       alternate_hypotheses: [hardware ? 'platform_timing' : 'hardware_timing'], unknowns_and_conflicts: [], next_discriminating_test: 'Compare synchronized events', proposed_action: 'Have an operator review the evidence', action_requires_human_approval: true, action_executed: false,
+      model_draft: { status: 'unverified_draft_for_human_review', model: 'granite-3.2-8b-tools', runtime: 'Intel Xeon 6767P', evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
     } })
   })
   await page.goto('/?act=2&scene=0')
@@ -55,8 +56,8 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   await page.getByRole('button', { name: /Inspect approved history/ }).click()
   await page.getByRole('button', { name: /Evaluate the evidence/ }).click()
   await expect(page.getByText('hardware timing').first()).toBeVisible()
-  await expect(page.getByText('INTEL CPU TARGET', { exact: true })).toBeVisible()
-  await expect(page.getByText('Not configured on Flightpath')).toBeVisible()
+  await expect(page.getByText('INTEL CPU LIVE', { exact: true })).toBeVisible()
+  await expect(page.getByText('granite-3.2-8b-tools').first()).toBeVisible()
   await expect(page.getByText('POLICY DECIDES')).toBeVisible()
   await page.getByRole('button', { name: /Review the authority boundary/ }).click()
   await expect(page.getByText('Action executed: false')).toBeVisible()
@@ -67,6 +68,9 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   await expect(page.getByText(/Each checkpoint inspects the same evidence record/)).toBeVisible()
   await expect(page).toHaveURL(/act=2/)
   await page.goto('/?act=4&scene=0')
-  await expect(page.getByText('TWO SUPPORTED DECISIONS')).toBeVisible()
+  await expect(page.getByText('SUPPORTED DECISIONS')).toBeVisible()
   await expect(page.getByText('ZERO AUTOMATED ACTIONS')).toBeVisible()
+  await expect(page.getByText('INTEL CPU LIVE')).toBeVisible()
+  await expect(page.getByText(/explanation only · no evidence or action authority/)).toBeVisible()
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true)
 })

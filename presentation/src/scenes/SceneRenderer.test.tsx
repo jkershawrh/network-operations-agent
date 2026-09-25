@@ -104,15 +104,17 @@ describe('SceneRenderer', () => {
 
   it('builds the payoff from live journey evidence', () => {
     clearJourneyEvidence()
-    recordJourneyEvidence({ scenarioId: 'ptp-hardware', cause: 'hardware_timestamping', observationCount: 3, historicalSourceCount: 1, supportingEvidenceIds: ['hardware-1'], actionExecuted: false, latencyMs: 47, collectedAt: '2026-09-24T12:00:00Z' })
+    recordJourneyEvidence({ scenarioId: 'ptp-hardware', cause: 'hardware_timestamping', observationCount: 3, historicalSourceCount: 1, supportingEvidenceIds: ['hardware-1'], actionExecuted: false, model: 'granite-3.2-8b-tools', modelRuntime: 'Intel Xeon 6767P', modelStatus: 'unverified_draft_for_human_review', latencyMs: 47, collectedAt: '2026-09-24T12:00:00Z' })
     recordJourneyEvidence({ scenarioId: 'ptp-platform', cause: 'platform_timing', observationCount: 3, historicalSourceCount: 2, supportingEvidenceIds: ['openshift-platform-1'], actionExecuted: false, latencyMs: 53, collectedAt: '2026-09-24T12:00:01Z' })
     const scene = scenes.find((item) => item.type === 'evidence-payoff')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByText('LIVE')).toBeInTheDocument()
     expect(screen.getByText('hardware_timestamping')).toBeInTheDocument()
-    expect(screen.getByText(/3 observations · 47ms · action executed: false/)).toBeInTheDocument()
+    expect(screen.getByText(/3 observations · 47ms · no action/)).toBeInTheDocument()
+    expect(screen.getByText('granite-3.2-8b-tools')).toBeInTheDocument()
+    expect(screen.getByText(/Intel Xeon 6767P/)).toBeInTheDocument()
     expect(screen.getByText('ONE ALARM')).toBeInTheDocument()
-    expect(screen.getByText('TWO SUPPORTED DECISIONS')).toBeInTheDocument()
+    expect(screen.getByText('SUPPORTED DECISIONS')).toBeInTheDocument()
     expect(screen.getByText('ZERO AUTOMATED ACTIONS')).toBeInTheDocument()
     clearJourneyEvidence()
   })

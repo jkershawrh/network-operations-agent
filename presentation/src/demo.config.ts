@@ -8,7 +8,7 @@ export const demoConfig: DemoConfig = {
   subtitle: 'A timing alarm can cross network, platform, and hardware boundaries',
   event: 'Network Operations quickstart',
   audience: 'Network operators, platform teams, and technical decision makers',
-  cta: 'The story is complete. The incident is not.',
+  cta: 'Evidence before inference. Human before action.',
   brand: {
     primary: { name: 'Red Hat', logo: storyAsset('logos/redhat.svg'), alt: 'Red Hat' },
     partner: { name: 'Intel', logo: storyAsset('logos/intel.png'), alt: 'Intel' },
@@ -52,9 +52,9 @@ export const demoConfig: DemoConfig = {
     },
     {
       id: 'payoff', label: '04', title: 'Evidence & Handoff', scenes: [
-        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'What Flightpath proved', emptyState: 'Run both live investigations first.', line1: 'The alarm stayed the same.', line2: 'The evidence changed the decision.', cta: 'Continue this incident →', speakerPrompt: 'Read back only the live causes and human-action boundary.' },
+        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'What Flightpath proved', emptyState: 'Run both live investigations first.', line1: 'Same alarm. Different evidence.', line2: 'The evidence changed the decision.', cta: 'Now challenge the evidence →', speakerPrompt: 'Close on three verified boundaries: evidence chose the cause, Granite explained it on Intel CPU, and the operator retained authority.' },
       ],
     },
   ],
-  relatedStories: [{ title: 'Continue this incident', duration: '25–35 minutes', question: 'Can the operator trace and challenge the evidence?', technology: 'Live workspace · Structured evidence · Human review', instruction: 'Keep the same timing alarm and evidence trail. Inspect its provenance, challenge the conclusion, and make the human review decision.', href: '/' }],
+  relatedStories: [{ title: 'Challenge the evidence', duration: '25–35 minutes', question: 'Can the operator validate the conclusion?', technology: 'Live workspace · Provenance · Human review', instruction: 'Carry this incident into the guided lab. Inspect provenance, challenge the conclusion, and make the human review decision.', href: '/' }],
 }

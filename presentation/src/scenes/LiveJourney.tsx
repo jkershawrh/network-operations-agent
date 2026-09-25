@@ -99,6 +99,9 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
       historicalSourceCount: result.historical_context_with_source_revision.length,
       supportingEvidenceIds: result.primary_hypothesis.supporting_evidence_ids,
       actionExecuted: result.action_executed,
+      model: result.model_draft?.model,
+      modelRuntime: result.model_draft?.runtime,
+      modelStatus: result.model_draft?.status,
       latencyMs,
       collectedAt: new Date().toISOString(),
     })

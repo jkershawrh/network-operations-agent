@@ -5,6 +5,9 @@ export type InvestigationEvidence = {
   historicalSourceCount: number
   supportingEvidenceIds: string[]
   actionExecuted: boolean
+  model?: string
+  modelRuntime?: string
+  modelStatus?: string
   latencyMs: number
   collectedAt: string
 }
