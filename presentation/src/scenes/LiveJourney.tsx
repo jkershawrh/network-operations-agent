@@ -234,8 +234,8 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           {error && <div className="error-panel">Live operation stopped: {error}</div>}
           <div className="workspace-actions">
             <button className="button button-secondary" onClick={() => setShowTopology((value) => !value)}>{showTopology ? 'Hide' : 'Inspect'} technical topology</button>
-            {phase.id !== 'compare' && <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running live…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button>}
-            {phase.id === 'compare' && <button className="button button-quiet" onClick={reset}>Restart proof</button>}
+            {phase.id !== 'compare' ? <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running live…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button> : <span className="action-placeholder" aria-hidden="true" />}
+            {phase.id === 'compare' ? <button className="button button-quiet" onClick={reset}>Restart proof</button> : <span className="action-placeholder" aria-hidden="true" />}
           </div>
         </div>
       </section>

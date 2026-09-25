@@ -50,7 +50,7 @@ button, input { font: inherit; }
 button { color: inherit; }
 a { color: inherit; }
 
-.app { min-height: 100vh; }
+.app { height: 100vh; overflow: hidden; }
 .opening, .finale { min-height: 100vh; display: grid; place-content: center; text-align: center; padding: var(--space-5); cursor: pointer; }
 .opening h1, .finale h1 { font: 800 clamp(2rem, 5vw, 4.5rem)/1.05 'Red Hat Display'; letter-spacing: -.045em; max-width: 1000px; margin: var(--space-6) auto var(--space-3); }
 .opening p { color: var(--text-dim); font-size: clamp(1rem, 2vw, 1.35rem); }
@@ -241,8 +241,8 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .scene:has(.operator-workspace) > .eyebrow,
 .scene:has(.operator-workspace) > h1,
 .scene:has(.operator-workspace) > .lede { display: none; }
-.scene:has(.operator-workspace) { width: min(1420px, 100%); }
-.operator-workspace { width: min(1420px, 100%); min-height: min(520px, calc(100vh - 118px)); max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
+.scene:has(.operator-workspace) { width: min(1420px, 100%); height: min(620px, calc(100vh - 118px)); min-height: 0; justify-content: flex-start; }
+.operator-workspace { width: min(1420px, 100%); height: 100%; max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
 .workspace-rail { display: flex; flex-direction: column; padding: .75rem 0; border-right: 1px solid var(--border); background: #191919; }
 .rail-title { padding: .25rem .75rem .7rem; color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .1em; }
 .workspace-rail button { display: grid; grid-template-columns: 25px 1fr; align-items: center; gap: .5rem; min-height: 46px; padding: .45rem .65rem; color: var(--text-disabled); background: transparent; border: 0; border-left: 3px solid transparent; text-align: left; font-size: .68rem; cursor: default; }
@@ -255,7 +255,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .workspace-rail button.complete { color: var(--text-secondary); cursor: pointer; }
 .workspace-rail button.complete span { color: var(--success); border-color: var(--success); }
 .checkpoint-count { margin-top: auto; padding: .65rem .75rem; color: var(--text-disabled); border-top: 1px solid var(--border); font: .56rem 'Red Hat Mono'; text-transform: uppercase; }
-.workspace-main { min-width: 0; display: flex; flex-direction: column; padding: 1rem 1.1rem .8rem; }
+.workspace-main { position: relative; min-width: 0; display: flex; flex-direction: column; padding: 1rem 1.1rem 7.4rem; }
 .workspace-act { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
 .workspace-act > div:first-child { display: grid; gap: .15rem; }
 .workspace-act span, .incident-intake span, .decision-board span, .authority-board span, .condition-change span, .comparison-workspace span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; text-transform: uppercase; }
@@ -315,12 +315,12 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .comparison-workspace article > strong { color: var(--success); font: 700 1.25rem 'Red Hat Display'; }
 .comparison-workspace article > div { color: var(--text-secondary); font-size: .7rem; }
 .comparison-workspace b { color: var(--intel-cyan); font: 700 .95rem 'Red Hat Mono'; }
-.workspace-footer { margin-top: .75rem; display: grid; gap: .55rem; }
-.runtime-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.workspace-footer { position: absolute; right: 1.1rem; bottom: .8rem; left: 1.1rem; display: grid; gap: .55rem; }
+.runtime-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
 .runtime-strip span { display: grid; gap: .15rem; padding: .45rem .55rem; color: var(--text-disabled); background: #191919; font: 700 .5rem 'Red Hat Mono'; }
 .runtime-strip b { color: var(--text-secondary); font-size: .58rem; overflow-wrap: anywhere; }
-.workspace-actions { display: flex; justify-content: flex-end; align-items: center; gap: .45rem; }
-.workspace-actions .button { padding: .55rem .75rem; font-size: .68rem; }
+.workspace-actions { width: min(520px, 100%); margin-left: auto; display: grid; grid-template-columns: 190px 210px 105px; align-items: stretch; gap: .45rem; }
+.workspace-actions .button { width: 100%; min-height: 36px; padding: .55rem .75rem; font-size: .68rem; }
 .activity-rail { display: flex; flex-direction: column; padding: .85rem; border-left: 1px solid var(--border); background: #191919; }
 .rail-label { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; }
 .activity-rail > strong { margin: .25rem 0 .75rem; font-size: .82rem; }
@@ -431,6 +431,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .attribution { color: var(--text-disabled); margin-top: var(--space-5); }
 
 @media (max-width: 760px) {
+  .app { height: auto; min-height: 100vh; overflow: visible; }
   .mechanism-grid { grid-template-columns: 1fr; }
   .payoff-comparison, .payoff-boundaries { grid-template-columns: 1fr; }
   .demo-header { padding: .55rem .5rem; }
@@ -476,12 +477,14 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .scene:has(.operator-workspace) > .eyebrow,
   .scene:has(.operator-workspace) > h1,
   .scene:has(.operator-workspace) > .lede { display: block; }
+  .scene:has(.operator-workspace) { height: auto; min-height: 0; }
   .operator-workspace { height: auto; min-height: 0; grid-template-columns: 1fr; overflow: visible; }
   .workspace-rail { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
   .rail-title, .checkpoint-count { display: none; }
   .workspace-rail button { min-width: 120px; border-left: 0; border-bottom: 3px solid transparent; }
   .workspace-rail button.active { border-bottom-color: var(--intel-cyan); }
-  .workspace-main { min-height: 620px; }
+  .workspace-main { min-height: 620px; padding-bottom: .8rem; }
+  .workspace-footer { position: static; margin-top: auto; padding-top: .75rem; }
   .activity-rail { border-left: 0; border-top: 1px solid var(--border); }
   .incident-intake, .decision-board { grid-template-columns: 1fr; }
   .authority-board > div, .authority-board .authority-stop { grid-column: auto; grid-template-columns: 1fr; }
@@ -493,7 +496,8 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .comparison-thesis { grid-column: auto; grid-template-columns: 1fr; }
   .change-arrow { text-align: center; }
   .runtime-strip { grid-template-columns: 1fr 1fr; }
-  .workspace-actions { flex-wrap: wrap; justify-content: flex-start; }
+  .workspace-actions { width: 100%; margin-left: 0; display: flex; flex-wrap: wrap; justify-content: flex-start; }
+  .workspace-actions .action-placeholder { display: none; }
   .topology-drawer { overflow: auto; padding: 1rem; }
   .architecture-compare .reframe-arrow { transform: rotate(90deg); }
 }
