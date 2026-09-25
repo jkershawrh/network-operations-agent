@@ -23,7 +23,7 @@ export const demoConfig: DemoConfig = {
     {
       id: 'architecture', label: '01', title: 'Guided Architecture', scenes: [
         {
-          id: 'guided-architecture', type: 'guided-architecture', beat: 'system-reveal', eyebrow: 'Guided system boundaries', title: 'Separate observation, context, inference, and authority', body: 'Reveal one boundary at a time.',
+          id: 'guided-architecture', type: 'guided-architecture', beat: 'system-reveal', eyebrow: 'Guided system boundaries', title: 'Separate observation, context, inference, and authority',
           layers: [
             { id: 'alarm', component: 'Scenario contract', tone: 'primary', question: 'What exactly happened?', answer: 'A validated event starts the investigation.', detail: 'The alarm is input—not a diagnosis.' },
             { id: 'diagnostics', component: 'Read-only MCP', tone: 'partner', question: 'What do the systems show right now?', answer: 'Named diagnostics return current observations.', detail: 'Allowlisted scopes preserve source and time. They cannot mutate the network.' },
