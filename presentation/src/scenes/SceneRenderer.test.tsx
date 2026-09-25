@@ -32,8 +32,9 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('app Deployment')).toBeInTheDocument()
     expect(screen.getByText('diagnostics Deployment')).toBeInTheDocument()
     expect(screen.getByText(':8095/mcp')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Run the live journey' })).toBeInTheDocument()
-    expect(screen.getByText(/Click anywhere to verify Flightpath/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Start the live path' })).toBeInTheDocument()
+    expect(screen.getByText(/Click anywhere to start/)).toBeInTheDocument()
+    expect(screen.getByText(/Each click advances one infrastructure boundary/)).toBeInTheDocument()
   })
 
   it('renders the statistic-grid scene', () => {

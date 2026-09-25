@@ -30,7 +30,7 @@ export function validateDemoConfig(config: DemoConfig): string[] {
   if (scenes.length > 7) warnings.push(`Presenter story has ${scenes.length} scenes; keep the pitch to 7 or fewer and move depth into the guided demo or lab.`)
   if (!scenes.some((scene) => scene.type === 'guided-architecture')) warnings.push('Story is missing a guided architecture reveal.')
   if (!scenes.some((scene) => scene.type === 'live-proof' || scene.type === 'live-journey')) warnings.push('Story is missing a live proof scene.')
-  if ((config.relatedStories?.length ?? 0) < 3) warnings.push('Finale must hand off to live demonstration, guided demo, and hands-on lab journeys.')
+  if (!(config.relatedStories?.some((story) => story.href))) warnings.push('Finale must provide one explicit guided handoff or close.')
 
   return warnings
 }

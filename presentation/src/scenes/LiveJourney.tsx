@@ -5,89 +5,88 @@ import { TechnicalTopology } from './TechnicalTopology'
 import { clearJourneyEvidence, readJourneyEvidence, recordJourneyEvidence, type InvestigationEvidence } from '../live/journeyEvidence'
 
 type Result = {
-  alarm_id: string
-  current_observations_with_tool_provenance: Array<{ evidence_id: string; scope: string; state: string; provenance: string }>
-  historical_context_with_source_revision: Array<{ source_id: string; source_revision: string }>
+  current_observations_with_tool_provenance: Array<{ evidence_id: string }>
+  historical_context_with_source_revision: Array<{ source_id: string }>
   primary_hypothesis: { cause: string; supporting_evidence_ids: string[] }
-  unknowns_and_conflicts: string[]
   next_discriminating_test: string
-  action_requires_human_approval: boolean
   action_executed: boolean
 }
 
-const journeySteps = [
-  { title: 'Verify the deployed system', subtitle: 'The app pod reaches only the approved MCP diagnostic service.', phase: 'ready' as const },
-  { title: 'Investigate the hardware signal', subtitle: 'The API orchestrates current diagnostics, history, and deterministic evidence policy.', phase: 'investigation' as const, scenario: 'ptp-hardware' },
-  { title: 'Change the evidence', subtitle: 'The same deployed path must select a different supported cause.', phase: 'investigation' as const, scenario: 'ptp-platform' },
-]
+const path = [
+  { title: 'Verify Flightpath', explanation: 'Before making a claim, the story asks the deployed app and approved diagnostics service whether they are ready.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], action: 'ready' },
+  { title: 'Send the hardware condition', explanation: 'The operator starts a real investigation. HTTPS crosses the OpenShift Route and stable Service before reaching the app pod.', activeIds: ['browser', 'route', 'app-service', 'app'], action: 'hardware' },
+  { title: 'Collect current observations', explanation: 'The app uses its NetworkPolicy-approved MCP connection to call three allowlisted, read-only diagnostics. These observations describe now—not history.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], metric: 'observations' },
+  { title: 'Add approved history', explanation: 'Versioned cases and runbooks are retrieved separately. They provide context, but they cannot overwrite what the current diagnostics observed.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history'], metric: 'history' },
+  { title: 'Apply evidence policy', explanation: 'The deterministic policy compares current signals with approved context. It may support a cause only with evidence IDs returned in this run.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy'], metric: 'cause' },
+  { title: 'Stop at human authority', explanation: 'The system recommends the next discriminating test, then stops. The operator retains the decision and no remediation is executed.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator'], metric: 'authority' },
+  { title: 'Change the condition', explanation: 'The same deployed path now receives a platform timing fault. Only the evidence changes; the architecture and policy stay fixed.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], action: 'platform' },
+  { title: 'Compare the live evidence', explanation: 'The second set of observations selects a different supported cause. That is the proof: the diagnosis follows evidence, not the alarm label.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator'], metric: 'compare' },
+] as const
 
 export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const [step, setStep] = useState(-1)
   const [status, setStatus] = useState<'idle' | 'running' | 'paused' | 'complete' | 'error'>('idle')
-  const [source, setSource] = useState<'LIVE' | 'ERROR'>('LIVE')
-  const [result, setResult] = useState<Result | null>(null)
   const [error, setError] = useState('')
   const [evidence, setEvidence] = useState<InvestigationEvidence[]>(() => readJourneyEvidence())
+  const [results, setResults] = useState<Record<string, Result>>({})
   const controller = useRef<AbortController | null>(null)
-
   useEffect(() => () => controller.current?.abort(), [])
 
-  const runStep = async (index: number) => {
-    controller.current?.abort()
-    controller.current = new AbortController()
-    setStep(index); setStatus('running'); setError(''); setResult(null); setSource('LIVE')
+  const runRequest = async (scenarioId: 'ptp-hardware' | 'ptp-platform') => {
     const startedAt = performance.now()
+    const response = await fetch('/api/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario_id: scenarioId }), signal: controller.current!.signal })
+    if (!response.ok) throw new Error(`Investigation returned HTTP ${response.status}`)
+    const result = await response.json() as Result
+    setResults((current) => ({ ...current, [scenarioId]: result }))
+    recordJourneyEvidence({ scenarioId, cause: result.primary_hypothesis.cause, observationCount: result.current_observations_with_tool_provenance.length, historicalSourceCount: result.historical_context_with_source_revision.length, supportingEvidenceIds: result.primary_hypothesis.supporting_evidence_ids, actionExecuted: result.action_executed, latencyMs: Math.round(performance.now() - startedAt), collectedAt: new Date().toISOString() })
+    setEvidence(readJourneyEvidence())
+  }
+
+  const advance = async () => {
+    if (status === 'running' || status === 'complete') return
+    const next = step + 1
+    controller.current?.abort(); controller.current = new AbortController()
+    setStep(next); setStatus('running'); setError('')
     try {
-      if (index === 0) {
+      const action = 'action' in path[next] ? path[next].action : undefined
+      if (action === 'ready') {
         const response = await fetch('/ready', { signal: controller.current.signal })
-        if (!response.ok) throw new Error(`Readiness returned HTTP ${response.status}`)
-        const data = await response.json()
-        if (data.status !== 'ready') throw new Error('Diagnostics are not ready')
-      } else {
-        const response = await fetch('/api/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario_id: journeySteps[index].scenario }), signal: controller.current.signal })
-        if (!response.ok) throw new Error(`Investigation returned HTTP ${response.status}`)
-        const nextResult = await response.json() as Result
-        setResult(nextResult)
-        const recorded = {
-          scenarioId: journeySteps[index].scenario!,
-          cause: nextResult.primary_hypothesis.cause,
-          observationCount: nextResult.current_observations_with_tool_provenance.length,
-          historicalSourceCount: nextResult.historical_context_with_source_revision.length,
-          supportingEvidenceIds: nextResult.primary_hypothesis.supporting_evidence_ids,
-          actionExecuted: nextResult.action_executed,
-          latencyMs: Math.round(performance.now() - startedAt),
-          collectedAt: new Date().toISOString(),
-        }
-        recordJourneyEvidence(recorded)
-        setEvidence(readJourneyEvidence())
-      }
-      setStatus(index === journeySteps.length - 1 ? 'complete' : 'paused')
+        if (!response.ok || (await response.json()).status !== 'ready') throw new Error('Flightpath is not ready')
+      } else if (action === 'hardware') await runRequest('ptp-hardware')
+      else if (action === 'platform') await runRequest('ptp-platform')
+      setStatus(next === path.length - 1 ? 'complete' : 'paused')
     } catch (cause) {
       if ((cause as Error).name === 'AbortError') return
-      setSource('ERROR'); setError(cause instanceof Error ? cause.message : 'Live journey failed'); setStatus('error')
+      setError(cause instanceof Error ? cause.message : 'Live journey failed'); setStatus('error')
     }
   }
 
-  const advance = () => {
-    if (status === 'idle') void runStep(0)
-    else if (status === 'paused') void runStep(step + 1)
-  }
+  const hardware = evidence.find((item) => item.scenarioId === 'ptp-hardware')
+  const platform = evidence.find((item) => item.scenarioId === 'ptp-platform')
+  const current = step >= 6 ? platform : hardware
+  const result = step >= 6 ? results['ptp-platform'] : results['ptp-hardware']
+  const metric = step >= 0 && 'metric' in path[step] ? path[step].metric : undefined
+  const metricContent = metric === 'observations' && current ? [`${current.observationCount}`, 'current observations', current.supportingEvidenceIds.join(', ')]
+    : metric === 'history' && current ? [`${current.historicalSourceCount}`, 'approved historical sources', 'Kept separate from current evidence']
+    : metric === 'cause' && current ? [current.cause, 'supported cause', current.supportingEvidenceIds.join(', ')]
+    : metric === 'authority' && current ? [String(current.actionExecuted), 'remediation executed', result?.next_discriminating_test ?? 'Human review required']
+    : metric === 'compare' && hardware && platform ? [`${hardware.cause} → ${platform.cause}`, 'condition changed the diagnosis', `${hardware.latencyMs}ms / ${platform.latencyMs}ms · ${hardware.observationCount + platform.observationCount} observations total`]
+    : current && (step === 1 || step === 6) ? [`${current.latencyMs}ms`, 'live request latency', current.scenarioId]
+    : step === 0 ? ['READY', 'deployed services', 'Flightpath readiness response'] : undefined
 
-  return <SceneFrame scene={scene}>
-    <div className="live-click-stage" onClick={(event) => { event.stopPropagation(); if (!(event.target as HTMLElement).closest('button, a')) advance() }} data-testid="live-click-stage">
-    <div className="journey-status"><span className={`source-badge source-${source === 'LIVE' ? 'live' : 'offline'}`}>{source}</span><strong>{step < 0 ? 'Ready to begin' : journeySteps[step].title}</strong><span>{step < 0 ? 'The diagram will activate from the deployed responses.' : journeySteps[step].subtitle}</span></div>
-    <TechnicalTopology activeThrough={step < 0 ? 'idle' : journeySteps[step].phase} running={status === 'running'} />
-    {evidence.length > 0 && <div className="live-run-grid">{evidence.map((item) => <div className="live-run-card" key={item.scenarioId}><span>{item.scenarioId}</span><strong>{item.cause}</strong><div><b>{item.latencyMs}ms</b><b>{item.observationCount} observations</b><b>{item.historicalSourceCount} sources</b></div><small>{item.supportingEvidenceIds.join(', ')} · action executed: {String(item.actionExecuted)}</small></div>)}</div>}
-    {result && <div className="journey-next"><span>Next discriminating test</span><strong>{result.next_discriminating_test}</strong></div>}
-    {error && <div className="error-panel">Live journey stopped at the failed boundary: {error}</div>}
+  return <SceneFrame scene={scene}><div className="live-click-stage" data-testid="live-click-stage" onClick={(event) => { event.stopPropagation(); if (!(event.target as HTMLElement).closest('button, a')) void advance() }}>
+    <div className="journey-status"><span className={`journey-step-count ${status === 'complete' ? 'complete' : ''}`}>{step < 0 ? 'START' : `${step + 1} / ${path.length}`}</span><strong>{step < 0 ? 'Trace one request through the live system' : path[step].title}</strong></div>
+    <TechnicalTopology activeIds={step < 0 ? [] : [...path[step].activeIds]} running={status === 'running'} />
+    <div className="journey-explanation"><span>What is happening</span><strong>{step < 0 ? 'Each click advances one infrastructure boundary and reveals the live measurement or decision produced there.' : path[step].explanation}</strong></div>
+    {metricContent && <div className="journey-live-metric"><strong>{metricContent[0]}</strong><span>{metricContent[1]}</span><small>{metricContent[2]}</small></div>}
+    {error && <div className="error-panel">Live journey stopped at this boundary: {error}</div>}
     <div className="journey-controls">
-      {status === 'idle' && <button className="button button-primary" onClick={() => void runStep(0)}>Run the live journey</button>}
-      {status === 'running' && <button className="button button-secondary" disabled>Running against Flightpath…</button>}
-      {status === 'paused' && <button className="button button-primary" onClick={() => void runStep(step + 1)}>Next live act →</button>}
-      {status === 'complete' && <><button className="button button-secondary" onClick={() => { clearJourneyEvidence(); setEvidence([]); setStep(-1); setStatus('idle'); setResult(null) }}>Replay</button><a className="button button-primary journey-link" href="/">Open the live workspace →</a></>}
-      {status === 'error' && <button className="button button-primary" onClick={() => void runStep(Math.max(step, 0))}>Retry failed act</button>}
+      {status === 'idle' && <button className="button button-primary" onClick={() => void advance()}>Start the live path</button>}
+      {status === 'running' && <button className="button button-secondary" disabled>Running on Flightpath…</button>}
+      {status === 'paused' && <button className="button button-primary" onClick={() => void advance()}>Next boundary →</button>}
+      {status === 'error' && <button className="button button-primary" onClick={() => { setStep((value) => value - 1); setStatus('paused') }}>Retry boundary</button>}
+      {status === 'complete' && <><button className="button button-secondary" onClick={() => { clearJourneyEvidence(); setEvidence([]); setResults({}); setStep(-1); setStatus('idle') }}>Replay path</button><a className="button button-primary journey-link" href="/">Open guided investigation →</a></>}
     </div>
-    {status !== 'running' && status !== 'complete' && <div className="click-hint">Click anywhere to {status === 'idle' ? 'verify Flightpath' : 'run the next live condition'} →</div>}
-    </div>
-  </SceneFrame>
+    {status !== 'running' && status !== 'complete' && <div className="click-hint">Click anywhere to {step < 0 ? 'start' : 'advance the live path'} →</div>}
+  </div></SceneFrame>
 }

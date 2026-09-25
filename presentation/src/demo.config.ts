@@ -55,9 +55,5 @@ export const demoConfig: DemoConfig = {
       ],
     },
   ],
-  relatedStories: [
-    { title: 'Live Demonstration', duration: '5–10 minutes', question: 'Can changing the evidence change the hypothesis?', technology: 'Two synthetic incidents · Structured evidence · Human review', instruction: 'Open the Network Operations Workspace and run both cases.', href: '/' },
-    { title: 'Guided Demo', duration: '25–35 minutes', question: 'Can the audience trace every claim to its owner and boundary?', technology: 'Baseline · Architecture trace · OpenShift resources', instruction: 'Continue in the Showroom guide through Modules 1 and 2.' },
-    { title: 'Hands-on Lab', duration: '75–90 minutes', question: 'Can participants extend, break, qualify, and explain the pattern?', technology: 'Build · Failure injection · Qualification · NOC decision brief', instruction: 'Complete all seven Showroom modules and export the evidence bundle.' },
-  ],
+  relatedStories: [{ title: 'Guided investigation', duration: '25–35 minutes', question: 'Can the operator trace and challenge the evidence?', technology: 'Live workspace · Structured evidence · Human review', instruction: 'Move from narrated proof into the operator workspace. Run a scenario, inspect provenance, compare history, and make the review decision.', href: '/' }],
 }

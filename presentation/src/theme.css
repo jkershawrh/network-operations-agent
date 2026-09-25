@@ -141,6 +141,8 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .architecture-dialog .button { align-self: flex-start; margin-top: auto; }
 .journey-status { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); color: var(--text-secondary); }
 .journey-status > span:last-child { color: var(--text-dim); font-size: .85rem; }
+.journey-step-count { color: var(--intel-cyan); font: 700 .62rem 'Red Hat Mono'; letter-spacing: .08em; }
+.journey-step-count.complete { color: var(--success); }
 .technical-topology { margin-top: -.25rem; }
 .topology-legend { display: flex; justify-content: center; gap: 1rem; margin-bottom: .45rem; color: var(--text-dim); font: .6rem 'Red Hat Mono'; }
 .topology-legend span { display: flex; align-items: center; gap: .3rem; }
@@ -202,6 +204,13 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .live-run-card b { color: var(--text-secondary); font: 700 .68rem 'Red Hat Mono'; }
 .live-run-card small { color: var(--text-dim); font-size: .65rem; }
 .click-hint { color: var(--text-disabled); font: .68rem 'Red Hat Mono'; text-transform: uppercase; }
+.journey-explanation { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .8rem; width: min(980px, 100%); margin: 0 auto; padding: .55rem .75rem; text-align: left; background: var(--surface-1); border-left: 3px solid var(--intel-cyan); }
+.journey-explanation span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; text-transform: uppercase; white-space: nowrap; }
+.journey-explanation strong { color: var(--text-secondary); font-size: .72rem; line-height: 1.35; }
+.journey-live-metric { display: grid; grid-template-columns: auto auto 1fr; align-items: baseline; gap: .65rem; width: min(900px, 100%); margin: 0 auto; padding: .45rem .75rem; background: var(--success-dim); border: 1px solid var(--success); border-radius: var(--radius-sm); text-align: left; }
+.journey-live-metric > strong { color: var(--success); font: 800 1.15rem 'Red Hat Mono'; }
+.journey-live-metric > span { color: var(--text); font-weight: 700; }
+.journey-live-metric > small { color: var(--text-dim); overflow-wrap: anywhere; }
 .live-click-stage .journey-next { display: grid; grid-template-columns: auto 1fr; gap: .7rem; width: min(900px, 100%); margin: 0 auto; padding: .55rem .75rem; text-align: left; background: var(--surface-1); border-left: 3px solid var(--intel-cyan); }
 .live-click-stage .journey-next span { color: var(--text-dim); font: 700 .58rem 'Red Hat Mono'; text-transform: uppercase; }
 .live-click-stage .journey-next strong { font-size: .72rem; }
@@ -266,6 +275,12 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .fallback-note, .error-panel { color: var(--warning); font-size: .82rem; }
 
 .finale { cursor: default; }
+.guided-handoff { width: min(680px, 100%); display: grid; justify-items: center; gap: .8rem; margin: 2rem auto; padding: 1.5rem; border: 1px solid var(--intel-cyan); border-radius: var(--radius-md); background: var(--intel-cyan-dim); }
+.guided-handoff > strong { color: var(--intel-cyan); font-size: 1.4rem; }
+.guided-handoff > span { max-width: 580px; color: var(--text-secondary); line-height: 1.5; }
+.guided-handoff .button { text-decoration: none; }
+.finale-actions { display: flex; justify-content: center; gap: .75rem; }
+.button-quiet { color: var(--text-dim); background: transparent; border: 0; }
 .related-card { display: grid; gap: .65rem; text-decoration: none; border-left: 3px solid var(--intel-cyan); }
 .related-card em { color: var(--text); }
 .related-card span { color: var(--text-dim); font-size: .85rem; }
