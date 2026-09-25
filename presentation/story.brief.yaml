@@ -3,9 +3,9 @@ presentation:
   title: One Alarm. Two Causes. One Evidence Trail.
   audience: Network operators, platform teams, and technical decision makers
   desired_decision: Adopt a bounded evidence contract before connecting an agent to operational systems
-  duration_minutes: 15
+  duration_minutes: 7
   core_tension: A timing alarm crosses technical boundaries, but an AI explanation must not cross the operator's authority boundary
-  cta: Choose one approved incident and map its evidence boundary
+  cta: Choose the next journey depth: live proof, guided demo, or hands-on lab
 
 source_material:
   mode: repository
@@ -17,7 +17,7 @@ source_material:
     - ../tests/test_investigation.py
     - ../showroom/modules/ROOT/pages/
   consequential_assumptions:
-    - The presentation is the 15-minute opening path in the unified Showroom; the same environment also supports the guided demo and 90-minute lab.
+    - The presentation is a 5–7 minute opening path in the unified Showroom; depth belongs in the live demonstration, guided demo, and hands-on lab.
     - The live API is same-origin at /api/investigate when deployed with the application.
 
 architecture:
@@ -35,7 +35,7 @@ architecture:
     - Human review is required; no decision is persisted and nothing executes.
   critical_flows:
     - Alarm to three diagnostic scopes to approved retrieval to evidence case to human review.
-    - Hardware and platform scenarios must yield different supported causes.
+    - The short story runs one live case; the Workspace compares hardware and platform scenarios, which must yield different supported causes.
   omitted_from_main_story:
     - The learner-authored upstream-clock scenario belongs to the 90-minute lab.
     - Launchpad catalog plumbing and deployment internals do not change the core decision.

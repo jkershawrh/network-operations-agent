@@ -34,6 +34,18 @@ export interface BaseScene {
   speakerPrompt?: string
 }
 
+export interface GuidedArchitectureScene extends BaseScene {
+  type: 'guided-architecture'
+  layers: Array<{
+    id: string
+    question: string
+    answer: string
+    component: string
+    detail: string
+    tone?: 'primary' | 'partner' | 'success'
+  }>
+}
+
 export interface IntroScene extends BaseScene {
   type: 'intro'
   subtitle: string
@@ -143,6 +155,7 @@ export type SceneConfig =
   | StatGridScene
   | ReframeScene
   | ArchitectureScene
+  | GuidedArchitectureScene
   | ArchitectureFlowScene
   | ArchitectureLayersScene
   | ArchitectureCompareScene
@@ -168,6 +181,8 @@ export interface RelatedStory {
   question: string
   technology: string
   href?: string
+  duration?: string
+  instruction?: string
 }
 
 export interface DemoConfig {

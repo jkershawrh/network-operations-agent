@@ -35,6 +35,18 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('Faster')).toBeInTheDocument()
   })
 
+  it('guides architecture as operator questions and revealed answers', async () => {
+    const scene = scenes.find((item) => item.type === 'guided-architecture')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    expect(screen.getByText('What exactly happened?')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal next boundary' }))
+    expect(await screen.findByText('What do the systems show right now?')).toBeInTheDocument()
+  })
+
+  it('keeps the presenter pitch at seven scenes or fewer', () => {
+    expect(scenes.length).toBeLessThanOrEqual(7)
+  })
+
   it('renders the custom React scene escape hatch', () => {
     const scene: SceneConfig = {
       id: 'coverage-custom',

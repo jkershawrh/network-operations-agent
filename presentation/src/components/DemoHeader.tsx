@@ -1,7 +1,7 @@
 import type { ActConfig, BrandConfig } from '../types'
 import { BrandLockup } from './BrandLockup'
 
-export function DemoHeader({ brand, acts, actIndex, onAct, onPrevious, onNext, onRestart, onFullscreen }: {
+export function DemoHeader({ brand, acts, actIndex, onAct, onPrevious, onNext, onRestart, onFullscreen, onPresenterPrompt, presenterPromptVisible }: {
   brand: BrandConfig
   acts: ActConfig[]
   actIndex: number
@@ -10,6 +10,8 @@ export function DemoHeader({ brand, acts, actIndex, onAct, onPrevious, onNext, o
   onNext: () => void
   onRestart: () => void
   onFullscreen: () => void
+  onPresenterPrompt: () => void
+  presenterPromptVisible: boolean
 }) {
   return (
     <header className="demo-header">
@@ -20,6 +22,7 @@ export function DemoHeader({ brand, acts, actIndex, onAct, onPrevious, onNext, o
           {acts.map((act, index) => <button key={act.id} className={index === actIndex ? 'active' : index < actIndex ? 'done' : ''} onClick={() => onAct(index)} title={`${act.label} ${act.title}`} aria-label={`Go to act ${act.label}: ${act.title}`} />)}
         </div>
         <button onClick={onNext} aria-label="Next scene">→</button>
+        <button className={presenterPromptVisible ? 'control-active' : ''} onClick={onPresenterPrompt} aria-label="Toggle presenter prompt">P</button>
         <button onClick={onFullscreen} aria-label="Toggle fullscreen">⛶</button>
       </nav>
     </header>

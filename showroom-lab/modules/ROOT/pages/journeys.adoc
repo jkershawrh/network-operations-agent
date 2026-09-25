@@ -8,12 +8,16 @@ namespace. You can move between paths without ordering another environment.
 == Presentation
 
 Use the *Story* tab for a presenter-led Red Hat x Intel narrative. It explains
-the operational problem, trust boundaries, architecture, and value in about
-15 minutes. Its proof scenes call this seat's live investigation API. If that
+the operational problem, a guided question-and-answer architecture reveal,
+one live proof, and the handoff in about 5–7 minutes. Its proof scene calls this seat's live investigation API. If that
 API is unavailable, the scene is visibly labeled *REHEARSAL* or *OFFLINE*; a
 fixture is never presented as a live result.
 
 Best for:: opening a workshop, executive context, or a solution overview.
+
+Presenter control:: Press *P* to show or hide the current speaker prompt. Do
+not continue presenting after the final choice; move the room into the
+Workspace, guided demo, or lab.
 
 == Demonstration
 

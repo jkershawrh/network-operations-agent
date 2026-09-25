@@ -8,7 +8,7 @@ export const demoConfig: DemoConfig = {
   subtitle: 'Evidence-backed network operations with Red Hat and Intel',
   event: 'Network Operations quickstart',
   audience: 'Network operators, platform teams, and technical decision makers',
-  cta: 'Choose one approved incident and map its evidence boundary.',
+  cta: 'Choose the depth that fits the room.',
   brand: {
     primary: { name: 'Red Hat', logo: storyAsset('logos/redhat.svg'), alt: 'Red Hat' },
     partner: { name: 'Intel', logo: storyAsset('logos/intel.png'), alt: 'Intel' },
@@ -17,68 +17,45 @@ export const demoConfig: DemoConfig = {
   acts: [
     {
       id: 'alarm', label: '00', title: 'The Alarm', scenes: [
-        { id: 'intro', type: 'intro', beat: 'ordinary-world', title: 'One Alarm. Two Causes. One Evidence Trail.', subtitle: 'A timing alarm can cross network, platform, and hardware boundaries' },
-        { id: 'stakes', type: 'metric', beat: 'stakes', eyebrow: 'The safety invariant', value: '0', label: 'network or platform changes executed by this quickstart', tone: 'success', citation: { label: 'Quickstart contract: remediation_execution=false' } },
-        { id: 'root-cause', type: 'quote', beat: 'root-cause', title: 'The alarm is real. The first explanation may not be.', quote: 'A timing alarm can originate in the network, the OpenShift platform, or the underlying hardware.', attribution: 'Network Operations quickstart' },
-        { id: 'reframe', type: 'reframe', beat: 'reframe', title: 'Reframe the operator’s decision', before: 'Ask an AI for the answer', after: 'Build a traceable evidence case', detail: 'The system may explain evidence. It cannot replace provenance, uncertainty, or human review.' },
+        { id: 'intro', type: 'intro', beat: 'ordinary-world', title: 'One Alarm. Two Causes. One Evidence Trail.', subtitle: 'A timing alarm can cross network, platform, and hardware boundaries', speakerPrompt: 'Start with the operator, not the technology: the alarm is real, but it does not identify its own cause.' },
+        { id: 'reframe', type: 'reframe', beat: 'stakes', eyebrow: 'The operational tension', title: 'The first explanation may be wrong', before: 'Ask AI for an answer', after: 'Build a traceable evidence case', detail: 'Current observations, approved history, optional model wording, and human authority must remain distinct. The safety invariant is zero remediation actions executed.', citation: { label: 'Quickstart contract: remediation_execution=false' }, speakerPrompt: 'The value is not autonomous repair. It is a faster, defensible next decision without surrendering operator authority.' },
       ],
     },
     {
-      id: 'evidence', label: '01', title: 'The Evidence Boundary', scenes: [
-        { id: 'flow', type: 'architecture-flow', beat: 'system-reveal', eyebrow: 'System reveal', title: 'Every conclusion has a visible path', body: 'Present observations and historical context remain separate all the way to review.', steps: [
-          { id: 'alarm', label: 'Synthetic alarm', detail: 'Versioned event + KPI snapshot', transition: 'normalize', tone: 'primary' },
-          { id: 'mcp', label: 'Read-only MCP', detail: 'Network · Platform · Hardware', transition: 'observe', tone: 'partner' },
-          { id: 'history', label: 'Approved retrieval', detail: 'Runbooks + prior synthetic cases', transition: 'compare' },
-          { id: 'case', label: 'Evidence case', detail: 'Hypothesis · Unknowns · Next test', transition: 'review', tone: 'success' },
-          { id: 'human', label: 'Human operator', detail: 'Approve, question, or reject' },
-        ] },
-        { id: 'boundaries', type: 'trust-boundary', beat: 'system-reveal', title: 'Three sources. Three meanings.', zones: [
-          { id: 'present', label: 'Current observations', boundary: 'MCP provenance', items: ['Observed state', 'Timestamp', 'Tool identity'], tone: 'partner' },
-          { id: 'history', label: 'Historical context', boundary: 'Approved sources', items: ['Source revision', 'Matching signals', 'Retrieval score'] },
-          { id: 'wording', label: 'Optional model wording', boundary: 'Unverified draft', items: ['Cannot change the cause', 'Cannot execute action', 'Must cite evidence IDs'], tone: 'primary' },
-        ] },
-        { id: 'pipeline', type: 'pipeline', beat: 'system-reveal', title: 'The investigation earns its recommendation', steps: [
-          { label: 'Observe', detail: 'Call bounded diagnostics' }, { label: 'Retrieve', detail: 'Rank approved context' }, { label: 'Compare', detail: 'Test competing causes' }, { label: 'Expose uncertainty', detail: 'Unknowns stay visible' }, { label: 'Propose', detail: 'One next diagnostic test' },
-        ] },
+      id: 'architecture', label: '01', title: 'Guided Architecture', scenes: [
+        {
+          id: 'guided-architecture', type: 'guided-architecture', beat: 'system-reveal', eyebrow: 'Guided architecture · reveal each boundary', title: 'Who is allowed to claim what?', body: 'Use the operator question to reveal one responsibility at a time.',
+          layers: [
+            { id: 'alarm', component: 'Scenario contract', tone: 'primary', question: 'What exactly happened?', answer: 'A validated synthetic event starts the investigation.', detail: 'The alarm ID, occurrence time, and bounded scenario are input—not a diagnosis.' },
+            { id: 'diagnostics', component: 'Read-only MCP', tone: 'partner', question: 'What do the systems show right now?', answer: 'Named diagnostics produce current observations with provenance.', detail: 'Network, platform, hardware, and upstream scopes are allowlisted. No arbitrary tool and no mutation capability enters the path.' },
+            { id: 'history', component: 'Approved history', question: 'Has this pattern happened before?', answer: 'Versioned runbooks and synthetic cases add context—not proof.', detail: 'Historical sources retain IDs and revisions, and remain separate from current observations.' },
+            { id: 'policy', component: 'Evidence policy', tone: 'success', question: 'Which cause does the evidence actually support?', answer: 'Deterministic policy compares competing causes and may abstain.', detail: 'Exactly one causal signal is required. Missing, malformed, or conflicting required evidence produces an inconclusive result.' },
+            { id: 'operator', component: 'NOC operator', tone: 'primary', question: 'Who owns the next action?', answer: 'A human reviews the evidence and chooses the next diagnostic step.', detail: 'Optional model wording cannot add evidence, select a different cause, or authorize remediation.' },
+          ],
+          speakerPrompt: 'Pause after every question. Let the audience answer before revealing the component and boundary.',
+        },
       ],
     },
     {
-      id: 'proof', label: '02', title: 'Two Investigations', scenes: [
-        { id: 'hardware-proof', type: 'live-proof', beat: 'live-proof', eyebrow: 'Live proof · Case one', title: 'The hardware signal earns a hardware hypothesis', body: 'The same API gathers three current observations and keeps the recommendation read-only.', adapterId: 'hardware-investigation', cta: 'Investigate hardware signal', resultFields: [
+      id: 'proof', label: '02', title: 'Live Proof', scenes: [
+        { id: 'hardware-proof', type: 'live-proof', beat: 'live-proof', eyebrow: 'Live proof · investigation one', title: 'The evidence—not the alarm label—selects the cause', body: 'Run the hardware case here. Then continue into the Workspace to switch evidence and compare the platform case without extending the presentation.', adapterId: 'hardware-investigation', cta: 'Run live investigation', resultFields: [
           { key: 'alarm', label: 'Alarm' }, { key: 'cause', label: 'Supported cause' }, { key: 'observations', label: 'Current observations' }, { key: 'support', label: 'Supporting evidence' }, { key: 'approval', label: 'Human approval' }, { key: 'executed', label: 'Action executed' },
-        ] },
-        { id: 'platform-proof', type: 'live-proof', beat: 'live-proof', eyebrow: 'Live proof · Case two', title: 'Change the evidence. Change the hypothesis.', body: 'The platform fixture must not collapse into the hardware answer.', adapterId: 'platform-investigation', cta: 'Investigate platform signal', resultFields: [
-          { key: 'alarm', label: 'Alarm' }, { key: 'cause', label: 'Supported cause' }, { key: 'observations', label: 'Current observations' }, { key: 'support', label: 'Supporting evidence' }, { key: 'approval', label: 'Human approval' }, { key: 'executed', label: 'Action executed' },
-        ] },
-        { id: 'comparison', type: 'comparison', beat: 'trials', title: 'One alarm family. Distinct evidence.', columns: [
-          { label: 'Hardware signal', value: 'hardware_timing', detail: 'NIC timestamp fault present; platform timing fault absent', tone: 'partner' },
-          { label: 'Platform signal', value: 'platform_timing', detail: 'Platform timing fault present; NIC timestamp fault absent', tone: 'success' },
-        ] },
+        ], speakerPrompt: 'Call out LIVE, REHEARSAL, or OFFLINE before discussing the result. Never imply a fixture is live.' },
+        { id: 'proof-boundary', type: 'comparison', beat: 'trials', title: 'Same alarm family. Different evidence. Different hypothesis.', columns: [
+          { label: 'Hardware case', value: 'hardware_timing', detail: 'NIC timestamp fault present; platform timing remains healthy', tone: 'partner' },
+          { label: 'Platform case', value: 'platform_timing', detail: 'Platform timing fault present; NIC timestamping remains healthy', tone: 'success' },
+        ], body: 'The second case belongs in the operator workspace, where the audience can inspect observations, unknowns, provenance, and the next test.', speakerPrompt: 'End the pitch here if time is short. Open the Workspace for the five-to-ten-minute demonstration.' },
       ],
     },
     {
-      id: 'limits', label: '03', title: 'Authority and Limits', scenes: [
-        { id: 'tradeoff', type: 'tradeoff', beat: 'trials', title: 'Useful because it knows where to stop', options: [
-          { title: 'Deterministic evidence', strength: 'Traceable cause selection', tradeoff: 'Limited to approved scenarios and diagnostic contracts.' },
-          { title: 'Optional model wording', strength: 'Operator-friendly explanation', tradeoff: 'Unverified and never allowed to change the selected hypothesis.' },
-          { title: 'Human review', strength: 'Preserves operational authority', tradeoff: 'The quickstart recommends; it does not remediate.' },
-        ], decision: 'Missing or conflicting evidence produces an evidence gap—not a fabricated answer.' },
-        { id: 'scope', type: 'stat-grid', beat: 'trials', eyebrow: 'Honest scope', title: 'What this proves—and what it does not', stats: [
-          { value: '2', label: 'Approved synthetic quickstart scenarios', tone: 'partner' },
-          { value: '3', label: 'Read-only diagnostic scopes', tone: 'neutral' },
-          { value: '1', label: 'Next discriminating test proposed', tone: 'success' },
-          { value: '0', label: 'Remediation actions executed', tone: 'success' },
-        ], citation: { label: 'Quickstart contract and automated scenario tests' } },
-      ],
-    },
-    {
-      id: 'payoff', label: '04', title: 'The Operator Stays in Control', scenes: [
-        { id: 'punchline', type: 'punchline', beat: 'transformation', eyebrow: 'The transformation', line1: 'The agent does not close the incident.', line2: 'It makes the next decision defensible.', cta: 'Map your next approved incident →' },
+      id: 'payoff', label: '03', title: 'The Handoff', scenes: [
+        { id: 'punchline', type: 'punchline', beat: 'transformation', eyebrow: 'The transformation', line1: 'The agent does not close the incident.', line2: 'It makes the next decision defensible.', cta: 'Continue into proof, practice, or build →', speakerPrompt: 'Do not keep presenting. Choose the next journey based on the room and hand control to the live environment.' },
       ],
     },
   ],
   relatedStories: [
-    { title: 'Build an Incident Pattern', question: 'Can this evidence contract travel to another alarm?', technology: 'Portable JSON · Approved tools · Human review' },
-    { title: 'Reliability Lab', question: 'What happens when tools, retrieval, or model wording fail?', technology: 'Failure injection · Qualification · Evidence bundle' },
+    { title: 'Live Demonstration', duration: '5–10 minutes', question: 'Can changing the evidence change the hypothesis?', technology: 'Two synthetic incidents · Structured evidence · Human review', instruction: 'Open the Network Operations Workspace and run both cases.', href: '/' },
+    { title: 'Guided Demo', duration: '25–35 minutes', question: 'Can the audience trace every claim to its owner and boundary?', technology: 'Baseline · Architecture trace · OpenShift resources', instruction: 'Continue in the Showroom guide through Modules 1 and 2.' },
+    { title: 'Hands-on Lab', duration: '75–90 minutes', question: 'Can participants extend, break, qualify, and explain the pattern?', technology: 'Build · Failure injection · Qualification · NOC decision brief', instruction: 'Complete all seven Showroom modules and export the evidence bundle.' },
   ],
 }

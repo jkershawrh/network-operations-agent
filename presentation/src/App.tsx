@@ -33,6 +33,7 @@ export default function App() {
   const [started, setStarted] = useState(initial.started)
   const [position, setPosition] = useState<Position>(initial.position)
   const [finale, setFinale] = useState(initial.finale)
+  const [showPresenterPrompt, setShowPresenterPrompt] = useState(false)
   const touchStart = useRef<number | null>(null)
   const warnings = useMemo(() => validateDemoConfig(demoConfig), [])
   const safeAct = Math.min(position.act, demoConfig.acts.length - 1)
@@ -81,6 +82,7 @@ export default function App() {
       if (['ArrowLeft', 'PageUp'].includes(event.key)) { event.preventDefault(); previous() }
       if (event.key === 'Home') restart()
       if (event.key.toLowerCase() === 'f') void document.documentElement.requestFullscreen?.()
+      if (event.key.toLowerCase() === 'p') setShowPresenterPrompt((visible) => !visible)
     }
     window.addEventListener('popstate', onPop)
     window.addEventListener('keydown', onKey)
@@ -109,6 +111,8 @@ export default function App() {
         onNext={next}
         onRestart={restart}
         onFullscreen={() => document.fullscreenElement ? void document.exitFullscreen() : void document.documentElement.requestFullscreen?.()}
+        onPresenterPrompt={() => setShowPresenterPrompt((visible) => !visible)}
+        presenterPromptVisible={showPresenterPrompt}
       />
       <div className="stage" onClick={(event) => { if ((event.target as HTMLElement).closest('button, a')) return; next() }}>
         <AnimatePresence mode="wait">
@@ -116,6 +120,7 @@ export default function App() {
         </AnimatePresence>
       </div>
       {!finale && <div className="scene-progress">{act.label} · {safeScene + 1}/{act.scenes.length}</div>}
+      {!finale && showPresenterPrompt && scene.speakerPrompt && <aside className="presenter-prompt" aria-live="polite"><strong>Presenter prompt</strong><span>{scene.speakerPrompt}</span></aside>}
     </div>
   )
 }
