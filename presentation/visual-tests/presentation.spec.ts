@@ -121,6 +121,11 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
     const compactNextBox = await compactNext.boundingBox()
     return compactNextBox!.y + compactNextBox!.height
   }).toBeLessThanOrEqual(693)
+  const compactWorkspaceBox = await page.getByTestId('live-operator-workspace').boundingBox()
+  const compactMetricsBox = await page.locator('.runtime-strip span', { hasText: 'METRICS' }).boundingBox()
+  expect(compactMetricsBox!.y + compactMetricsBox!.height).toBeLessThanOrEqual(
+    compactWorkspaceBox!.y + compactWorkspaceBox!.height,
+  )
   await expect(page).toHaveScreenshot('live-journey-decide-compact.png', { fullPage: true })
   await page.setViewportSize(defaultViewport)
   await page.getByRole('button', { name: 'Inspect technical topology' }).click()

@@ -550,7 +550,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 
 @media (min-width: 761px) and (max-height: 750px) {
   .scene:has(.operator-workspace) { height: calc(100vh - 88px); }
-  .workspace-main { padding: .65rem .8rem 5.3rem; }
+  .workspace-main { padding: .65rem .8rem; }
   .workspace-act h2 { font-size: 1.3rem; }
   .workspace-explanation { min-height: 25px; margin: .3rem 0; font-size: .68rem; }
   .decision-transform { gap: .35rem; }
@@ -562,7 +562,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .llm-exchange section { gap: .12rem; padding: .3rem .4rem; }
   .llm-exchange strong { font-size: .56rem; line-height: 1.25; }
   .llm-exchange small { font-size: .47rem; line-height: 1.25; }
-  .workspace-footer { right: .8rem; bottom: .55rem; left: .8rem; gap: .3rem; background: var(--surface-1); }
+  .workspace-footer { position: static; flex: 0 0 auto; margin-top: .35rem; gap: .3rem; background: var(--surface-1); }
   .runtime-strip span { padding: .28rem .4rem; }
   .workspace-actions .button { min-height: 30px; padding: .35rem .55rem; }
 }
