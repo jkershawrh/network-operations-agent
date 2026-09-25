@@ -27,7 +27,9 @@ The two-deployment shape is intentional. If tool implementation and orchestratio
 
 [source,bash,role="execute"]
 ----
-APP_URL="https://$(oc get route network-operations-workspace -o jsonpath='{.spec.host}')"
+APP_URL="https://$(oc get route \
+  -l app.kubernetes.io/name=network-operations-agent,app.kubernetes.io/component=app \
+  -o jsonpath='{.items[0].spec.host}')"
 curl -fsS "$APP_URL/ready" | jq
 ----
 
