@@ -35,6 +35,9 @@ describe('SceneRenderer', () => {
     expect(screen.getByRole('button', { name: 'Start the live path' })).toBeInTheDocument()
     expect(screen.getByText(/Click anywhere to start/)).toBeInTheDocument()
     expect(screen.getByText(/Each click advances one infrastructure boundary/)).toBeInTheDocument()
+    expect(screen.getByText('Agent journey')).toBeInTheDocument()
+    expect(screen.getByText('Workload flow')).toBeInTheDocument()
+    expect(screen.getByText('LLM role')).toBeInTheDocument()
   })
 
   it('renders the statistic-grid scene', () => {

@@ -143,6 +143,9 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .journey-status > span:last-child { color: var(--text-dim); font-size: .85rem; }
 .journey-step-count { color: var(--intel-cyan); font: 700 .62rem 'Red Hat Mono'; letter-spacing: .08em; }
 .journey-step-count.complete { color: var(--success); }
+.journey-lanes { display: flex; justify-content: center; gap: .45rem; margin: -.35rem 0 .2rem; }
+.journey-lanes span { padding: .25rem .65rem; color: var(--text-disabled); border: 1px solid var(--border); border-radius: 999px; font: 700 .58rem 'Red Hat Mono'; text-transform: uppercase; }
+.journey-lanes span.active { color: var(--intel-cyan); border-color: var(--intel-cyan); background: var(--intel-cyan-dim); }
 .technical-topology { margin-top: -.25rem; }
 .topology-legend { display: flex; justify-content: center; gap: 1rem; margin-bottom: .45rem; color: var(--text-dim); font: .6rem 'Red Hat Mono'; }
 .topology-legend span { display: flex; align-items: center; gap: .3rem; }
