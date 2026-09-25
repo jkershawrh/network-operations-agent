@@ -1,14 +1,15 @@
 # Launchpad quickstart-to-lab handoff
 
 The full seven-module lab is implemented in `showroom-lab/`, and its release
-boundary is defined in `contracts/lab-contract.yaml`. The same ordered
-environment now exposes Presentation, Demonstration, Guided demo, and
-Hands-on lab paths. The remaining work in this document is environment and
-catalog qualification—not additional learner-content expansion.
+boundary is defined in `contracts/lab-contract.yaml`. It is a separate
+Launchpad-ordered environment with its own network; it is not embedded in the
+persistent presentation or live guided-proof runtime. The remaining work in
+this document is environment and catalog qualification—not additional
+learner-content expansion.
 
 This repository remains the canonical application and learning source. It
 retains a concise Antora build in `showroom/` for local source validation,
-while Launchpad uses the unified journey in `showroom-lab/`. Launchpad owns
+while Launchpad packages the separate lab journey from `showroom-lab/`. Launchpad owns
 environment binding, seat certification, catalog lifecycle, and ordering;
 those are not source-completeness gates.
 

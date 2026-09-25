@@ -56,5 +56,5 @@ export const demoConfig: DemoConfig = {
       ],
     },
   ],
-  relatedStories: [{ title: 'Challenge the evidence', duration: '25–35 minutes', question: 'Can the operator validate the conclusion?', technology: 'Live workspace · Provenance · Human review', instruction: 'Carry this incident into the guided lab. Inspect provenance, challenge the conclusion, and make the human review decision.', href: '/' }],
+  relatedStories: [{ title: 'Intel AI 301: Build an Evidence-Backed Network Operations Agent', duration: '4 hours', question: 'Can you build and qualify the workflow yourself?', technology: 'Separate Launchpad lab environment · Network Operations', instruction: 'The presentation ends here. Order the separate hands-on Network Operations lab in Partner AI Launchpad to build the scenario, inspect provenance, test failure boundaries, and produce the operator decision brief.', href: 'https://launchpad-candidate.apps.flightpath.fm2aihpcsed.com/request' }],
 }

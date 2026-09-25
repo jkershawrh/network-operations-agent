@@ -1,8 +1,8 @@
 # Audience journey acceptance matrix
 
-This matrix treats the presentation, live system, guided demo, and lab as one
-product. A green release must preserve the transitions between them, not merely
-render the React story.
+This matrix treats the presentation and live guided proof as one presenter
+experience. The hands-on lab is a separate Launchpad product; a green release
+must end with an explicit order handoff rather than embedding the lab runtime.
 
 | Journey contract | Red | Amber | Green | Automated evidence |
 |---|---|---|---|---|
@@ -12,9 +12,9 @@ render the React story.
 | Demonstration | Repeats the entire presentation | Runs one case without comparison | Workspace compares both alarm cases and exposes evidence, unknowns, next test, and authority | smoke and publication tests |
 | Mechanism explanation | Component inventory or side journey | Mechanisms named without connection to proof | Provenance, abstention, and authority are explained inline from the observed result | presentation scene test |
 | Evidence payoff | Static claim or memorized metric | Qualitative recap disconnected from the run | Payoff reads causes, observation counts, request timing, and action boundary from current-session Flightpath responses | journey evidence component test |
-| Guided demo | No instructor path | Commands exist but architecture is disconnected | Modules 1–2 connect UI, API evidence, architecture, and OpenShift resources | Showroom publication tests |
-| Hands-on lab | Read-only tour only | Participant edits without qualification | Participant builds a third case, extends MCP, injects failures, qualifies behavior, and exports a decision brief | lab contract and behavior suite |
-| Journey handoff | Presentation ends with another slide | CTA names a next step but does not identify where | Finale offers live demo, guided demo, and lab with duration and exact destination | config validation and finale rendering |
+| Guided proof | Static narration only | Live workspace is disconnected from the story | Presentation, architecture, and live proof share one evidence journey and stop before lab authoring | presentation and live-journey tests |
+| Hands-on lab boundary | Lab controls or lab network appear in the presenter runtime | Lab is described but the separation is unclear | No lab runtime is embedded; Launchpad provisions the separate environment | deployment values and publication tests |
+| Journey handoff | Presentation ends with another slide or an internal lab link | CTA names Launchpad but not the orderable item | Finale names the Network Operations catalog item, duration, and exact Launchpad order destination | config validation and finale rendering |
 | Presenter guidance | No timing or prompts | Separate notes that drift from scenes | Scene-bound prompts available with `P`; guide states where to stop and transition | presenter-control test |
 | Honest claims | Unqualified production or autonomous-operation claims | Caveats only in documentation | Synthetic scope, source state, uncertainty, and no-remediation boundary remain visible | claim registry, contracts, and tests |
 
@@ -30,9 +30,10 @@ only for an internal rehearsal with the limitation called out before the run.
    reveal the architecture through five operator questions, run two live
    conditions, explain the operating mechanisms inline, and deliver a payoff
    derived from the current Flightpath responses.
-2. **Live demonstration — 5–10 minutes:** open *Network Operations Workspace*,
-   run both built-in cases, and compare provenance, unknowns, and the next test.
-3. **Guided demo — 25–35 minutes:** follow Modules 1–2 with the Workspace,
-   Terminal, and OpenShift Console visible.
-4. **Hands-on lab — 75–90 minutes:** complete all seven modules, ending with a
-   qualification report, checksums, and a NOC decision brief.
+2. **Live guided proof — 5–10 minutes:** run both built-in cases in the
+   presenter environment and compare provenance, unknowns, and the next test.
+3. **Close and hand off:** end the presentation. Do not open a lab module or a
+   lab network inside the presenter runtime.
+4. **Separate Launchpad lab — 4 hours:** order *Intel AI 301: Build an
+   Evidence-Backed Network Operations Agent* and continue in its provisioned
+   network, ending with qualification evidence and a NOC decision brief.

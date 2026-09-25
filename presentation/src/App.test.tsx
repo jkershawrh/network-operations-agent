@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
+import { Finale } from './components/Finale'
+import { demoConfig } from './demo.config'
 
 describe('presentation controls', () => {
   beforeEach(() => window.history.replaceState(null, '', '/'))
@@ -39,5 +41,14 @@ describe('presentation controls', () => {
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: 'Toggle presenter prompt' }))
     expect(screen.getByText(/Open on the incident/)).toBeInTheDocument()
+  })
+
+  it('hands off to the separately orderable Launchpad lab', () => {
+    render(<Finale config={demoConfig} onRestart={vi.fn()} />)
+    expect(screen.queryByRole('link', { name: 'Order the hands-on lab →' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Close presentation' }))
+    const orderLink = screen.getByRole('link', { name: 'Order the hands-on lab →' })
+    expect(orderLink).toHaveAttribute('href', 'https://launchpad-candidate.apps.flightpath.fm2aihpcsed.com/request')
+    expect(screen.getByText(/The presentation ends here/)).toBeInTheDocument()
   })
 })

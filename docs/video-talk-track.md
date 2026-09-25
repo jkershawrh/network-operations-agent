@@ -189,13 +189,13 @@ Evidence chose the cause. AI explained the result. Human authority was preserved
 
 Evidence before inference. Human before action.
 
-The presentation has shown the operating model. The guided investigation is where the operator now takes control.
+The presentation and guided proof end here. The hands-on Network Operations lab is a separate environment with its own network, ordered from Partner AI Launchpad.
 
-Using the same incident and evidence trail, they can inspect provenance, challenge the conclusion, and make the human review decision themselves.
+In that lab, participants build and qualify the workflow themselves: they inspect provenance, extend the scenario, test failure boundaries, and produce the operator decision brief.
 
 Red Hat provides the governed application platform and operational boundaries. Intel provides the CPU infrastructure for practical enterprise inference. Together, they make agentic operations explainable, deployable, and accountable.
 
-**Click:** Begin guided investigation.
+**Click:** Order the hands-on lab—or close the presentation.
 
 ## Recording Checklist
 

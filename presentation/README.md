@@ -1,9 +1,9 @@
 # Network Operations demo story
 
 This React/Vite presentation converts the Evidence-Backed Network Operations
-Agent into a Red Hat × Intel hero's-journey story. In a built runtime image it
-is served at `/story/` and appears as the *Story* tab beside the live Workspace,
-Terminal, OpenShift Console, and Showroom guide.
+Agent into a Red Hat × Intel hero's-journey story. In a built presenter image it
+is served at `/story/` beside the bounded live Network Operations proof.
+The separately orderable Launchpad lab is not embedded in this runtime.
 
 ## Run with live proof
 
@@ -27,8 +27,8 @@ fixture and visibly displays `REHEARSAL` or `OFFLINE`.
 The presenter story is intentionally limited to 5–7 minutes and seven or fewer
 top-level scenes. The architecture act reveals one operator question and one
 responsibility boundary at a time. Press `P` to show speaker prompts. At the
-finale, stop presenting and choose the live Workspace, the first two guided
-modules, or the complete lab.
+finale, stop presenting or follow the single Launchpad link to order the
+separate hands-on Network Operations lab.
 
 ## Validate
 

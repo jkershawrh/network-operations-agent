@@ -5,7 +5,7 @@ presentation:
   desired_decision: Adopt a bounded evidence contract before connecting an agent to operational systems
   duration_minutes: 7
   core_tension: A timing alarm crosses technical boundaries, but an AI explanation must not cross the operator's authority boundary
-  cta: Continue the same incident in guided practice
+  cta: End the presentation and order the separate hands-on lab in Launchpad
 
 source_material:
   mode: repository
@@ -17,7 +17,7 @@ source_material:
     - ../tests/test_investigation.py
     - ../showroom/modules/ROOT/pages/
   consequential_assumptions:
-    - The presentation is a 5–7 minute opening path in the unified Showroom; depth belongs in the live demonstration, guided demo, and hands-on lab.
+    - The presentation and its live guided proof run in the presenter environment. The hands-on network lab is a separate, orderable Launchpad environment and is not embedded in this experience.
     - The live API is same-origin at /api/investigate when deployed with the application.
     - Flightpath currently has no model Secret or model endpoint assigned. The CPU path must display as not configured until live identity and placement are verified.
 
@@ -40,6 +40,7 @@ architecture:
     - The short story runs one live case; the Workspace compares hardware and platform scenarios, which must yield different supported causes.
   omitted_from_main_story:
     - The learner-authored upstream-clock scenario belongs to the 90-minute lab.
+    - The hands-on lab network, lab modules, authoring tools, and failure injection are not part of the presentation or guided proof runtime.
     - Launchpad catalog plumbing and deployment internals do not change the core decision.
 
 beats:

@@ -29,7 +29,7 @@ describe('validateDemoConfig', () => {
       expect.stringContaining('7 or fewer'),
       expect.stringContaining('guided architecture'),
       expect.stringContaining('live proof'),
-      expect.stringContaining('guided handoff'),
+      expect.stringContaining('Launchpad lab handoff'),
     ]))
   })
 })
