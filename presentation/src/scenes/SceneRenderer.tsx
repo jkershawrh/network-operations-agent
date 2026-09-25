@@ -4,7 +4,6 @@ import type { SceneConfig } from '../types'
 import { LiveProof } from './LiveProof'
 import { LiveJourney } from './LiveJourney'
 import { SceneFrame } from './SceneFrame'
-import { TechnicalTopology } from './TechnicalTopology'
 import { readJourneyEvidence } from '../live/journeyEvidence'
 
 const toneClass = (tone?: string) => tone ? `tone-${tone}` : ''
@@ -14,14 +13,6 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
   const [revealed, setRevealed] = useState(false)
   const layer = scene.layers[step]
   const complete = step === scene.layers.length
-  const nodeGroups = [
-    ['browser', 'route', 'app-service', 'app'],
-    ['diagnostics-service', 'mcp'],
-    ['history'],
-    ['policy'],
-    ['operator'],
-  ]
-  const activeIds = nodeGroups.slice(0, step + (revealed ? 1 : 0)).flat()
   const advance = () => {
     if (!revealed) setRevealed(true)
     else { setStep((value) => value + 1); setRevealed(false) }
@@ -29,7 +20,7 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
 
   return (
     <SceneFrame scene={scene}>
-      <div className="guided-architecture guided-technical" data-testid="guided-architecture">
+      <div className="guided-architecture" data-testid="guided-architecture">
         <div className="architecture-map" aria-label="Architecture progress">
           {scene.layers.map((item, index) => (
             <div className={`architecture-map-item ${toneClass(item.tone)} ${index < step ? 'done' : ''} ${index === step ? 'active' : ''}`} key={item.id}>
@@ -55,7 +46,6 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
             </motion.div>
           )}
         </AnimatePresence>
-        <TechnicalTopology activeIds={activeIds} />
       </div>
     </SceneFrame>
   )
@@ -77,6 +67,14 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
       <div className="punchline"><div>{scene.line1}</div><strong>{scene.line2}</strong>{scene.cta && <span>{scene.cta}</span>}</div>
     </div></SceneFrame>
   }
+
+  if (scene.type === 'incident-open') return <SceneFrame scene={scene}>
+    <div className="incident-open">
+      <div className="incident-alarm"><span>Active alarm</span><strong>{scene.alarm}</strong><small>{scene.symptom}</small></div>
+      <div className="incident-split">{scene.possibilities.map((possibility) => <div className={`incident-cause tone-${possibility.tone}`} key={possibility.label}><span>Possible cause</span><strong>{possibility.label}</strong><small>{possibility.signal}</small></div>)}</div>
+      <div className="incident-decision">{scene.decision}</div>
+    </div>
+  </SceneFrame>
 
   if (scene.type === 'intro') {
     return (

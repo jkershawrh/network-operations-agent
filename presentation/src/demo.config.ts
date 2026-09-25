@@ -17,13 +17,13 @@ export const demoConfig: DemoConfig = {
   acts: [
     {
       id: 'alarm', label: '00', title: 'The Alarm', scenes: [
-        { id: 'reframe', type: 'reframe', beat: 'stakes', eyebrow: 'The operational tension', title: 'The first explanation may be wrong', before: 'Ask AI for an answer', after: 'Build a traceable evidence case', detail: 'Current observations, approved history, optional model wording, and human authority must remain distinct. The safety invariant is zero remediation actions executed.', citation: { label: 'Quickstart contract: remediation_execution=false' }, speakerPrompt: 'Start with the operator, not the technology: the alarm is real, but it does not identify its own cause. The value is a faster, defensible next decision without surrendering operator authority.' },
+        { id: 'incident-open', type: 'incident-open', beat: 'stakes', eyebrow: '02:17 · timing alarm · production network', title: 'One alarm is not one cause', alarm: 'PTP synchronization degraded', symptom: 'The same visible alarm can originate in the NIC timestamp path or the OpenShift timing service.', possibilities: [{ label: 'Hardware timing', signal: 'NIC timestamp fault present', tone: 'partner' }, { label: 'Platform timing', signal: 'Timing service fault present', tone: 'primary' }], decision: 'The operator needs evidence that changes the diagnosis—not a more confident guess.', citation: { label: 'Synthetic quickstart scenarios · no remediation authority' }, speakerPrompt: 'Open on the incident. Point to the identical symptom and two plausible causes. The audience should feel the ambiguity before you explain the evidence system.' },
       ],
     },
     {
       id: 'architecture', label: '01', title: 'Guided Architecture', scenes: [
         {
-          id: 'guided-architecture', type: 'guided-architecture', beat: 'system-reveal', eyebrow: 'Guided architecture · reveal each boundary', title: 'Who is allowed to claim what?', body: 'Use the operator question to reveal one responsibility at a time.',
+          id: 'guided-architecture', type: 'guided-architecture', beat: 'system-reveal', eyebrow: 'Guided system boundaries', title: 'Separate observation, context, inference, and authority', body: 'Reveal one responsibility at a time. The technical deployment appears when the live request runs.',
           layers: [
             { id: 'alarm', component: 'Scenario contract', tone: 'primary', question: 'What exactly happened?', answer: 'A validated synthetic event starts the investigation.', detail: 'The alarm ID, occurrence time, and bounded scenario are input—not a diagnosis.' },
             { id: 'diagnostics', component: 'Read-only MCP', tone: 'partner', question: 'What do the systems show right now?', answer: 'Named diagnostics produce current observations with provenance.', detail: 'Network, platform, hardware, and upstream scopes are allowlisted. No arbitrary tool and no mutation capability enters the path.' },

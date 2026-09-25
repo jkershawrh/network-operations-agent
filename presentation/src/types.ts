@@ -76,6 +76,14 @@ export interface ReframeScene extends BaseScene {
   detail?: string
 }
 
+export interface IncidentOpenScene extends BaseScene {
+  type: 'incident-open'
+  alarm: string
+  symptom: string
+  possibilities: Array<{ label: string; signal: string; tone: 'primary' | 'partner' }>
+  decision: string
+}
+
 export interface ArchitectureScene extends BaseScene {
   type: 'architecture'
   nodes: Array<{ id: string; label: string; detail?: string; tone?: 'primary' | 'partner' | 'success' }>
@@ -171,6 +179,7 @@ export type SceneConfig =
   | QuoteScene
   | StatGridScene
   | ReframeScene
+  | IncidentOpenScene
   | ArchitectureScene
   | GuidedArchitectureScene
   | ArchitectureFlowScene

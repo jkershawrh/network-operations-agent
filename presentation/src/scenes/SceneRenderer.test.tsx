@@ -33,6 +33,7 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('diagnostics Deployment')).toBeInTheDocument()
     expect(screen.getByText(':8095/mcp')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Run the live journey' })).toBeInTheDocument()
+    expect(screen.getByText(/Click anywhere to verify Flightpath/)).toBeInTheDocument()
   })
 
   it('renders the statistic-grid scene', () => {
@@ -55,7 +56,6 @@ describe('SceneRenderer', () => {
     expect(screen.queryByText('A validated synthetic event starts the investigation.')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
     expect(await screen.findByText('A validated synthetic event starts the investigation.')).toBeInTheDocument()
-    expect(document.querySelector('[data-node="route"]')).toHaveClass('active')
     fireEvent.click(screen.getByRole('button', { name: 'Ask next question →' }))
     expect(await screen.findByText('What do the systems show right now?')).toBeInTheDocument()
   })
@@ -65,7 +65,7 @@ describe('SceneRenderer', () => {
   })
 
   it('preserves the progressive proof sequence before the lab', () => {
-    expect(scenes.map((scene) => scene.type)).toEqual(['reframe', 'guided-architecture', 'live-journey', 'mechanisms', 'evidence-payoff'])
+    expect(scenes.map((scene) => scene.type)).toEqual(['incident-open', 'guided-architecture', 'live-journey', 'mechanisms', 'evidence-payoff'])
   })
 
   it('builds the payoff from live journey evidence', () => {

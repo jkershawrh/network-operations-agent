@@ -106,6 +106,16 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .reframe-after { color: var(--success); border-color: var(--success); }
 .reframe-arrow { color: var(--intel-cyan); font-size: 2.5rem; }
 .supporting { color: var(--text-secondary); }
+.incident-open { display: grid; gap: var(--space-3); max-width: 920px; margin: var(--space-3) auto 0; }
+.incident-alarm { display: grid; gap: .45rem; padding: 1rem 1.3rem; text-align: left; background: linear-gradient(90deg, var(--rh-red-dim), var(--surface-1)); border: 1px solid var(--rh-red); border-radius: var(--radius-md); }
+.incident-alarm > span, .incident-cause > span { color: var(--text-dim); font: 700 .65rem 'Red Hat Mono'; letter-spacing: .1em; text-transform: uppercase; }
+.incident-alarm > strong { font: 700 clamp(1.5rem, 2.8vw, 2.4rem) 'Red Hat Display'; }
+.incident-alarm > small, .incident-cause > small { color: var(--text-secondary); font-size: .85rem; }
+.incident-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.incident-cause { display: grid; gap: .45rem; padding: 1rem 1.3rem; text-align: left; background: var(--surface-1); border: 1px solid var(--border); border-top: 3px solid var(--intel-cyan); border-radius: var(--radius-md); }
+.incident-cause.tone-primary { border-top-color: var(--rh-red); }
+.incident-cause > strong { font-size: 1.15rem; }
+.incident-decision { padding: .75rem 1rem; color: var(--intel-cyan); font-weight: 700; background: var(--intel-cyan-dim); border-radius: var(--radius-sm); }
 
 .architecture, .pipeline { display: flex; justify-content: center; align-items: stretch; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-5); }
 .architecture-node { min-width: 210px; background: var(--surface-1); border: 2px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); display: grid; gap: .4rem; }
@@ -183,6 +193,18 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .journey-evidence .journey-next { grid-column: 1 / -1; border-color: var(--intel-cyan); }
 .journey-controls { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-4); }
 .journey-link { text-decoration: none; }
+.live-click-stage { display: grid; gap: .45rem; cursor: pointer; }
+.live-run-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .65rem; width: min(900px, 100%); margin: 0 auto; }
+.live-run-card { display: grid; gap: .3rem; padding: .65rem .8rem; text-align: left; background: var(--surface-1); border-left: 3px solid var(--success); border-radius: var(--radius-sm); }
+.live-run-card > span { color: var(--text-dim); font: 700 .58rem 'Red Hat Mono'; text-transform: uppercase; }
+.live-run-card > strong { color: var(--intel-cyan); }
+.live-run-card > div { display: flex; gap: .75rem; flex-wrap: wrap; }
+.live-run-card b { color: var(--text-secondary); font: 700 .68rem 'Red Hat Mono'; }
+.live-run-card small { color: var(--text-dim); font-size: .65rem; }
+.click-hint { color: var(--text-disabled); font: .68rem 'Red Hat Mono'; text-transform: uppercase; }
+.live-click-stage .journey-next { display: grid; grid-template-columns: auto 1fr; gap: .7rem; width: min(900px, 100%); margin: 0 auto; padding: .55rem .75rem; text-align: left; background: var(--surface-1); border-left: 3px solid var(--intel-cyan); }
+.live-click-stage .journey-next span { color: var(--text-dim); font: 700 .58rem 'Red Hat Mono'; text-transform: uppercase; }
+.live-click-stage .journey-next strong { font-size: .72rem; }
 .architecture-flow { display: flex; justify-content: center; align-items: stretch; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
 .architecture-flow .architecture-node { min-width: 148px; max-width: 160px; padding-inline: var(--space-2); }
 .flow-wrap { display: flex; align-items: center; gap: var(--space-2); }
@@ -263,6 +285,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .stage { padding: 1.5rem 1rem 3rem; }
   .scene { min-height: 72vh; }
   .reframe { grid-template-columns: 1fr; gap: var(--space-2); }
+  .incident-split, .live-run-grid { grid-template-columns: 1fr; }
   .reframe-arrow { transform: rotate(90deg); }
   .pipeline-wrap { width: 100%; flex-direction: column; }
   .pipeline-step { width: 100%; }
@@ -287,6 +310,18 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .journey-evidence { grid-template-columns: 1fr; }
   .journey-evidence .journey-next { grid-column: auto; }
   .architecture-compare .reframe-arrow { transform: rotate(90deg); }
+}
+
+@media (min-width: 761px) {
+  .stage { height: calc(100vh - 58px); min-height: 0; overflow: hidden; padding: clamp(1rem, 2.5vw, 2.5rem); }
+  .scene { min-height: 0; max-height: calc(100vh - 110px); }
+  .scene h1 { font-size: clamp(1.8rem, 3vw, 3.2rem); margin-bottom: .65rem; }
+  .scene .lede { margin-bottom: 1rem; }
+  .guided-architecture { margin-top: .75rem; }
+  .architecture-dialog { min-height: 300px; padding: 1.4rem; }
+  .live-click-stage .technical-topology { margin: .15rem 0; }
+  .live-click-stage .journey-status { margin: 0 0 .25rem; }
+  .live-click-stage .journey-controls { margin-top: .25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

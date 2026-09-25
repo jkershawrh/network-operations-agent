@@ -10,13 +10,13 @@ describe('presentation controls', () => {
     expect(screen.getByText('click or press space to begin')).toBeInTheDocument()
     fireEvent.keyDown(window, { key: ' ' })
     expect(new URLSearchParams(window.location.search).get('act')).toBe('0')
-    expect(screen.getByText('The first explanation may be wrong')).toBeInTheDocument()
+    expect(screen.getByText('One alarm is not one cause')).toBeInTheDocument()
   })
 
   it('supports deep links', () => {
     window.history.replaceState(null, '', '/?act=1&scene=0')
     render(<App />)
-    expect(screen.getByText('Who is allowed to claim what?')).toBeInTheDocument()
+    expect(screen.getByText('Separate observation, context, inference, and authority')).toBeInTheDocument()
   })
 
   it('restarts from the brand control', () => {
@@ -38,6 +38,6 @@ describe('presentation controls', () => {
     window.history.replaceState(null, '', '/?act=0&scene=0')
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: 'Toggle presenter prompt' }))
-    expect(screen.getByText(/Start with the operator/)).toBeInTheDocument()
+    expect(screen.getByText(/Open on the incident/)).toBeInTheDocument()
   })
 })
