@@ -400,21 +400,24 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .mechanism-card.tone-success { border-top-color: var(--success); }
 .mechanism-card > span { color: var(--text-disabled); font: 700 .7rem 'Red Hat Mono'; }
 .mechanism-card em, .mechanism-card small { color: var(--text-secondary); font-style: normal; line-height: 1.45; }
-.evidence-payoff { display: grid; gap: var(--space-4); }
+.evidence-payoff { display: grid; gap: .8rem; width: min(1040px, 100%); margin: 0 auto; }
 .evidence-payoff-status, .evidence-empty { display: flex; align-items: center; justify-content: center; gap: var(--space-3); }
-.payoff-model-proof { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: .65rem; padding: .65rem .85rem; border: 1px solid var(--intel-cyan); border-radius: var(--radius-sm); background: var(--intel-cyan-dim); text-align: left; }
-.payoff-model-proof span { color: var(--intel-cyan); font: 700 .62rem 'Red Hat Mono'; letter-spacing: .08em; }
-.payoff-model-proof strong { font-family: 'Red Hat Mono'; }
-.payoff-model-proof small { color: var(--text-secondary); }
-.proof-equation { display: grid; grid-template-columns: 1fr auto 1fr auto 1.15fr; align-items: center; gap: .7rem; }
-.proof-equation > div { display: grid; gap: .3rem; padding: .85rem 1rem; text-align: left; border-top: 3px solid var(--intel-cyan); background: var(--surface-1); }
-.proof-equation > b { color: var(--text-disabled); font: 700 1.4rem 'Red Hat Mono'; }
-.proof-equation span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; }
-.proof-equation strong { font-size: .95rem; }
-.proof-equation .proof-equation-result { border-color: var(--success); }
-.proof-equation .proof-equation-result strong { color: var(--success); font: 700 1.25rem 'Red Hat Display'; }
-.proof-equation .proof-safety { grid-column: 1 / -1; grid-template-columns: auto 1fr; align-items: center; border-top: 0; border-left: 3px solid var(--rh-red); padding-block: .55rem; }
-.proof-equation .proof-safety span { color: var(--rh-red); }
+.payoff-thesis { display: grid; justify-items: center; gap: .2rem; padding: .65rem 1rem; }
+.payoff-thesis span, .payoff-run > span, .payoff-boundaries span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; }
+.payoff-thesis > strong { color: var(--text-secondary); font: 500 1rem 'Red Hat Text'; }
+.payoff-thesis h2 { margin: 0; color: var(--success); font: 700 clamp(1.8rem, 3.5vw, 3rem) 'Red Hat Display'; }
+.payoff-comparison { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+.payoff-run { display: grid; gap: .35rem; padding: .85rem 1rem; text-align: left; border-top: 3px solid var(--intel-cyan); background: var(--surface-1); }
+.payoff-run > small { color: var(--text-dim); font: .58rem 'Red Hat Mono'; }
+.payoff-run > div { display: flex; align-items: baseline; gap: .5rem; }
+.payoff-run b { color: var(--text); font: 700 1.15rem 'Red Hat Display'; text-transform: capitalize; }
+.payoff-run em { color: var(--success); font: normal 700 .6rem 'Red Hat Mono'; text-transform: uppercase; }
+.payoff-run p { margin: 0; color: var(--text-secondary); font-size: .7rem; }
+.payoff-boundaries { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
+.payoff-boundaries > div { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .2rem .7rem; padding: .65rem .8rem; text-align: left; border-left: 3px solid var(--success); background: var(--surface-1); }
+.payoff-boundaries > div:last-child { border-color: var(--intel-cyan); }
+.payoff-boundaries strong { overflow-wrap: anywhere; }
+.payoff-boundaries small { grid-column: 2; color: var(--text-dim); font-size: .62rem; }
 .proof-toolbar { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin: var(--space-4); }
 .button { border: 0; border-radius: var(--radius-sm); padding: .7rem 1.2rem; cursor: pointer; font-weight: 700; }
 .button-primary { background: var(--intel-cyan); color: #071117; }
@@ -440,6 +443,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 
 @media (max-width: 760px) {
   .mechanism-grid { grid-template-columns: 1fr; }
+  .payoff-comparison, .payoff-boundaries { grid-template-columns: 1fr; }
   .demo-header { padding: .55rem .5rem; }
   .brand-lockup-compact { gap: .35rem; }
   .brand-lockup-compact img { max-width: 48px; height: 14px; }

@@ -125,13 +125,13 @@ describe('SceneRenderer', () => {
     const scene = scenes.find((item) => item.type === 'evidence-payoff')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByText('LIVE')).toBeInTheDocument()
-    expect(screen.getByText('hardware_timestamping')).toBeInTheDocument()
-    expect(screen.getByText(/3 observations · 47ms · no action/)).toBeInTheDocument()
+    expect(screen.getByText('hardware timestamping')).toBeInTheDocument()
+    expect(screen.getByText(/3 current observations · 1 approved sources/)).toBeInTheDocument()
     expect(screen.getByText('granite-3.2-8b-tools')).toBeInTheDocument()
     expect(screen.getByText(/Intel Xeon 6767P/)).toBeInTheDocument()
-    expect(screen.getByText('ONE ALARM')).toBeInTheDocument()
-    expect(screen.getByText('SUPPORTED DECISIONS')).toBeInTheDocument()
-    expect(screen.getByText('ZERO AUTOMATED ACTIONS')).toBeInTheDocument()
+    expect(screen.getByText('THE RESULT')).toBeInTheDocument()
+    expect(screen.getByText('HUMAN AUTHORITY')).toBeInTheDocument()
+    expect(screen.getByText('Zero automated actions')).toBeInTheDocument()
     clearJourneyEvidence()
   })
 

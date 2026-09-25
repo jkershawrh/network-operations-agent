@@ -97,12 +97,15 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
   if (scene.type === 'mechanisms') return <SceneFrame scene={scene}><div className="mechanism-grid">{scene.mechanisms.map((mechanism, index) => <div className={`mechanism-card ${toneClass(mechanism.tone)}`} key={mechanism.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{mechanism.label}</strong><em>{mechanism.claim}</em><small>{mechanism.detail}</small></div>)}</div></SceneFrame>
   if (scene.type === 'evidence-payoff') {
     const evidence = readJourneyEvidence()
-    const causes = new Set(evidence.map((item) => item.cause)).size
     const safe = evidence.length > 0 && evidence.every((item) => !item.actionExecuted)
     const modelProof = evidence.find((item) => item.model)
     return <SceneFrame scene={scene}><div className="evidence-payoff">
-      {evidence.length ? <><div className="evidence-payoff-status"><span className="source-badge source-live">LIVE</span><strong>{evidence.length} infrastructure investigations completed</strong></div><div className="proof-equation"><div><span>ONE ALARM</span><strong>PTP degraded</strong></div><b>+</b><div><span>{evidence.length} LIVE CONDITIONS</span><strong>{evidence.reduce((sum, item) => sum + item.observationCount, 0)} observations</strong></div><b>=</b><div className="proof-equation-result"><span>SUPPORTED DECISIONS</span><strong>{causes} causes</strong></div><div className="proof-safety"><span>ZERO AUTOMATED ACTIONS</span><strong>{safe ? 'Human authority preserved' : 'Review required'}</strong></div></div>{modelProof && <div className="payoff-model-proof"><span>INTEL CPU LIVE</span><strong>{modelProof.model}</strong><small>{modelProof.modelRuntime} · explanation only · no evidence or action authority</small></div>}<div className="journey-evidence">{evidence.map((item) => <div key={item.scenarioId}><span>{item.scenarioId}</span><strong>{item.cause}</strong><small>{item.observationCount} observations · {item.latencyMs}ms · no action</small></div>)}</div></> : <div className="evidence-empty"><span className="source-badge source-offline">NOT RUN</span><strong>{scene.emptyState}</strong></div>}
-      <div className="punchline"><div>{scene.line1}</div><strong>{scene.line2}</strong>{scene.cta && <span>{scene.cta}</span>}</div>
+      {evidence.length ? <>
+        <div className="evidence-payoff-status"><span className="source-badge source-live">LIVE</span><strong>{evidence.length} investigations · one alarm · two evidence paths</strong></div>
+        <div className="payoff-thesis"><span>THE RESULT</span><strong>{scene.line1}</strong><h2>{scene.line2}</h2></div>
+        <div className="payoff-comparison">{evidence.map((item, index) => <div className="payoff-run" key={item.scenarioId}><span>CONDITION {index + 1}</span><small>{item.scenarioId}</small><div><b>{item.cause.replaceAll('_', ' ')}</b><em>supported</em></div><p>{item.observationCount} current observations · {item.historicalSourceCount} approved sources</p></div>)}</div>
+        <div className="payoff-boundaries"><div><span>HUMAN AUTHORITY</span><strong>{safe ? 'Zero automated actions' : 'Review required'}</strong><small>{safe ? 'The operator retained control.' : 'The action boundary needs review.'}</small></div>{modelProof && <div><span>INTEL CPU EXPLANATION</span><strong>{modelProof.model}</strong><small>{modelProof.modelRuntime} · wording only · no evidence or action authority</small></div>}</div>
+      </> : <div className="evidence-empty"><span className="source-badge source-offline">NOT RUN</span><strong>{scene.emptyState}</strong></div>}
     </div></SceneFrame>
   }
 
