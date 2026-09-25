@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('opening, first story beat, and architecture remain visually stable', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
   await expect(page).toHaveScreenshot('opening.png', { fullPage: true })
   await page.keyboard.press('Space')
@@ -10,6 +11,8 @@ test('opening, first story beat, and architecture remain visually stable', async
   await expect(page).toHaveScreenshot('first-story-beat.png', { fullPage: true })
   await page.goto('/?act=1&scene=0')
   await expect(page).toHaveScreenshot('architecture.png', { fullPage: true })
+  await page.getByRole('button', { name: 'Reveal technical boundary' }).click()
+  await expect(page.getByText('Architecture answer')).toBeVisible()
   await page.goto('/?act=2&scene=0')
   await expect(page).toHaveScreenshot('live-journey.png', { fullPage: true })
 })

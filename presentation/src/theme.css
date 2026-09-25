@@ -197,14 +197,29 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-optional-path { grid-column: 3; display: flex; justify-content: flex-end; align-items: center; margin-top: .35rem; opacity: .72; }
 .topology-optional-path .topology-node { width: 175px; min-height: 54px; }
 .guided-technical { grid-template-columns: 180px 1fr; gap: .75rem 1rem; margin-top: .5rem; }
+.scene:has(.guided-technical) { width: min(1400px, 100%); }
+.scene:has(.guided-technical) > h1 { max-width: 1320px; font-size: clamp(1.8rem, 2.65vw, 2.75rem); }
+.scene:has(.guided-technical) > .lede { margin-bottom: .55rem; }
 .guided-technical .architecture-map { grid-template-columns: repeat(6, 1fr); grid-column: 1 / -1; }
 .guided-technical .architecture-map-item { grid-template-columns: 22px 1fr; padding: .4rem .55rem; font-size: .68rem; }
 .guided-technical .architecture-map-item > span { width: 20px; height: 20px; }
-.guided-technical .architecture-dialog { grid-column: 1 / -1; min-height: 190px; padding: 1rem 1.25rem; gap: .55rem; }
+.guided-technical .architecture-dialog { grid-column: 1 / -1; min-height: 128px; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); grid-template-rows: 1fr auto; align-items: center; gap: .45rem 1.5rem; padding: .8rem 1.25rem; }
+.guided-technical .architecture-question { grid-column: 1; grid-row: 1; }
+.guided-technical .architecture-answer { grid-column: 2; grid-row: 1 / span 2; }
+.guided-technical .architecture-dialog .button { grid-column: 1; grid-row: 2; margin-top: 0; justify-self: start; }
+.guided-technical .architecture-complete { grid-template-columns: 1fr auto; }
+.guided-technical .architecture-complete > .eyebrow,
+.guided-technical .architecture-complete > h2,
+.guided-technical .architecture-complete > p { grid-column: 1; }
+.guided-technical .architecture-complete > .button { grid-column: 2; grid-row: 1 / span 3; }
 .guided-technical .architecture-question h2 { font-size: clamp(1.2rem, 2vw, 1.7rem); margin: .25rem 0; }
 .guided-technical .architecture-answer h3 { font-size: 1rem; }
 .guided-technical .architecture-answer p { font-size: .78rem; margin: .2rem 0; }
 .guided-technical .technical-topology { grid-column: 1 / -1; }
+.guided-technical .topology-node,
+.guided-technical .topology-policy { min-height: 62px; }
+.guided-technical .openshift-boundary { padding-top: 1rem; padding-bottom: .55rem; }
+.guided-technical .topology-support-paths { margin-top: .35rem; padding-top: .35rem; }
 .journey-evidence { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin-top: var(--space-4); text-align: left; }
 .journey-evidence > div { display: grid; gap: .3rem; padding: var(--space-3); background: var(--surface-1); border-left: 3px solid var(--success); }
 .journey-evidence span { color: var(--text-dim); font: 700 .65rem 'Red Hat Mono'; text-transform: uppercase; }
@@ -443,6 +458,14 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .architecture-layer { grid-template-columns: 1fr; gap: .35rem; }
   .architecture-compare { grid-template-columns: 1fr; }
   .guided-architecture { grid-template-columns: 1fr; }
+  .guided-technical .architecture-dialog { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .guided-technical .architecture-question,
+  .guided-technical .architecture-answer,
+  .guided-technical .architecture-dialog .button,
+  .guided-technical .architecture-complete > .eyebrow,
+  .guided-technical .architecture-complete > h2,
+  .guided-technical .architecture-complete > p,
+  .guided-technical .architecture-complete > .button { grid-column: 1; grid-row: auto; }
   .architecture-map { grid-template-columns: repeat(5, 1fr); }
   .architecture-map-item { grid-template-columns: 1fr; text-align: center; font-size: .65rem; border-left: 0; border-bottom: 3px solid var(--border); }
   .architecture-map-item > span { margin: auto; }
