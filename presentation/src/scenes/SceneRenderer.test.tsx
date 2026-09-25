@@ -105,12 +105,41 @@ describe('SceneRenderer', () => {
   it('builds the payoff from live journey evidence', () => {
     clearJourneyEvidence()
     recordJourneyEvidence({ scenarioId: 'ptp-hardware', cause: 'hardware_timestamping', observationCount: 3, historicalSourceCount: 1, supportingEvidenceIds: ['hardware-1'], actionExecuted: false, latencyMs: 47, collectedAt: '2026-09-24T12:00:00Z' })
+    recordJourneyEvidence({ scenarioId: 'ptp-platform', cause: 'platform_timing', observationCount: 3, historicalSourceCount: 2, supportingEvidenceIds: ['openshift-platform-1'], actionExecuted: false, latencyMs: 53, collectedAt: '2026-09-24T12:00:01Z' })
     const scene = scenes.find((item) => item.type === 'evidence-payoff')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByText('LIVE')).toBeInTheDocument()
     expect(screen.getByText('hardware_timestamping')).toBeInTheDocument()
     expect(screen.getByText(/3 observations · 47ms · action executed: false/)).toBeInTheDocument()
+    expect(screen.getByText('ONE ALARM')).toBeInTheDocument()
+    expect(screen.getByText('TWO SUPPORTED DECISIONS')).toBeInTheDocument()
+    expect(screen.getByText('ZERO AUTOMATED ACTIONS')).toBeInTheDocument()
     clearJourneyEvidence()
+  })
+
+  it('makes the agent, policy, LLM, and human boundaries explicit at decision time', async () => {
+    const response = {
+      investigation_id: 'run-1', alarm_id: 'synthetic-ptp-001', mode: 'deterministic_fixture_proof',
+      current_observations_with_tool_provenance: [{ evidence_id: 'hardware-1', scope: 'hardware', signal: 'nic_timestamp_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'fixture-v1' }],
+      historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'ptp-runbook', source_revision: 'v1', excerpt: 'Compare current signals.' }],
+      primary_hypothesis: { cause: 'hardware_timing', supporting_evidence_ids: ['hardware-1'] }, alternate_hypotheses: ['platform_timing'], unknowns_and_conflicts: [],
+      next_discriminating_test: 'Compare lock state', proposed_action: 'Have an operator review', action_requires_human_approval: true, action_executed: false,
+    }
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'ready' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(response), { status: 200 }))
+    const scene = scenes.find((item) => item.type === 'live-journey')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    fireEvent.click(screen.getByRole('button', { name: /Verify Flightpath readiness/ }))
+    await screen.findByText('What is running now?')
+    fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
+    await screen.findByText('What did the systems report?')
+    fireEvent.click(screen.getByRole('button', { name: /Inspect approved history/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Evaluate the evidence/ }))
+    expect(await screen.findByText('AGENT ORCHESTRATES')).toBeInTheDocument()
+    expect(screen.getByText('POLICY DECIDES')).toBeInTheDocument()
+    expect(screen.getByText('LLM NOT CALLED')).toBeInTheDocument()
+    expect(screen.getByText('HUMAN ACTS')).toBeInTheDocument()
   })
 
   it('renders the custom React scene escape hatch', () => {

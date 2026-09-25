@@ -193,10 +193,21 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           {hardware.historical_context_with_source_revision.map((item) => <article key={item.evidence_id}><span>{item.source_id} · {item.source_revision}</span><strong>{item.excerpt}</strong></article>)}
         </div>}
 
-        {phase.id === 'decision' && hardware && <div className="decision-board">
-          <div><span>SUPPORTED CAUSE</span><strong>{titleCase(hardware.primary_hypothesis.cause)}</strong><small>{hardware.primary_hypothesis.supporting_evidence_ids.join(', ')}</small></div>
-          <div><span>ALTERNATE</span><strong>{hardware.alternate_hypotheses.map(titleCase).join(', ')}</strong><small>{hardware.unknowns_and_conflicts.length ? hardware.unknowns_and_conflicts.join('; ') : 'No conflicting required evidence'}</small></div>
-          <div><span>LLM ROLE</span><strong>{hardware.model_draft?.status ? titleCase(hardware.model_draft.status) : 'Not used'}</strong><small>{hardware.model_draft?.model ?? 'Evidence policy produced the decision; no model authority'}</small></div>
+        {phase.id === 'decision' && hardware && <div className="decision-transform" aria-label="Evidence to decision boundaries">
+          <motion.div className="decision-stage agent" initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}>
+            <span>AGENT ORCHESTRATES</span><strong>{hardware.current_observations_with_tool_provenance.length} observations + {hardware.historical_context_with_source_revision.length} sources</strong><small>Collects and preserves provenance</small>
+          </motion.div>
+          <div className="decision-arrow">→</div>
+          <motion.div className="decision-stage policy" initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .12 }}>
+            <span>POLICY DECIDES</span><strong>{titleCase(hardware.primary_hypothesis.cause)}</strong><small>Supported by {hardware.primary_hypothesis.supporting_evidence_ids.join(', ')}</small>
+          </motion.div>
+          <div className="decision-arrow">→</div>
+          <motion.div className="decision-stage human" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .24 }}>
+            <span>HUMAN ACTS</span><strong>Review required</strong><small>No remediation executed</small>
+          </motion.div>
+          <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
+            <span>LLM NOT CALLED</span><strong>The evidence policy did not need model inference.</strong><small>An optional draft may explain a result, but cannot add evidence, change the cause, or authorize action.</small>
+          </motion.div>
         </div>}
 
         {phase.id === 'authority' && hardware && <div className="authority-board">
@@ -222,7 +233,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           <div className="runtime-strip">
             <span>WORKLOAD <b>{currentResult?.alarm_id ?? 'awaiting input'}</b></span>
             <span>AGENT <b>{currentResult ? 'investigation complete' : status === 'running' ? 'running' : 'ready'}</b></span>
-            <span>LLM <b>{currentResult?.model_draft?.model ?? 'not required'}</b></span>
+            <span>LLM <b>{currentResult?.model_draft?.model ?? (currentResult ? 'NOT CALLED · policy path' : 'not required')}</b></span>
             <span>SOURCE <b>{currentResult ? 'LIVE · Flightpath' : 'not collected'}</b></span>
           </div>
           {error && <div className="error-panel">Live operation stopped: {error}</div>}
