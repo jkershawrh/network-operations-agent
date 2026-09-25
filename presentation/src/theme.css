@@ -1,0 +1,191 @@
+@font-face { font-family: 'Red Hat Display'; src: url('/fonts/RedHatDisplay-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Red Hat Display'; src: url('/fonts/RedHatDisplay-Bold.otf') format('opentype'); font-weight: 700 900; font-display: swap; }
+@font-face { font-family: 'Red Hat Text'; src: url('/fonts/RedHatText-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Red Hat Text'; src: url('/fonts/RedHatText-Medium.otf') format('opentype'); font-weight: 500 600; font-display: swap; }
+@font-face { font-family: 'Red Hat Text'; src: url('/fonts/RedHatText-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Red Hat Mono'; src: url('/fonts/RedHatMono-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Red Hat Mono'; src: url('/fonts/RedHatMono-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
+
+:root {
+  --rh-red: #ee0000;
+  --rh-red-dark: #a60000;
+  --rh-red-dim: rgba(238, 0, 0, .13);
+  --intel-cyan: #00aeef;
+  --intel-blue: #0071c5;
+  --intel-cyan-dim: rgba(0, 174, 239, .13);
+  --success: #63993d;
+  --success-dim: rgba(99, 153, 61, .14);
+  --warning: #f5a623;
+  --warning-dim: rgba(245, 166, 35, .14);
+  --danger: #f0561d;
+  --danger-dim: rgba(240, 86, 29, .14);
+  --bg: #151515;
+  --surface-1: #1f1f1f;
+  --surface-2: #292929;
+  --border: #3b3b3b;
+  --text: #fff;
+  --text-secondary: #c7c7c7;
+  --text-dim: #a3a3a3;
+  --text-disabled: #707070;
+  --space-1: .5rem;
+  --space-2: .75rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 20px 60px rgba(0, 0, 0, .28);
+  font-family: 'Red Hat Text', system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { background: radial-gradient(circle at 72% 20%, rgba(0, 174, 239, .07), transparent 30%), var(--bg); color: var(--text); }
+button, input { font: inherit; }
+button { color: inherit; }
+a { color: inherit; }
+
+.app { min-height: 100vh; }
+.opening, .finale { min-height: 100vh; display: grid; place-content: center; text-align: center; padding: var(--space-5); cursor: pointer; }
+.opening h1, .finale h1 { font: 800 clamp(2rem, 5vw, 4.5rem)/1.05 'Red Hat Display'; letter-spacing: -.045em; max-width: 1000px; margin: var(--space-6) auto var(--space-3); }
+.opening p { color: var(--text-dim); font-size: clamp(1rem, 2vw, 1.35rem); }
+.start-hint { display: block; color: var(--text-disabled); margin-top: 4rem; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; }
+.brand-lockup { display: flex; align-items: center; justify-content: center; gap: 1.4rem; }
+.brand-lockup img { width: auto; height: 32px; max-width: 150px; object-fit: contain; }
+.brand-lockup span { color: var(--text-disabled); font-size: 1.5rem; font-weight: 300; }
+.brand-lockup-compact { gap: .75rem; }
+.brand-lockup-compact img { height: 20px; max-width: 90px; }
+.brand-lockup-compact span { font-size: 1rem; }
+.brand-lockup-hero { margin-bottom: var(--space-6); }
+
+.demo-header { position: sticky; inset: 0 0 auto; z-index: 20; min-height: 58px; padding: .75rem 2rem; display: flex; justify-content: space-between; align-items: center; background: rgba(31, 31, 31, .92); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); }
+.brand-button, .presenter-controls button { background: transparent; border: 0; cursor: pointer; }
+.presenter-controls { display: flex; align-items: center; gap: .65rem; }
+.presenter-controls > button { font-size: 1.15rem; width: 32px; height: 32px; border-radius: 50%; }
+.presenter-controls > button:hover, .presenter-controls > button:focus-visible { background: var(--surface-2); outline: 2px solid var(--intel-cyan); }
+.progress { display: flex; gap: .45rem; }
+.progress button { width: 28px; height: 5px; padding: 0; border: 0; border-radius: 3px; background: var(--border); }
+.progress button.done { background: var(--success); }
+.progress button.active { background: var(--intel-cyan); box-shadow: 0 0 10px rgba(0, 174, 239, .5); }
+
+.stage { min-height: calc(100vh - 58px); display: grid; place-items: center; padding: clamp(2rem, 5vw, 5rem); cursor: pointer; }
+.scene { width: min(1100px, 100%); min-height: min(66vh, 680px); display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.scene h1 { font: 700 clamp(2rem, 4vw, 4rem)/1.08 'Red Hat Display'; letter-spacing: -.035em; margin: .4rem auto 1rem; max-width: 950px; }
+.scene .lede { color: var(--text-secondary); font-size: clamp(1rem, 1.6vw, 1.25rem); max-width: 760px; margin: 0 auto 2rem; }
+.eyebrow { color: var(--intel-cyan); font-size: .75rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.subtitle { color: var(--text-dim); font-size: clamp(1rem, 2vw, 1.35rem); letter-spacing: .05em; text-transform: uppercase; }
+.citation, .timestamp { color: var(--text-disabled); font: .72rem 'Red Hat Mono'; margin-top: 2rem; }
+.scene-progress { position: fixed; right: 1.4rem; bottom: 1rem; color: var(--text-disabled); font: .72rem 'Red Hat Mono'; }
+
+.hero-metric { font: 700 clamp(4rem, 12vw, 9rem)/1 'Red Hat Mono'; margin-top: 1rem; }
+.hero-label { color: var(--text-secondary); font-size: clamp(1.2rem, 2.5vw, 2rem); max-width: 800px; margin: 1rem auto; }
+.tone-danger { color: var(--rh-red) !important; }
+.tone-success { color: var(--success) !important; }
+.tone-partner { color: var(--intel-cyan) !important; }
+.tone-neutral { color: var(--text) !important; }
+blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin: 1rem auto; max-width: 900px; }
+.quote-attribution { color: var(--text-dim); }
+
+.stat-grid, .metric-grid, .comparison-grid, .tradeoff-grid, .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--space-3); margin: var(--space-5) 0; }
+.stat, .metric-card, .comparison-card, .tradeoff-card, .related-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); text-align: left; box-shadow: var(--shadow); }
+.stat-value, .comparison-value, .metric-value { font: 700 clamp(1.7rem, 3vw, 2.7rem) 'Red Hat Mono'; margin-bottom: .4rem; }
+.metric-label { color: var(--text-dim); font-size: .72rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.metric-value { overflow-wrap: anywhere; }
+
+.reframe { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-5); margin: var(--space-5) 0; }
+.reframe-before, .reframe-after { padding: var(--space-5); border-radius: var(--radius-md); background: var(--surface-1); border: 1px solid var(--border); font: 600 clamp(1.2rem, 2.3vw, 2rem) 'Red Hat Display'; }
+.reframe-before { color: var(--danger); }
+.reframe-after { color: var(--success); border-color: var(--success); }
+.reframe-arrow { color: var(--intel-cyan); font-size: 2.5rem; }
+.supporting { color: var(--text-secondary); }
+
+.architecture, .pipeline { display: flex; justify-content: center; align-items: stretch; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-5); }
+.architecture-node { min-width: 210px; background: var(--surface-1); border: 2px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); display: grid; gap: .4rem; }
+.architecture-node span { color: var(--text-dim); }
+.architecture-node.tone-primary { border-color: var(--rh-red); }
+.architecture-node.tone-partner { border-color: var(--intel-cyan); }
+.architecture-node.tone-success { border-color: var(--success); }
+.architecture-flow { display: flex; justify-content: center; align-items: stretch; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
+.architecture-flow .architecture-node { min-width: 148px; max-width: 160px; padding-inline: var(--space-2); }
+.flow-wrap { display: flex; align-items: center; gap: var(--space-2); }
+.flow-transition { color: var(--intel-cyan); display: grid; place-items: center; min-width: 24px; font: 700 .7rem 'Red Hat Mono'; }
+.architecture-layers { display: grid; gap: var(--space-2); margin: var(--space-5) auto 0; max-width: 880px; }
+.architecture-layer { display: grid; grid-template-columns: minmax(140px, .35fr) 1fr; gap: var(--space-4); text-align: left; padding: var(--space-3) var(--space-4); background: var(--surface-1); border-left: 4px solid var(--border); border-radius: var(--radius-sm); }
+.architecture-layer span { color: var(--text-secondary); }
+.architecture-layer.tone-primary { border-color: var(--rh-red); }
+.architecture-layer.tone-partner { border-color: var(--intel-cyan); }
+.architecture-layer.tone-success { border-color: var(--success); }
+.architecture-compare { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-4); margin: var(--space-5) 0; }
+.architecture-side { min-height: 240px; display: flex; align-content: center; justify-content: center; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-4); border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); }
+.architecture-side .metric-label { width: 100%; margin-bottom: var(--space-2); }
+.architecture-side.before { border-color: var(--danger); }
+.architecture-side.after { border-color: var(--success); }
+.architecture-chip { display: inline-block; padding: .55rem .75rem; margin: .25rem; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--border); }
+.boundary-grid, .topology-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--space-3); margin-top: var(--space-5); }
+.boundary-zone, .topology-location { position: relative; display: grid; gap: var(--space-2); padding: var(--space-5) var(--space-4) var(--space-4); background: var(--surface-1); border: 2px dashed var(--border); border-radius: var(--radius-md); text-align: left; }
+.boundary-zone.tone-primary, .topology-location.tone-primary { border-color: var(--rh-red); }
+.boundary-zone.tone-partner, .topology-location.tone-partner { border-color: var(--intel-cyan); }
+.boundary-zone.tone-success, .topology-location.tone-success { border-color: var(--success); }
+.boundary-zone h2, .topology-location h2 { margin: 0; }
+.boundary-zone > span, .topology-location p { color: var(--text-secondary); }
+.boundary-label { position: absolute; top: -.65rem; left: 1rem; padding: .15rem .55rem; background: var(--bg); color: var(--warning); font: 700 .65rem 'Red Hat Mono'; text-transform: uppercase; }
+.pipeline-wrap { display: flex; align-items: center; gap: var(--space-3); }
+.pipeline-step { min-width: 180px; padding: var(--space-4); background: var(--surface-1); border: 2px solid var(--intel-cyan); border-radius: var(--radius-md); display: grid; gap: .4rem; }
+.pipeline-step > span { width: 28px; height: 28px; margin: auto; border-radius: 50%; display: grid; place-items: center; background: var(--rh-red); font-weight: 700; }
+.pipeline-step small { color: var(--text-dim); }
+.connector { color: var(--text-disabled); }
+
+.scale-track { display: grid; gap: var(--space-2); margin-top: var(--space-5); }
+.scale-stage { display: flex; align-items: center; justify-content: space-between; text-align: left; padding: var(--space-3) var(--space-4); background: var(--surface-1); border-left: 3px solid var(--intel-cyan); border-radius: var(--radius-sm); }
+.scale-stage div { display: grid; }
+.scale-stage span { color: var(--text-dim); }
+.scale-stage b { color: var(--intel-cyan); font: 700 1.5rem 'Red Hat Mono'; }
+.tradeoff-card h2 { margin-top: 0; }
+.tradeoff-card .strength { color: var(--success); }
+.decision { padding: var(--space-3); color: var(--intel-cyan); font-weight: 700; }
+
+.punchline { display: grid; gap: var(--space-3); font: clamp(1.5rem, 3vw, 2.6rem) 'Red Hat Display'; }
+.punchline strong { font-size: clamp(2.3rem, 5vw, 4.6rem); line-height: 1.05; color: var(--intel-cyan); }
+.punchline span { color: var(--success); font-size: 1.2rem; margin-top: var(--space-4); }
+.proof-toolbar { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin: var(--space-4); }
+.button { border: 0; border-radius: var(--radius-sm); padding: .7rem 1.2rem; cursor: pointer; font-weight: 700; }
+.button-primary { background: var(--intel-cyan); color: #071117; }
+.button-secondary { background: var(--surface-2); border: 1px solid var(--border); }
+.button:disabled { opacity: .5; cursor: wait; }
+.source-badge { border-radius: 999px; padding: .25rem .7rem; font: 700 .68rem 'Red Hat Mono'; text-transform: uppercase; }
+.source-live { color: var(--success); background: var(--success-dim); }
+.source-rehearsal, .source-offline { color: var(--warning); background: var(--warning-dim); }
+.fallback-note, .error-panel { color: var(--warning); font-size: .82rem; }
+
+.finale { cursor: default; }
+.related-card { display: grid; gap: .65rem; text-decoration: none; border-left: 3px solid var(--intel-cyan); }
+.related-card em { color: var(--text); }
+.related-card span { color: var(--text-dim); font-size: .85rem; }
+.attribution { color: var(--text-disabled); margin-top: var(--space-5); }
+
+@media (max-width: 760px) {
+  .demo-header { padding: .65rem .8rem; }
+  .brand-lockup-compact img { max-width: 64px; height: 16px; }
+  .progress button { width: 16px; }
+  .stage { padding: 1.5rem 1rem 3rem; }
+  .scene { min-height: 72vh; }
+  .reframe { grid-template-columns: 1fr; gap: var(--space-2); }
+  .reframe-arrow { transform: rotate(90deg); }
+  .pipeline-wrap { width: 100%; flex-direction: column; }
+  .pipeline-step { width: 100%; }
+  .connector { transform: rotate(90deg); }
+  .architecture-flow, .flow-wrap { width: 100%; flex-direction: column; }
+  .flow-transition { min-height: 30px; transform: rotate(90deg); }
+  .architecture-layer { grid-template-columns: 1fr; gap: .35rem; }
+  .architecture-compare { grid-template-columns: 1fr; }
+  .architecture-compare .reframe-arrow { transform: rotate(90deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

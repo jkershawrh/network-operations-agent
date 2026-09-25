@@ -1,0 +1,8 @@
+{
+  "collectedAt": "2026-09-22T08:31:00.000Z",
+  "source": "deterministic synthetic quickstart fixtures",
+  "scenarios": {
+    "ptp-hardware": { "alarm": "synthetic-ptp-001", "cause": "hardware_timing", "observations": 3, "support": "hardware-1", "approval": "required", "executed": "no" },
+    "ptp-platform": { "alarm": "synthetic-ptp-002", "cause": "platform_timing", "observations": 3, "support": "openshift_platform-1", "approval": "required", "executed": "no" }
+  }
+}

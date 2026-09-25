@@ -1,0 +1,105 @@
+version: 1
+presentation:
+  title: One Alarm. Two Causes. One Evidence Trail.
+  audience: Network operators, platform teams, and technical decision makers
+  desired_decision: Adopt a bounded evidence contract before connecting an agent to operational systems
+  duration_minutes: 15
+  core_tension: A timing alarm crosses technical boundaries, but an AI explanation must not cross the operator's authority boundary
+  cta: Choose one approved incident and map its evidence boundary
+
+source_material:
+  mode: repository
+  items:
+    - ../contracts/quickstart-contract.yaml
+    - ../contracts/openapi/openapi.yaml
+    - ../docs/architecture.md
+    - ../tests/claim_registry.yaml
+    - ../tests/test_investigation.py
+    - ../showroom/modules/ROOT/pages/
+  consequential_assumptions:
+    - The presentation is for the 25–35 minute quickstart, not the separate 90-minute lab.
+    - The live API is same-origin at /api/investigate when deployed with the application.
+
+architecture:
+  actors:
+    - Synthetic alarm provider
+    - Read-only MCP diagnostic tools
+    - Approved knowledge provider
+    - Deterministic orchestrator
+    - Optional model client
+    - Human reviewer
+  boundaries:
+    - MCP observations are present state with tool provenance.
+    - Retrieved excerpts are historical context with source revisions.
+    - Model wording is unverified and cannot change the hypothesis or execute an action.
+    - Human review is required; no decision is persisted and nothing executes.
+  critical_flows:
+    - Alarm to three diagnostic scopes to approved retrieval to evidence case to human review.
+    - Hardware and platform scenarios must yield different supported causes.
+  omitted_from_main_story:
+    - The learner-authored upstream-clock scenario belongs to the 90-minute lab.
+    - Launchpad catalog plumbing and deployment internals do not change the core decision.
+
+beats:
+  - beat: ordinary-world
+    claim: A timing alarm can originate in the network, OpenShift platform, or hardware.
+  - beat: stakes
+    claim: A plausible explanation must not become an unreviewed remediation action.
+  - beat: root-cause
+    claim: The alarm alone does not identify the responsible layer.
+  - beat: reframe
+    claim: Build a traceable evidence case instead of asking a model for an answer.
+  - beat: system-reveal
+    claim: Current observations, approved history, optional wording, and human authority remain separate.
+  - beat: live-proof
+    claim: Two approved synthetic scenarios produce distinct evidence-backed hypotheses.
+  - beat: trials
+    claim: Missing or conflicting evidence causes abstention rather than fabrication.
+  - beat: transformation
+    claim: The agent makes the next operator decision defensible without taking control.
+  - beat: next-journey
+    claim: Map another approved incident into the same bounded evidence contract.
+
+evidence:
+  - id: no-remediation
+    claim: The quickstart executes no network or platform remediation.
+    classification: verified-fact
+    source: ../contracts/quickstart-contract.yaml
+    owner: Quickstart contract
+    last_verified: 2026-09-24
+    treatment: Show as the safety invariant; never imply autonomous resolution.
+  - id: hardware-case
+    claim: The hardware scenario selects hardware_timing from hardware-1.
+    classification: rehearsal-fixture
+    source: ../data/scenarios/ptp-hardware.json and ../tests/test_investigation.py
+    owner: Quickstart tests
+    last_verified: 2026-09-24
+    treatment: Show LIVE only after /api/investigate succeeds; otherwise label REHEARSAL.
+  - id: platform-case
+    claim: The platform scenario selects platform_timing from openshift_platform-1.
+    classification: rehearsal-fixture
+    source: ../data/scenarios/ptp-platform.json and ../tests/test_investigation.py
+    owner: Quickstart tests
+    last_verified: 2026-09-24
+    treatment: Show LIVE only after /api/investigate succeeds; otherwise label REHEARSAL.
+  - id: scope-counts
+    claim: The short quickstart uses two approved scenarios and three read-only diagnostic scopes.
+    classification: verified-fact
+    source: ../contracts/quickstart-contract.yaml and ../src/network_ops/web.py
+    owner: Quickstart contract
+    last_verified: 2026-09-24
+    treatment: Present as scope, not production scale or performance.
+
+live_systems:
+  - id: hardware-investigation
+    endpoint: POST /api/investigate
+    request: '{"scenario_id":"ptp-hardware"}'
+    fallback: public/fixtures/network-operations-proof.json
+  - id: platform-investigation
+    endpoint: POST /api/investigate
+    request: '{"scenario_id":"ptp-platform"}'
+    fallback: public/fixtures/network-operations-proof.json
+
+open_questions:
+  - Confirm the final deployment route and whether the presentation will be served by the same application origin.
+  - Confirm event-specific audience wording before external delivery.

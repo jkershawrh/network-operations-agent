@@ -3,7 +3,10 @@
   "private": true,
   "scripts": {
     "build:showroom": "antora site.yml",
-    "build:lab": "antora site-lab.yml"
+    "build:lab": "antora site-lab.yml",
+    "presentation:dev": "npm --prefix presentation run dev",
+    "presentation:check": "npm --prefix presentation run check",
+    "presentation:build": "npm --prefix presentation run build"
   },
   "devDependencies": {
     "@antora/cli": "3.2.0",

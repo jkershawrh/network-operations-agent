@@ -24,6 +24,8 @@ The core experience runs without an LLM so a participant can see which decisions
 
 This repository now contains two deliberately separate journeys. The original 25–35 minute quickstart replays two bounded incidents. The 90-minute lab adds a learner-built upstream-clock scenario, a fourth MCP diagnostic, controlled dependency failures, a reliability qualification report, and a NOC decision brief. Lab APIs are disabled unless `NETWORK_OPS_LAB_MODE=1`; the quickstart default is unchanged.
 
+The separate `presentation/` application tells the short quickstart as a Red Hat × Intel interactive demo story. It preserves the same safety and evidence boundaries, calls `POST /api/investigate` for the two approved scenarios, and visibly labels checked-in results as `REHEARSAL` whenever the live endpoint is unavailable. Run it with `npm run presentation:dev` and validate it with `npm run presentation:check`.
+
 ## Detailed description
 
 ## Architecture
