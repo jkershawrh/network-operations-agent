@@ -1,5 +1,6 @@
 import type { LiveDataAdapter } from '../types'
 import { registerAdapter } from './adapters'
+import { storyEndpoint } from './paths'
 
 type InvestigationResponse = {
   alarm_id: string
@@ -33,7 +34,7 @@ function investigationAdapter(options: { id: string; scenarioId: string; fixture
     timeoutMs: 8_000,
     rehearsal: { data: options.fixture, collectedAt: '2026-09-22T08:31:00.000Z' },
     async load(signal) {
-      const response = await fetch('/api/investigate', {
+      const response = await fetch(storyEndpoint('api/investigate'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scenario_id: options.scenarioId }),

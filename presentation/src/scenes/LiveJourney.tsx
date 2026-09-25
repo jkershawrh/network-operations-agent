@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { storyEndpoint } from '../live/paths'
 import { motion } from 'motion/react'
 import type { LiveJourneyScene } from '../types'
 import { SceneFrame } from './SceneFrame'
@@ -183,7 +184,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
 
   const runRequest = async (scenarioId: ScenarioId) => {
     const startedAt = performance.now()
-    const response = await fetch('/api/investigate', {
+    const response = await fetch(storyEndpoint('api/investigate'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scenario_id: scenarioId }),
@@ -219,7 +220,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
     try {
       if (phase.id === 'alarm') {
         setStatus('running')
-        const response = await fetch('/ready', { signal: controller.current.signal })
+        const response = await fetch(storyEndpoint('ready'), { signal: controller.current.signal })
         if (!response.ok || (await response.json()).status !== 'ready') throw new Error('The live system is not ready')
         await runRequest('ptp-hardware')
       } else if (phase.id === 'decide') {

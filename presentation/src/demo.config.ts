@@ -1,6 +1,6 @@
 import type { DemoConfig } from './types'
 
-const storyAsset = (path: string) => `${import.meta.env.BASE_URL}${path}`
+const storyAsset = (path: string) => new URL(path, window.location.href).toString()
 
 export const demoConfig: DemoConfig = {
   id: 'network-operations-story',

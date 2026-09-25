@@ -105,6 +105,9 @@ jobs:
           story_asset="$(sed -n 's/.*src="\([^"]*\.js\)".*/\1/p' <<<"$story_html")"
           [[ "$story_asset" == /story/assets/*.js ]]
           curl -fsS "http://127.0.0.1:18080${story_asset}" >/dev/null
+          curl -fsS http://127.0.0.1:18080/story/logos/redhat.svg >/dev/null
+          curl -fsS http://127.0.0.1:18080/story/logos/intel.png >/dev/null
+          curl -fsS http://127.0.0.1:18080/story/fonts/RedHatDisplay-Regular.otf >/dev/null
           for scenario in ptp-hardware ptp-platform; do
             curl -fsS -X POST http://127.0.0.1:18080/api/investigate \
               -H 'Content-Type: application/json' \

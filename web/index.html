@@ -129,18 +129,19 @@
         status.textContent = `Unable to run scenario: ${error.message}`;
       }
     }
-    fetch('/health').then(r => r.json()).then(health => {
+    const workspaceEndpoint = path => new URL(path.replace(/^\/+/, ''), window.location.href).pathname;
+    fetch(workspaceEndpoint('health')).then(r => r.json()).then(health => {
       if (health.lab_mode) document.getElementById('lab-workspace').classList.remove('hidden');
     });
-    document.getElementById('investigate-pack').addEventListener('click', () => runLab('/api/lab/investigate', renderLabInvestigation));
-    document.getElementById('qualify-pack').addEventListener('click', () => runLab('/api/lab/qualify', renderQualification));
+    document.getElementById('investigate-pack').addEventListener('click', () => runLab(workspaceEndpoint('api/lab/investigate'), renderLabInvestigation));
+    document.getElementById('qualify-pack').addEventListener('click', () => runLab(workspaceEndpoint('api/lab/qualify'), renderQualification));
     document.getElementById('run').addEventListener('click', async () => {
       target.replaceChildren();
       currentInvestigation = null;
       document.getElementById('review').disabled = true;
       document.getElementById('review-result').textContent = '';
       try {
-        const response = await fetch('/api/investigate', {
+        const response = await fetch(workspaceEndpoint('api/investigate'), {
           method: 'POST', headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({scenario_id: document.getElementById('scenario').value})
         });
@@ -183,7 +184,7 @@
       if (!currentInvestigation) return;
       const output = document.getElementById('review-result');
       try {
-        const response = await fetch('/api/review', {
+        const response = await fetch(workspaceEndpoint('api/review'), {
           method: 'POST', headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({...currentInvestigation,
                                 decision: document.getElementById('decision').value})
