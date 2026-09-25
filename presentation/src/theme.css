@@ -117,6 +117,9 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .incident-cause > strong { font-size: 1.15rem; }
 .incident-decision { padding: .75rem 1rem; color: var(--intel-cyan); font-weight: 700; background: var(--intel-cyan-dim); border-radius: var(--radius-sm); }
 .incident-open { position: relative; min-height: 430px; display: grid; place-items: center; }
+.scene:has(.incident-open) > .eyebrow,
+.scene:has(.incident-open) > h1,
+.scene:has(.incident-open) > .lede { display: none; }
 .opening-beat-marker { position: absolute; top: 0; right: 0; color: var(--text-disabled); font: 700 .62rem 'Red Hat Mono'; }
 .incident-focus, .incident-synthesis { width: min(850px, 100%); display: grid; justify-items: center; gap: 1rem; text-align: center; }
 .incident-focus > span, .incident-synthesis > span { color: var(--rh-red); font: 700 .68rem 'Red Hat Mono'; letter-spacing: .12em; }

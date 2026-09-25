@@ -71,7 +71,7 @@ function IncidentOpening({ scene }: { scene: Extract<SceneConfig, { type: 'incid
       <div className="opening-beat-marker">{beat + 1} / 3</div>
       <AnimatePresence mode="wait">
         {beat === 0 && <motion.div className="incident-focus" key="alarm" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-          <span>02:17 · ACTIVE ALARM</span><strong>{scene.alarm}</strong><small>One symptom has crossed the network, platform, and hardware boundary.</small>
+          <span>02:17 · PRODUCTION NETWORK</span><strong>{scene.alarm}</strong><small>One alarm is not one cause.</small>
         </motion.div>}
         {beat === 1 && <motion.div className="incident-ambiguity" key="causes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="incident-ambiguity-title">The same alarm supports two plausible stories.</div>

@@ -49,7 +49,8 @@ describe('SceneRenderer', () => {
   it('paces the opening as three sparse internal beats', async () => {
     const scene = scenes.find((item) => item.type === 'incident-open')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
-    expect(screen.getByText('One symptom has crossed the network, platform, and hardware boundary.')).toBeInTheDocument()
+    expect(screen.getByText('02:17 · PRODUCTION NETWORK')).toBeInTheDocument()
+    expect(screen.getByText('One alarm is not one cause.')).toBeInTheDocument()
     expect(screen.queryByText('Hardware timing')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: /Reveal the ambiguity/ }))
     expect(await screen.findByText('Hardware timing')).toBeInTheDocument()
