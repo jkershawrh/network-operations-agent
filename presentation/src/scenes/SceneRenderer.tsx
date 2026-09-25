@@ -4,17 +4,31 @@ import type { SceneConfig } from '../types'
 import { LiveProof } from './LiveProof'
 import { LiveJourney } from './LiveJourney'
 import { SceneFrame } from './SceneFrame'
+import { TechnicalTopology } from './TechnicalTopology'
 
 const toneClass = (tone?: string) => tone ? `tone-${tone}` : ''
 
 function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'guided-architecture' }> }) {
   const [step, setStep] = useState(0)
+  const [revealed, setRevealed] = useState(false)
   const layer = scene.layers[step]
   const complete = step === scene.layers.length
+  const nodeGroups = [
+    ['browser', 'route', 'app-service', 'app'],
+    ['diagnostics-service', 'mcp'],
+    ['history'],
+    ['policy'],
+    ['operator'],
+  ]
+  const activeIds = nodeGroups.slice(0, step + (revealed ? 1 : 0)).flat()
+  const advance = () => {
+    if (!revealed) setRevealed(true)
+    else { setStep((value) => value + 1); setRevealed(false) }
+  }
 
   return (
     <SceneFrame scene={scene}>
-      <div className="guided-architecture" data-testid="guided-architecture">
+      <div className="guided-architecture guided-technical" data-testid="guided-architecture">
         <div className="architecture-map" aria-label="Architecture progress">
           {scene.layers.map((item, index) => (
             <div className={`architecture-map-item ${toneClass(item.tone)} ${index < step ? 'done' : ''} ${index === step ? 'active' : ''}`} key={item.id}>
@@ -26,9 +40,9 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
           {!complete ? (
             <motion.div className="architecture-dialog" key={layer.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
               <div className="architecture-question"><span>Operator question</span><h2>{layer.question}</h2></div>
-              <div className="architecture-answer"><span>Architecture answer</span><h3>{layer.answer}</h3><p>{layer.detail}</p></div>
-              <button className="button button-primary" onClick={() => setStep((value) => value + 1)}>
-                {step === scene.layers.length - 1 ? 'Complete architecture' : 'Reveal next boundary'}
+              {revealed && <motion.div className="architecture-answer" initial={{ opacity: 0 }} animate={{ opacity: 1 }}><span>Architecture answer</span><h3>{layer.answer}</h3><p>{layer.detail}</p></motion.div>}
+              <button className="button button-primary" onClick={advance}>
+                {!revealed ? 'Reveal technical boundary' : step === scene.layers.length - 1 ? 'Complete architecture' : 'Ask next question →'}
               </button>
             </motion.div>
           ) : (
@@ -36,10 +50,11 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
               <div className="eyebrow">Architecture complete</div>
               <h2>Every claim now has an owner, a boundary, and a reviewer.</h2>
               <p>Continue to live proof and watch the evidence—not the alarm label—select the hypothesis.</p>
-              <button className="button button-secondary" onClick={() => setStep(0)}>Replay architecture</button>
+              <button className="button button-secondary" onClick={() => { setStep(0); setRevealed(false) }}>Replay architecture</button>
             </motion.div>
           )}
         </AnimatePresence>
+        <TechnicalTopology activeIds={activeIds} />
       </div>
     </SceneFrame>
   )

@@ -51,7 +51,11 @@ describe('SceneRenderer', () => {
     const scene = scenes.find((item) => item.type === 'guided-architecture')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByText('What exactly happened?')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Reveal next boundary' }))
+    expect(screen.queryByText('A validated synthetic event starts the investigation.')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
+    expect(await screen.findByText('A validated synthetic event starts the investigation.')).toBeInTheDocument()
+    expect(document.querySelector('[data-node="route"]')).toHaveClass('active')
+    fireEvent.click(screen.getByRole('button', { name: 'Ask next question →' }))
     expect(await screen.findByText('What do the systems show right now?')).toBeInTheDocument()
   })
 

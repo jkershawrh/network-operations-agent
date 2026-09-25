@@ -162,8 +162,19 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-policy span { color: var(--success); font: .5rem 'Red Hat Mono'; text-transform: uppercase; }
 .topology-policy strong { font-size: .7rem; }
 .topology-policy small { color: var(--text-dim); font-size: .55rem; }
+.topology-policy:not(.active) { border-color: var(--border); background: var(--surface-1); color: var(--text-disabled); }
+.topology-policy:not(.active) span { color: var(--text-disabled); }
 .topology-optional-path { grid-column: 3; display: flex; justify-content: flex-end; align-items: center; margin-top: .35rem; opacity: .72; }
 .topology-optional-path .topology-node { width: 175px; min-height: 54px; }
+.guided-technical { grid-template-columns: 180px 1fr; gap: .75rem 1rem; margin-top: .5rem; }
+.guided-technical .architecture-map { grid-template-columns: repeat(5, 1fr); grid-column: 1 / -1; }
+.guided-technical .architecture-map-item { grid-template-columns: 22px 1fr; padding: .4rem .55rem; font-size: .68rem; }
+.guided-technical .architecture-map-item > span { width: 20px; height: 20px; }
+.guided-technical .architecture-dialog { grid-column: 1 / -1; min-height: 190px; padding: 1rem 1.25rem; gap: .55rem; }
+.guided-technical .architecture-question h2 { font-size: clamp(1.2rem, 2vw, 1.7rem); margin: .25rem 0; }
+.guided-technical .architecture-answer h3 { font-size: 1rem; }
+.guided-technical .architecture-answer p { font-size: .78rem; margin: .2rem 0; }
+.guided-technical .technical-topology { grid-column: 1 / -1; }
 .journey-evidence { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin-top: var(--space-4); text-align: left; }
 .journey-evidence > div { display: grid; gap: .3rem; padding: var(--space-3); background: var(--surface-1); border-left: 3px solid var(--success); }
 .journey-evidence span { color: var(--text-dim); font: 700 .65rem 'Red Hat Mono'; text-transform: uppercase; }

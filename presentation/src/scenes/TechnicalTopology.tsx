@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 
-type Props = { activeThrough: 'idle' | 'ready' | 'investigation'; running?: boolean }
+type Props = { activeThrough?: 'idle' | 'ready' | 'investigation'; activeIds?: string[]; running?: boolean }
 
 const activeFor = (node: string, through: Props['activeThrough']) => {
   if (through === 'idle') return false
@@ -18,8 +18,8 @@ function Edge({ label, active, dashed }: { label: string; active: boolean; dashe
   return <div className={`topology-edge ${active ? 'active' : ''} ${dashed ? 'dashed' : ''}`}><span>{label}</span><b>→</b></div>
 }
 
-export function TechnicalTopology({ activeThrough, running }: Props) {
-  const on = (id: string) => activeFor(id, activeThrough)
+export function TechnicalTopology({ activeThrough = 'idle', activeIds, running }: Props) {
+  const on = (id: string) => activeIds ? activeIds.includes(id) : activeFor(id, activeThrough)
   return <div className="technical-topology" aria-label="Live technical deployment topology">
     <div className="topology-legend"><span><i className="legend-live" /> live request and evidence path</span><span><i className="legend-policy" /> enforced namespace boundary</span><span><i className="legend-optional" /> optional wording path</span></div>
     <div className="topology-graph">
@@ -41,7 +41,7 @@ export function TechnicalTopology({ activeThrough, running }: Props) {
         <div className="topology-support-paths">
           <Node id="history" kind="data" title="Approved history" detail="versioned cases + runbooks" active={on('history')} running={running} />
           <Edge label="local retrieval" active={on('history')} />
-          <div className="topology-policy"><span>inside app pod</span><strong>Deterministic evidence policy</strong><small>validate → compare → support or abstain</small></div>
+          <div className={`topology-policy ${on('policy') ? 'active' : ''}`}><span>inside app pod</span><strong>Deterministic evidence policy</strong><small>validate → compare → support or abstain</small></div>
           <Edge label="proposal only" active={on('browser')} />
           <Node id="operator" kind="authority" title="Human review" detail="zero remediation executed" active={on('operator')} running={running} />
         </div>
