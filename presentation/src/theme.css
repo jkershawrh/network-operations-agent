@@ -255,7 +255,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .workspace-rail button.complete { color: var(--text-secondary); cursor: pointer; }
 .workspace-rail button.complete span { color: var(--success); border-color: var(--success); }
 .checkpoint-count { margin-top: auto; padding: .65rem .75rem; color: var(--text-disabled); border-top: 1px solid var(--border); font: .56rem 'Red Hat Mono'; text-transform: uppercase; }
-.workspace-main { position: relative; min-width: 0; display: flex; flex-direction: column; padding: 1rem 1.1rem 7.4rem; }
+.workspace-main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; padding: 1rem 1.1rem 7.4rem; }
 .workspace-act { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
 .workspace-act > div:first-child { display: grid; gap: .15rem; }
 .workspace-act span, .incident-intake span, .decision-board span, .authority-board span, .condition-change span, .comparison-workspace span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; text-transform: uppercase; }
@@ -275,7 +275,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .incident-intake > div:nth-child(3), .decision-board > div:nth-child(3), .authority-stop { border-color: var(--success) !important; }
 .incident-intake strong, .decision-board strong, .authority-board strong { overflow-wrap: anywhere; font-size: .9rem; line-height: 1.3; }
 .incident-intake small, .decision-board small, .authority-board small { color: var(--text-dim); font-size: .65rem; line-height: 1.35; }
-.decision-transform { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: .5rem; align-content: start; }
+.decision-transform { min-height: 0; display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: .5rem; align-content: start; overflow-y: auto; }
 .decision-stage { min-width: 0; min-height: 125px; display: grid; align-content: center; gap: .45rem; padding: .85rem; border-top: 3px solid var(--intel-cyan); background: var(--surface-2); }
 .decision-stage span, .llm-bypass span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; }
 .decision-stage strong { font-size: .9rem; overflow-wrap: anywhere; }
@@ -344,7 +344,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .comparison-evidence-log code em { color: var(--text-disabled); font-style: normal; white-space: nowrap; }
 .comparison-evidence-log code.supporting em { color: var(--success); }
 .workspace-footer { position: absolute; right: 1.1rem; bottom: .8rem; left: 1.1rem; display: grid; gap: .55rem; }
-.runtime-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.runtime-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
 .runtime-strip span { display: grid; gap: .15rem; padding: .45rem .55rem; color: var(--text-disabled); background: #191919; font: 700 .5rem 'Red Hat Mono'; }
 .runtime-strip b { color: var(--text-secondary); font-size: .58rem; overflow-wrap: anywhere; }
 .workspace-actions { width: min(520px, 100%); margin-left: auto; display: grid; grid-template-columns: 190px 210px 105px; align-items: stretch; gap: .45rem; }
@@ -423,6 +423,10 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .payoff-thesis span, .payoff-run > span, .payoff-boundaries span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; }
 .payoff-thesis > strong { color: var(--text-secondary); font: 500 1rem 'Red Hat Text'; }
 .payoff-thesis h2 { margin: 0; color: var(--success); font: 700 clamp(1.8rem, 3.5vw, 3rem) 'Red Hat Display'; }
+.payoff-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; border: 1px solid var(--border); background: var(--border); }
+.payoff-metrics > div { min-width: 0; display: grid; gap: .2rem; padding: .55rem .65rem; text-align: left; background: #191919; }
+.payoff-metrics span { color: var(--text-disabled); font: 700 .5rem 'Red Hat Mono'; letter-spacing: .05em; }
+.payoff-metrics strong { color: var(--intel-cyan); font: 700 .82rem 'Red Hat Mono'; overflow-wrap: anywhere; }
 .payoff-comparison { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; }
 .payoff-run { display: grid; gap: .35rem; padding: .85rem 1rem; text-align: left; border-top: 3px solid var(--intel-cyan); background: var(--surface-1); }
 .payoff-run > small { color: var(--text-dim); font: .58rem 'Red Hat Mono'; }
@@ -463,7 +467,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 @media (max-width: 760px) {
   .app { height: auto; min-height: 100vh; overflow: visible; }
   .mechanism-grid { grid-template-columns: 1fr; }
-  .payoff-comparison, .payoff-boundaries { grid-template-columns: 1fr; }
+  .payoff-comparison, .payoff-boundaries, .payoff-metrics { grid-template-columns: 1fr; }
   .demo-header { padding: .55rem .5rem; }
   .brand-lockup-compact { gap: .35rem; }
   .brand-lockup-compact img { max-width: 48px; height: 14px; }
@@ -542,6 +546,25 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .live-click-stage .technical-topology { margin: .15rem 0; }
   .live-click-stage .journey-status { margin: 0 0 .25rem; }
   .live-click-stage .journey-controls { margin-top: .25rem; }
+}
+
+@media (min-width: 761px) and (max-height: 750px) {
+  .scene:has(.operator-workspace) { height: calc(100vh - 88px); }
+  .workspace-main { padding: .65rem .8rem 5.3rem; }
+  .workspace-act h2 { font-size: 1.3rem; }
+  .workspace-explanation { min-height: 25px; margin: .3rem 0; font-size: .68rem; }
+  .decision-transform { gap: .35rem; }
+  .decision-stage { min-height: 92px; gap: .22rem; padding: .5rem .6rem; }
+  .decision-stage.policy strong { font-size: 1rem; }
+  .decision-stage small, .llm-bypass small { font-size: .54rem; }
+  .llm-bypass { gap: .3rem; padding: .35rem .45rem; }
+  .llm-exchange { gap: .3rem; }
+  .llm-exchange section { gap: .12rem; padding: .3rem .4rem; }
+  .llm-exchange strong { font-size: .56rem; line-height: 1.25; }
+  .llm-exchange small { font-size: .47rem; line-height: 1.25; }
+  .workspace-footer { right: .8rem; bottom: .55rem; left: .8rem; gap: .3rem; background: var(--surface-1); }
+  .runtime-strip span { padding: .28rem .4rem; }
+  .workspace-actions .button { min-height: 30px; padding: .35rem .55rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

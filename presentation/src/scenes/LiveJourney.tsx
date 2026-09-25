@@ -191,6 +191,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const hardware = results['ptp-hardware']
   const platform = results['ptp-platform']
   const currentResult = phase.id === 'compare' ? platform : hardware
+  const currentEvidence = phase.id === 'compare' ? platformEvidence : hardwareEvidence
   const phaseNumber = phaseIndex + 1
   const audienceActIndex = audienceActs.findIndex((act) => phaseIndex >= act.start && phaseIndex <= act.end)
   const topologyState = topologyForPhase[phase.id]
@@ -289,6 +290,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           <div className="runtime-strip">
             <span>SOURCE <b>{currentResult ? 'LIVE · OpenShift' : 'awaiting run'}</b></span>
             <span>EVIDENCE <b>{currentResult ? `${currentResult.current_observations_with_tool_provenance.length} observations` : 'not collected'}</b></span>
+            <span>METRICS <b>{currentEvidence ? `${currentEvidence.latencyMs}ms end-to-end${currentEvidence.modelLatencyMs !== undefined ? ` · ${currentEvidence.modelLatencyMs}ms model` : ''}` : 'not measured'}</b></span>
             <span>AUTHORITY <b>{currentResult ? 'human · no action executed' : 'human approval required'}</b></span>
           </div>
           {error && <div className="error-panel">Live operation stopped: {error}</div>}

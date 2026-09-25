@@ -8,6 +8,10 @@ import { TechnicalTopology, type TopologyNodeId } from './TechnicalTopology'
 import { readJourneyEvidence } from '../live/journeyEvidence'
 
 const toneClass = (tone?: string) => tone ? `tone-${tone}` : ''
+const average = (values: number[]) => values.length
+  ? Math.round(values.reduce((total, value) => total + value, 0) / values.length)
+  : undefined
+const metricValue = (value?: number) => value === undefined ? 'not called' : `${value}ms`
 
 const architectureNodes: TopologyNodeId[][] = [
   ['browser', 'route', 'app-service', 'app'],
@@ -92,10 +96,21 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
     const evidence = readJourneyEvidence()
     const safe = evidence.length > 0 && evidence.every((item) => !item.actionExecuted)
     const modelProof = evidence.find((item) => item.model)
+    const observationCount = evidence.reduce((total, item) => total + item.observationCount, 0)
+    const averageLatency = average(evidence.map((item) => item.latencyMs))
+    const averageModelLatency = average(evidence.flatMap((item) => item.modelLatencyMs === undefined ? [] : [item.modelLatencyMs]))
+    const automatedActions = evidence.filter((item) => item.actionExecuted).length
     return <SceneFrame scene={scene}><div className="evidence-payoff">
       {evidence.length ? <>
         <div className="evidence-payoff-status"><span className="source-badge source-live">LIVE</span><strong>{evidence.length} investigations · one alarm · two evidence paths</strong></div>
         <div className="payoff-thesis"><span>THE RESULT</span><strong>{scene.line1}</strong><h2>{scene.line2}</h2></div>
+        <div className="payoff-metrics" aria-label="Live proof metrics">
+          <div><span>INVESTIGATIONS</span><strong>{evidence.length}</strong></div>
+          <div><span>OBSERVATIONS</span><strong>{observationCount}</strong></div>
+          <div><span>AVG ALARM → REVIEW</span><strong>{metricValue(averageLatency)}</strong></div>
+          <div><span>AVG MODEL INFERENCE</span><strong>{metricValue(averageModelLatency)}</strong></div>
+          <div><span>AUTOMATED ACTIONS</span><strong>{automatedActions}</strong></div>
+        </div>
         <div className="payoff-comparison">{evidence.map((item, index) => <div className="payoff-run" key={item.scenarioId}><span>CONDITION {index + 1}</span><small>{item.scenarioId}</small><div><b>{item.cause.replaceAll('_', ' ')}</b><em>supported</em></div><p>{item.observationCount} current observations · {item.historicalSourceCount} approved sources</p></div>)}</div>
         <div className="payoff-boundaries"><div><span>HUMAN AUTHORITY</span><strong>{safe ? 'Zero automated actions' : 'Review required'}</strong><small>{safe ? 'The operator retained control.' : 'The action boundary needs review.'}</small></div>{modelProof && <div><span>INTEL CPU EXPLANATION</span><strong>{modelProof.model}</strong><small>{modelProof.modelRuntime} · wording only · no evidence or action authority</small></div>}</div>
       </> : <div className="evidence-empty"><span className="source-badge source-offline">NOT RUN</span><strong>{scene.emptyState}</strong></div>}

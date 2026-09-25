@@ -133,6 +133,10 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('THE RESULT')).toBeInTheDocument()
     expect(screen.getByText('HUMAN AUTHORITY')).toBeInTheDocument()
     expect(screen.getByText('Zero automated actions')).toBeInTheDocument()
+    expect(screen.getByLabelText('Live proof metrics')).toHaveTextContent('2')
+    expect(screen.getByLabelText('Live proof metrics')).toHaveTextContent('6')
+    expect(screen.getByLabelText('Live proof metrics')).toHaveTextContent('50ms')
+    expect(screen.getByLabelText('Live proof metrics')).toHaveTextContent('0')
     clearJourneyEvidence()
   })
 
