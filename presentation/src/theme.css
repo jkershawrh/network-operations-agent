@@ -225,6 +225,14 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .punchline { display: grid; gap: var(--space-3); font: clamp(1.5rem, 3vw, 2.6rem) 'Red Hat Display'; }
 .punchline strong { font-size: clamp(2.3rem, 5vw, 4.6rem); line-height: 1.05; color: var(--intel-cyan); }
 .punchline span { color: var(--success); font-size: 1.2rem; margin-top: var(--space-4); }
+.mechanism-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin-top: var(--space-5); }
+.mechanism-card { display: grid; gap: .6rem; min-height: 210px; padding: var(--space-4); text-align: left; background: var(--surface-1); border: 1px solid var(--border); border-top: 3px solid var(--rh-red); border-radius: var(--radius-md); }
+.mechanism-card.tone-partner { border-top-color: var(--intel-cyan); }
+.mechanism-card.tone-success { border-top-color: var(--success); }
+.mechanism-card > span { color: var(--text-disabled); font: 700 .7rem 'Red Hat Mono'; }
+.mechanism-card em, .mechanism-card small { color: var(--text-secondary); font-style: normal; line-height: 1.45; }
+.evidence-payoff { display: grid; gap: var(--space-4); }
+.evidence-payoff-status, .evidence-empty { display: flex; align-items: center; justify-content: center; gap: var(--space-3); }
 .proof-toolbar { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin: var(--space-4); }
 .button { border: 0; border-radius: var(--radius-sm); padding: .7rem 1.2rem; cursor: pointer; font-weight: 700; }
 .button-primary { background: var(--intel-cyan); color: #071117; }
@@ -243,6 +251,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .attribution { color: var(--text-disabled); margin-top: var(--space-5); }
 
 @media (max-width: 760px) {
+  .mechanism-grid { grid-template-columns: 1fr; }
   .demo-header { padding: .55rem .5rem; }
   .brand-lockup-compact { gap: .35rem; }
   .brand-lockup-compact img { max-width: 48px; height: 14px; }

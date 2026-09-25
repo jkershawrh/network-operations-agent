@@ -5,6 +5,7 @@ import { LiveProof } from './LiveProof'
 import { LiveJourney } from './LiveJourney'
 import { SceneFrame } from './SceneFrame'
 import { TechnicalTopology } from './TechnicalTopology'
+import { readJourneyEvidence } from '../live/journeyEvidence'
 
 const toneClass = (tone?: string) => tone ? `tone-${tone}` : ''
 
@@ -68,6 +69,14 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
   if (scene.type === 'live-proof') return <LiveProof scene={scene} />
   if (scene.type === 'live-journey') return <LiveJourney scene={scene} />
   if (scene.type === 'guided-architecture') return <GuidedArchitecture scene={scene} />
+  if (scene.type === 'mechanisms') return <SceneFrame scene={scene}><div className="mechanism-grid">{scene.mechanisms.map((mechanism, index) => <div className={`mechanism-card ${toneClass(mechanism.tone)}`} key={mechanism.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{mechanism.label}</strong><em>{mechanism.claim}</em><small>{mechanism.detail}</small></div>)}</div></SceneFrame>
+  if (scene.type === 'evidence-payoff') {
+    const evidence = readJourneyEvidence()
+    return <SceneFrame scene={scene}><div className="evidence-payoff">
+      {evidence.length ? <><div className="evidence-payoff-status"><span className="source-badge source-live">LIVE</span><strong>{evidence.length} infrastructure investigations completed</strong></div><div className="journey-evidence">{evidence.map((item) => <div key={item.scenarioId}><span>{item.scenarioId}</span><strong>{item.cause}</strong><small>{item.observationCount} observations · {item.latencyMs}ms · action executed: {String(item.actionExecuted)}</small></div>)}</div></> : <div className="evidence-empty"><span className="source-badge source-offline">NOT RUN</span><strong>{scene.emptyState}</strong></div>}
+      <div className="punchline"><div>{scene.line1}</div><strong>{scene.line2}</strong>{scene.cta && <span>{scene.cta}</span>}</div>
+    </div></SceneFrame>
+  }
 
   if (scene.type === 'intro') {
     return (

@@ -10,6 +10,8 @@ render the React story.
 | Architecture | Static diagram or unexplained component list | Animated sequence without audience questions | Operator question → responsibility → boundary, revealed one at a time | guided-architecture component test |
 | Live proof | Fixture appears live or proof is only narrated | Honest fallback but no clear next step | Source state is explicit and proof hands off to the Workspace | live-proof tests and offline verification |
 | Demonstration | Repeats the entire presentation | Runs one case without comparison | Workspace compares both alarm cases and exposes evidence, unknowns, next test, and authority | smoke and publication tests |
+| Mechanism explanation | Component inventory or side journey | Mechanisms named without connection to proof | Provenance, abstention, and authority are explained inline from the observed result | presentation scene test |
+| Evidence payoff | Static claim or memorized metric | Qualitative recap disconnected from the run | Payoff reads causes, observation counts, request timing, and action boundary from current-session Flightpath responses | journey evidence component test |
 | Guided demo | No instructor path | Commands exist but architecture is disconnected | Modules 1–2 connect UI, API evidence, architecture, and OpenShift resources | Showroom publication tests |
 | Hands-on lab | Read-only tour only | Participant edits without qualification | Participant builds a third case, extends MCP, injects failures, qualifies behavior, and exports a decision brief | lab contract and behavior suite |
 | Journey handoff | Presentation ends with another slide | CTA names a next step but does not identify where | Finale offers live demo, guided demo, and lab with duration and exact destination | config validation and finale rendering |
@@ -25,8 +27,9 @@ only for an internal rehearsal with the limitation called out before the run.
 ## Presenter sequence
 
 1. **Story — 5–7 minutes:** establish the ambiguous alarm, reframe the value,
-   reveal the architecture through five operator questions, run one proof, and
-   deliver the punchline.
+   reveal the architecture through five operator questions, run two live
+   conditions, explain the operating mechanisms inline, and deliver a payoff
+   derived from the current Flightpath responses.
 2. **Live demonstration — 5–10 minutes:** open *Network Operations Workspace*,
    run both built-in cases, and compare provenance, unknowns, and the next test.
 3. **Guided demo — 25–35 minutes:** follow Modules 1–2 with the Workspace,

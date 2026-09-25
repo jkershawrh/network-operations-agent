@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { LiveJourneyScene } from '../types'
 import { SceneFrame } from './SceneFrame'
 import { TechnicalTopology } from './TechnicalTopology'
+import { clearJourneyEvidence, recordJourneyEvidence } from '../live/journeyEvidence'
 
 type Result = {
   alarm_id: string
@@ -34,6 +35,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
     controller.current?.abort()
     controller.current = new AbortController()
     setStep(index); setStatus('running'); setError(''); setResult(null); setSource('LIVE')
+    const startedAt = performance.now()
     try {
       if (index === 0) {
         const response = await fetch('/ready', { signal: controller.current.signal })
@@ -43,7 +45,18 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
       } else {
         const response = await fetch('/api/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario_id: journeySteps[index].scenario }), signal: controller.current.signal })
         if (!response.ok) throw new Error(`Investigation returned HTTP ${response.status}`)
-        setResult(await response.json() as Result)
+        const nextResult = await response.json() as Result
+        setResult(nextResult)
+        recordJourneyEvidence({
+          scenarioId: journeySteps[index].scenario!,
+          cause: nextResult.primary_hypothesis.cause,
+          observationCount: nextResult.current_observations_with_tool_provenance.length,
+          historicalSourceCount: nextResult.historical_context_with_source_revision.length,
+          supportingEvidenceIds: nextResult.primary_hypothesis.supporting_evidence_ids,
+          actionExecuted: nextResult.action_executed,
+          latencyMs: Math.round(performance.now() - startedAt),
+          collectedAt: new Date().toISOString(),
+        })
       }
       setStatus(index === journeySteps.length - 1 ? 'complete' : 'paused')
     } catch (cause) {
@@ -67,7 +80,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
       {status === 'idle' && <button className="button button-primary" onClick={() => void runStep(0)}>Run the live journey</button>}
       {status === 'running' && <button className="button button-secondary" disabled>Running against Flightpath…</button>}
       {status === 'paused' && <button className="button button-primary" onClick={() => void runStep(step + 1)}>Next live act →</button>}
-      {status === 'complete' && <><button className="button button-secondary" onClick={() => { setStep(-1); setStatus('idle'); setResult(null) }}>Replay</button><a className="button button-primary journey-link" href="/">Open the live workspace →</a></>}
+      {status === 'complete' && <><button className="button button-secondary" onClick={() => { clearJourneyEvidence(); setStep(-1); setStatus('idle'); setResult(null) }}>Replay</button><a className="button button-primary journey-link" href="/">Open the live workspace →</a></>}
       {status === 'error' && <button className="button button-primary" onClick={() => void runStep(Math.max(step, 0))}>Retry failed act</button>}
     </div>
   </SceneFrame>

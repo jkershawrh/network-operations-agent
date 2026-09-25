@@ -134,6 +134,19 @@ export interface ScaleScene extends BaseScene {
   stages: Array<{ label: string; value: string; detail?: string }>
 }
 
+export interface MechanismScene extends BaseScene {
+  type: 'mechanisms'
+  mechanisms: Array<{ id: string; label: string; claim: string; detail: string; tone?: 'primary' | 'partner' | 'success' }>
+}
+
+export interface EvidencePayoffScene extends BaseScene {
+  type: 'evidence-payoff'
+  emptyState: string
+  line1: string
+  line2: string
+  cta?: string
+}
+
 export interface TradeoffScene extends BaseScene {
   type: 'tradeoff'
   options: Array<{ title: string; strength: string; tradeoff: string }>
@@ -170,6 +183,8 @@ export type SceneConfig =
   | LiveJourneyScene
   | ComparisonScene
   | ScaleScene
+  | MechanismScene
+  | EvidencePayoffScene
   | TradeoffScene
   | PunchlineScene
   | CustomScene

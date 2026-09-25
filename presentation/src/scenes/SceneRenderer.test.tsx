@@ -4,6 +4,7 @@ import { demoConfig } from '../demo.config'
 import '../live/demoAdapter'
 import type { SceneConfig } from '../types'
 import { SceneRenderer } from './SceneRenderer'
+import { clearJourneyEvidence, recordJourneyEvidence } from '../live/journeyEvidence'
 
 describe('SceneRenderer', () => {
   const scenes = demoConfig.acts.flatMap((act) => act.scenes)
@@ -61,6 +62,21 @@ describe('SceneRenderer', () => {
 
   it('keeps the presenter pitch at seven scenes or fewer', () => {
     expect(scenes.length).toBeLessThanOrEqual(7)
+  })
+
+  it('preserves the progressive proof sequence before the lab', () => {
+    expect(scenes.map((scene) => scene.type)).toEqual(['reframe', 'guided-architecture', 'live-journey', 'mechanisms', 'evidence-payoff'])
+  })
+
+  it('builds the payoff from live journey evidence', () => {
+    clearJourneyEvidence()
+    recordJourneyEvidence({ scenarioId: 'ptp-hardware', cause: 'hardware_timestamping', observationCount: 3, historicalSourceCount: 1, supportingEvidenceIds: ['hardware-1'], actionExecuted: false, latencyMs: 47, collectedAt: '2026-09-24T12:00:00Z' })
+    const scene = scenes.find((item) => item.type === 'evidence-payoff')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    expect(screen.getByText('LIVE')).toBeInTheDocument()
+    expect(screen.getByText('hardware_timestamping')).toBeInTheDocument()
+    expect(screen.getByText(/3 observations · 47ms · action executed: false/)).toBeInTheDocument()
+    clearJourneyEvidence()
   })
 
   it('renders the custom React scene escape hatch', () => {

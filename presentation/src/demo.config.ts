@@ -41,8 +41,17 @@ export const demoConfig: DemoConfig = {
       ],
     },
     {
-      id: 'payoff', label: '03', title: 'The Handoff', scenes: [
-        { id: 'punchline', type: 'punchline', beat: 'transformation', eyebrow: 'The transformation', line1: 'The agent does not close the incident.', line2: 'It makes the next decision defensible.', cta: 'Continue into proof, practice, or build →', speakerPrompt: 'Do not keep presenting. Choose the next journey based on the room and hand control to the live environment.' },
+      id: 'mechanisms', label: '03', title: 'Why It Worked', scenes: [
+        { id: 'mechanisms', type: 'mechanisms', beat: 'trials', eyebrow: 'The operating mechanisms', title: 'The result is repeatable because the boundaries are explicit', body: 'Explain the machinery inline before moving into guided practice.', mechanisms: [
+          { id: 'provenance', label: 'Provenance first', claim: 'Every current observation keeps its source.', detail: 'The hypothesis can cite only validated evidence IDs returned by approved diagnostics.', tone: 'partner' },
+          { id: 'abstention', label: 'Fail closed', claim: 'Ambiguity becomes inconclusive—not confidence theater.', detail: 'Missing, malformed, or conflicting required evidence prevents a supported cause.', tone: 'primary' },
+          { id: 'authority', label: 'Human authority', claim: 'Recommendation and action remain separate.', detail: 'The workflow proposes the next discriminating test and executes no remediation.', tone: 'success' },
+        ], speakerPrompt: 'Tie each mechanism to the evidence the room just saw. Do not introduce a new side journey.' },
+      ],
+    },
+    {
+      id: 'payoff', label: '04', title: 'Evidence & Handoff', scenes: [
+        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'Close on Flightpath evidence—not a memorized number', emptyState: 'Run both live investigations before making the payoff claim.', line1: 'The agent does not close the incident.', line2: 'It makes the next decision defensible.', cta: 'Continue into guided practice or the lab →', speakerPrompt: 'Read back only the causes, observation counts, request timing, and action boundary returned in this session. If the proof was not run, return to Act 02.' },
       ],
     },
   ],
