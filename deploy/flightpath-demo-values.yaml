@@ -1,6 +1,6 @@
 image:
   repository: quay.io/rh-ee-jkershaw/network-operations-agent
-  digest: sha256:ee79a89405fa96a4541e2a22ebe3beabcea1277a97764f099e386241fccfbd42
+  digest: sha256:c810883cfc64bf1c6180b003f48d612aef2f3ef70497fa0f1f70cccbd2f803ef
 
 route:
   enabled: true
