@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { demoConfig } from '../demo.config'
 import '../live/demoAdapter'
 import type { SceneConfig } from '../types'
@@ -7,6 +7,7 @@ import { SceneRenderer } from './SceneRenderer'
 import { clearJourneyEvidence, recordJourneyEvidence } from '../live/journeyEvidence'
 
 describe('SceneRenderer', () => {
+  afterEach(() => vi.restoreAllMocks())
   const scenes = demoConfig.acts.flatMap((act) => act.scenes)
 
   for (const scene of scenes) {
@@ -23,21 +24,38 @@ describe('SceneRenderer', () => {
     expect(await screen.findByText('rehearsal')).toBeInTheDocument()
   })
 
-  it('renders a live infrastructure journey with the complete architecture flow', () => {
+  it('opens the live journey as an incident workspace instead of a topology', () => {
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    expect(screen.getByTestId('live-operator-workspace')).toBeInTheDocument()
+    expect(screen.getByText('What entered the system?')).toBeInTheDocument()
+    expect(screen.getByText('PTP synchronization degraded')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Verify Flightpath readiness/ })).toBeInTheDocument()
+    expect(screen.queryByLabelText('Live technical deployment topology')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
     expect(screen.getByLabelText('Live technical deployment topology')).toBeInTheDocument()
-    expect(screen.getByText('network-operations-demo · Flightpath')).toBeInTheDocument()
-    expect(screen.getByText('NetworkPolicy: app pods only')).toBeInTheDocument()
-    expect(screen.getByText('app Deployment')).toBeInTheDocument()
-    expect(screen.getByText('diagnostics Deployment')).toBeInTheDocument()
-    expect(screen.getByText(':8095/mcp')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Start the live path' })).toBeInTheDocument()
-    expect(screen.getByText(/Click anywhere to start/)).toBeInTheDocument()
-    expect(screen.getByText(/Each click advances one infrastructure boundary/)).toBeInTheDocument()
-    expect(screen.getByText('Agent journey')).toBeInTheDocument()
-    expect(screen.getByText('Workload flow')).toBeInTheDocument()
-    expect(screen.getByText('LLM role')).toBeInTheDocument()
+  })
+
+  it('runs one live investigation then labels later phases as response inspection', async () => {
+    const response = {
+      investigation_id: 'run-1', alarm_id: 'synthetic-ptp-001', mode: 'deterministic_fixture_proof',
+      current_observations_with_tool_provenance: [{ evidence_id: 'hardware-1', scope: 'hardware', signal: 'nic_timestamp_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'fixture-v1' }],
+      historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'ptp-runbook', source_revision: 'v1', excerpt: 'Compare current signals.' }],
+      primary_hypothesis: { cause: 'hardware_timing', supporting_evidence_ids: ['hardware-1'] }, alternate_hypotheses: ['platform_timing'], unknowns_and_conflicts: [],
+      next_discriminating_test: 'Compare lock state', proposed_action: 'Have an operator review', action_requires_human_approval: true, action_executed: false,
+    }
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ status: 'ready' }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify(response), { status: 200 }))
+    const scene = scenes.find((item) => item.type === 'live-journey')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    fireEvent.click(screen.getByRole('button', { name: /Verify Flightpath readiness/ }))
+    await screen.findByText('What is running now?')
+    fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
+    await screen.findByText('What did the systems report?')
+    expect(screen.getByText('nic timestamp fault · present')).toBeInTheDocument()
+    expect(screen.getByText(/Subsequent steps inspect sections of that same response/)).toBeInTheDocument()
+    await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(2))
   })
 
   it('renders the statistic-grid scene', () => {

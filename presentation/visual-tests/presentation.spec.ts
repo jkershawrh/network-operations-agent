@@ -26,7 +26,7 @@ test('desktop story acts fit one viewport', async ({ page }, testInfo) => {
   }
 })
 
-test('live journey owns canvas clicks and accumulates returned metrics', async ({ page }, testInfo) => {
+test('live journey runs both conditions and accumulates returned evidence', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'rehearsal-mobile', 'Mobile rehearsal uses the explicit step buttons')
   await page.route('**/ready', (route) => route.fulfill({ json: { status: 'ready' } }))
   let run = 0
@@ -34,37 +34,34 @@ test('live journey owns canvas clicks and accumulates returned metrics', async (
     run += 1
     const hardware = run === 1
     return route.fulfill({ json: {
+      investigation_id: `run-${run}`,
       alarm_id: `alarm-${run}`,
       current_observations_with_tool_provenance: [
-        { evidence_id: hardware ? 'hardware-1' : 'openshift_platform-1', scope: 'cause', state: 'present', provenance: 'live-test' },
-        { evidence_id: 'network-1', scope: 'network', state: 'present', provenance: 'live-test' },
-        { evidence_id: 'control-1', scope: 'control', state: 'absent', provenance: 'live-test' },
+        { evidence_id: hardware ? 'hardware-1' : 'openshift_platform-1', scope: hardware ? 'hardware' : 'openshift_platform', signal: hardware ? 'nic_timestamp_fault' : 'platform_timing_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
+        { evidence_id: 'network-1', scope: 'network', signal: 'timing_alarm', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
+        { evidence_id: 'control-1', scope: 'control', signal: 'alternate_fault', state: 'absent', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
       ],
-      historical_context_with_source_revision: [{ source_id: 'runbook', source_revision: 'v1' }],
+      historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'runbook', source_revision: 'v1', excerpt: 'Compare current timing signals before assigning a cause.' }],
       primary_hypothesis: { cause: hardware ? 'hardware_timing' : 'platform_timing', supporting_evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
-      unknowns_and_conflicts: [], next_discriminating_test: 'Compare synchronized events', action_requires_human_approval: true, action_executed: false,
+      alternate_hypotheses: [hardware ? 'platform_timing' : 'hardware_timing'], unknowns_and_conflicts: [], next_discriminating_test: 'Compare synchronized events', proposed_action: 'Have an operator review the evidence', action_requires_human_approval: true, action_executed: false,
     } })
   })
   await page.goto('/?act=2&scene=0')
-  const stage = page.getByTestId('live-click-stage')
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('READY', { exact: true })).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('live request latency')).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('current observations', { exact: true })).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('approved historical sources')).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('hardware_timing')).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('LLM participation', { exact: true })).toBeVisible()
-  await expect(page.getByText('NOT USED', { exact: true })).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('remediation executed', { exact: true })).toBeVisible()
-  await stage.click({ position: { x: 20, y: 20 } })
-  await stage.click({ position: { x: 20, y: 20 } })
-  await expect(page.getByText('hardware_timing → platform_timing')).toBeVisible()
-  await expect(page.getByText(/diagnosis follows evidence/)).toBeVisible()
+  await page.getByRole('button', { name: /Verify Flightpath readiness/ }).click()
+  await expect(page.getByText('What is running now?')).toBeVisible()
+  await page.getByRole('button', { name: /Investigate hardware signal/ }).click()
+  await expect(page.getByText('What did the systems report?')).toBeVisible()
+  await expect(page.getByText('nic timestamp fault · present')).toBeVisible()
+  await page.getByRole('button', { name: /Inspect approved history/ }).click()
+  await page.getByRole('button', { name: /Evaluate the evidence/ }).click()
+  await expect(page.getByText('hardware timing').first()).toBeVisible()
+  await expect(page.getByText('Not used')).toBeVisible()
+  await page.getByRole('button', { name: /Review the authority boundary/ }).click()
+  await expect(page.getByText('Action executed: false')).toBeVisible()
+  await page.getByRole('button', { name: /Change the incident condition/ }).click()
+  await page.getByRole('button', { name: /Investigate platform signal/ }).click()
+  await expect(page.getByText('Measured comparison')).toBeVisible()
+  await expect(page.getByText('platform timing').first()).toBeVisible()
+  await expect(page.getByText(/Subsequent steps inspect sections of that same response/)).toBeVisible()
   await expect(page).toHaveURL(/act=2/)
 })

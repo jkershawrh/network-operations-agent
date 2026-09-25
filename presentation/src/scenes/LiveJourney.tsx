@@ -4,94 +4,237 @@ import { SceneFrame } from './SceneFrame'
 import { TechnicalTopology } from './TechnicalTopology'
 import { clearJourneyEvidence, readJourneyEvidence, recordJourneyEvidence, type InvestigationEvidence } from '../live/journeyEvidence'
 
-type Result = {
-  mode?: string
-  current_observations_with_tool_provenance: Array<{ evidence_id: string }>
-  historical_context_with_source_revision: Array<{ source_id: string }>
-  primary_hypothesis: { cause: string; supporting_evidence_ids: string[] }
-  next_discriminating_test: string
-  action_executed: boolean
-  model_draft?: { status?: string; model?: string }
+type Observation = {
+  evidence_id: string
+  scope: string
+  signal: string
+  state: string
+  observed_at: string
+  provenance: string
 }
 
-const path = [
-  { lane: 'workload', title: 'Verify Flightpath', explanation: 'Before making a claim, the story asks the deployed app and approved diagnostics service whether they are ready.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], action: 'ready' },
-  { lane: 'agent', title: 'Start the agent journey', explanation: 'The operator gives the Network Operations agent a bounded scenario. The agent orchestrates the investigation; it does not jump directly to an LLM answer.', activeIds: ['browser', 'route', 'app-service', 'app'], action: 'hardware' },
-  { lane: 'workload', title: 'Collect current observations', explanation: 'The workload crosses the NetworkPolicy-approved MCP connection and calls three allowlisted, read-only diagnostics. These observations describe now—not history.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], metric: 'observations' },
-  { lane: 'workload', title: 'Add approved history', explanation: 'The agent retrieves versioned cases and runbooks separately. They provide context, but they cannot overwrite what the current diagnostics observed.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history'], metric: 'history' },
-  { lane: 'agent', title: 'Apply evidence policy', explanation: 'The agent applies deterministic policy to current signals and approved context. A cause is supported only by evidence IDs returned in this run.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy'], metric: 'cause' },
-  { lane: 'llm', title: 'Bound the LLM role', explanation: 'An optional OpenAI-compatible model may draft wording after the cause is decided. It cannot add evidence, change the hypothesis, or gain action authority.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy'], metric: 'llm' },
-  { lane: 'agent', title: 'Stop at human authority', explanation: 'The agent recommends the next discriminating test, then stops. The operator retains the decision and no remediation is executed.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator'], metric: 'authority' },
-  { lane: 'workload', title: 'Change the condition', explanation: 'The same workload path now receives a platform timing fault. Only the evidence changes; the architecture and policy stay fixed.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], action: 'platform' },
-  { lane: 'agent', title: 'Compare the live evidence', explanation: 'The agent follows the second evidence set to a different supported cause. That is the proof: the diagnosis follows evidence, not the alarm label.', activeIds: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator'], metric: 'compare' },
-] as const
+type HistoricalSource = {
+  evidence_id: string
+  source_id: string
+  source_revision: string
+  excerpt: string
+}
+
+type Result = {
+  investigation_id: string
+  alarm_id: string
+  mode?: string
+  current_observations_with_tool_provenance: Observation[]
+  historical_context_with_source_revision: HistoricalSource[]
+  primary_hypothesis: { cause: string; supporting_evidence_ids: string[] }
+  alternate_hypotheses: string[]
+  unknowns_and_conflicts: string[]
+  next_discriminating_test: string
+  proposed_action: string
+  action_requires_human_approval: boolean
+  action_executed: boolean
+  model_draft?: { status?: string; model?: string; text?: string }
+}
+
+type ScenarioId = 'ptp-hardware' | 'ptp-platform'
+type Phase = 'ready' | 'run-hardware' | 'observations' | 'history' | 'decision' | 'authority' | 'run-platform' | 'compare'
+type Status = 'idle' | 'running' | 'paused' | 'complete' | 'error'
+
+const phases: Array<{
+  id: Phase
+  label: string
+  kicker: string
+  explanation: string
+  cta: string
+  lane: 'workload' | 'agent' | 'decision'
+}> = [
+  { id: 'ready', label: 'Incident intake', kicker: 'What entered the system?', explanation: 'Verify the deployed application and its approved diagnostic boundary before submitting the synthetic PTP alarm.', cta: 'Verify Flightpath readiness', lane: 'workload' },
+  { id: 'run-hardware', label: 'Run investigation', kicker: 'What is running now?', explanation: 'Submit the hardware-signal scenario once. The Network Operations agent collects current diagnostics, retrieves approved context, applies evidence policy, and returns one bounded investigation record.', cta: 'Investigate hardware signal', lane: 'agent' },
+  { id: 'observations', label: 'Current diagnostics', kicker: 'What did the systems report?', explanation: 'Inspect the completed response. These observations describe the current incident and retain the diagnostic scope, collection time, and source provenance.', cta: 'Inspect approved history', lane: 'workload' },
+  { id: 'history', label: 'Historical context', kicker: 'What context was retrieved?', explanation: 'Versioned synthetic cases and runbooks add context. They remain visually and logically separate from current observations.', cta: 'Evaluate the evidence', lane: 'agent' },
+  { id: 'decision', label: 'Evidence decision', kicker: 'Why this cause?', explanation: 'Deterministic policy selects a cause only when the current evidence supports it. Optional model wording cannot change the evidence IDs or hypothesis.', cta: 'Review the authority boundary', lane: 'decision' },
+  { id: 'authority', label: 'Human authority', kicker: 'Where does the agent stop?', explanation: 'The agent recommends the next discriminating test, but executes nothing. A qualified operator owns the next action.', cta: 'Change the incident condition', lane: 'decision' },
+  { id: 'run-platform', label: 'Changed condition', kicker: 'Does the diagnosis follow the evidence?', explanation: 'Run the same workflow with a platform timing signal. The architecture and policy stay fixed; only the observed condition changes.', cta: 'Investigate platform signal', lane: 'agent' },
+  { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'Compare both completed live responses. The alarm class is the same, but the supporting evidence leads to a different cause while the no-action boundary remains intact.', cta: 'Open guided investigation', lane: 'decision' },
+]
+
+const titleCase = (value: string) => value.replaceAll('_', ' ')
 
 export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
-  const [step, setStep] = useState(-1)
-  const [status, setStatus] = useState<'idle' | 'running' | 'paused' | 'complete' | 'error'>('idle')
+  const [phaseIndex, setPhaseIndex] = useState(0)
+  const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState('')
   const [evidence, setEvidence] = useState<InvestigationEvidence[]>(() => readJourneyEvidence())
-  const [results, setResults] = useState<Record<string, Result>>({})
+  const [results, setResults] = useState<Partial<Record<ScenarioId, Result>>>({})
+  const [showTopology, setShowTopology] = useState(false)
   const controller = useRef<AbortController | null>(null)
+  const phase = phases[phaseIndex]
+
   useEffect(() => () => controller.current?.abort(), [])
 
-  const runRequest = async (scenarioId: 'ptp-hardware' | 'ptp-platform') => {
+  const runRequest = async (scenarioId: ScenarioId) => {
     const startedAt = performance.now()
-    const response = await fetch('/api/investigate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario_id: scenarioId }), signal: controller.current!.signal })
+    const response = await fetch('/api/investigate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario_id: scenarioId }),
+      signal: controller.current!.signal,
+    })
     if (!response.ok) throw new Error(`Investigation returned HTTP ${response.status}`)
     const result = await response.json() as Result
+    const latencyMs = Math.round(performance.now() - startedAt)
     setResults((current) => ({ ...current, [scenarioId]: result }))
-    recordJourneyEvidence({ scenarioId, cause: result.primary_hypothesis.cause, observationCount: result.current_observations_with_tool_provenance.length, historicalSourceCount: result.historical_context_with_source_revision.length, supportingEvidenceIds: result.primary_hypothesis.supporting_evidence_ids, actionExecuted: result.action_executed, latencyMs: Math.round(performance.now() - startedAt), collectedAt: new Date().toISOString() })
+    recordJourneyEvidence({
+      scenarioId,
+      cause: result.primary_hypothesis.cause,
+      observationCount: result.current_observations_with_tool_provenance.length,
+      historicalSourceCount: result.historical_context_with_source_revision.length,
+      supportingEvidenceIds: result.primary_hypothesis.supporting_evidence_ids,
+      actionExecuted: result.action_executed,
+      latencyMs,
+      collectedAt: new Date().toISOString(),
+    })
     setEvidence(readJourneyEvidence())
   }
 
-  const advance = async () => {
-    if (status === 'running' || status === 'complete') return
-    const next = step + 1
-    controller.current?.abort(); controller.current = new AbortController()
-    setStep(next); setStatus('running'); setError('')
+  const execute = async () => {
+    if (status === 'running') return
+    setError('')
+    controller.current?.abort()
+    controller.current = new AbortController()
+
     try {
-      const action = 'action' in path[next] ? path[next].action : undefined
-      if (action === 'ready') {
+      if (phase.id === 'ready') {
+        setStatus('running')
         const response = await fetch('/ready', { signal: controller.current.signal })
         if (!response.ok || (await response.json()).status !== 'ready') throw new Error('Flightpath is not ready')
-      } else if (action === 'hardware') await runRequest('ptp-hardware')
-      else if (action === 'platform') await runRequest('ptp-platform')
-      setStatus(next === path.length - 1 ? 'complete' : 'paused')
+      } else if (phase.id === 'run-hardware') {
+        setStatus('running')
+        await runRequest('ptp-hardware')
+      } else if (phase.id === 'run-platform') {
+        setStatus('running')
+        await runRequest('ptp-platform')
+      }
+
+      if (phase.id === 'compare') {
+        window.location.assign('/')
+        return
+      }
+      setPhaseIndex((current) => Math.min(current + 1, phases.length - 1))
+      setStatus(phaseIndex >= phases.length - 2 ? 'complete' : 'paused')
     } catch (cause) {
       if ((cause as Error).name === 'AbortError') return
-      setError(cause instanceof Error ? cause.message : 'Live journey failed'); setStatus('error')
+      setError(cause instanceof Error ? cause.message : 'Live journey failed')
+      setStatus('error')
     }
   }
 
-  const hardware = evidence.find((item) => item.scenarioId === 'ptp-hardware')
-  const platform = evidence.find((item) => item.scenarioId === 'ptp-platform')
-  const current = step >= 7 ? platform : hardware
-  const result = step >= 7 ? results['ptp-platform'] : results['ptp-hardware']
-  const metric = step >= 0 && 'metric' in path[step] ? path[step].metric : undefined
-  const metricContent = metric === 'observations' && current ? [`${current.observationCount}`, 'current observations', current.supportingEvidenceIds.join(', ')]
-    : metric === 'history' && current ? [`${current.historicalSourceCount}`, 'approved historical sources', 'Kept separate from current evidence']
-    : metric === 'cause' && current ? [current.cause, 'supported cause', current.supportingEvidenceIds.join(', ')]
-    : metric === 'llm' && result ? [result.model_draft?.status ?? 'NOT USED', 'LLM participation', result.model_draft?.model ?? 'Deterministic evidence path; optional model has no evidence or authority']
-    : metric === 'authority' && current ? [String(current.actionExecuted), 'remediation executed', result?.next_discriminating_test ?? 'Human review required']
-    : metric === 'compare' && hardware && platform ? [`${hardware.cause} → ${platform.cause}`, 'condition changed the diagnosis', `${hardware.latencyMs}ms / ${platform.latencyMs}ms · ${hardware.observationCount + platform.observationCount} observations total`]
-    : current && (step === 1 || step === 7) ? [`${current.latencyMs}ms`, 'live request latency', `${current.scenarioId} · ${result?.mode ?? 'deterministic investigation'}`]
-    : step === 0 ? ['READY', 'deployed services', 'Flightpath readiness response'] : undefined
+  const hardwareEvidence = evidence.find((item) => item.scenarioId === 'ptp-hardware')
+  const platformEvidence = evidence.find((item) => item.scenarioId === 'ptp-platform')
+  const hardware = results['ptp-hardware']
+  const platform = results['ptp-platform']
+  const currentResult = phase.id === 'run-platform' || phase.id === 'compare' ? platform : hardware
+  const currentEvidence = phase.id === 'run-platform' || phase.id === 'compare' ? platformEvidence : hardwareEvidence
+  const phaseNumber = phaseIndex + 1
 
-  return <SceneFrame scene={scene}><div className="live-click-stage" data-testid="live-click-stage" onClick={(event) => { event.stopPropagation(); if (!(event.target as HTMLElement).closest('button, a')) void advance() }}>
-    <div className="journey-status"><span className={`journey-step-count ${status === 'complete' ? 'complete' : ''}`}>{step < 0 ? 'START' : `${step + 1} / ${path.length}`}</span><strong>{step < 0 ? 'Trace one request through the live system' : path[step].title}</strong></div>
-    <div className="journey-lanes"><span className={step >= 0 && path[step].lane === 'agent' ? 'active' : ''}>Agent journey</span><span className={step >= 0 && path[step].lane === 'workload' ? 'active' : ''}>Workload flow</span><span className={step >= 0 && path[step].lane === 'llm' ? 'active' : ''}>LLM role</span></div>
-    <TechnicalTopology activeIds={step < 0 ? [] : [...path[step].activeIds, ...(path[step].lane === 'llm' && result?.model_draft ? ['model'] : [])]} running={status === 'running'} />
-    <div className="journey-explanation"><span>What is happening</span><strong>{step < 0 ? 'Each click advances one infrastructure boundary and reveals the live measurement or decision produced there.' : path[step].explanation}</strong></div>
-    {metricContent && <div className="journey-live-metric"><strong>{metricContent[0]}</strong><span>{metricContent[1]}</span><small>{metricContent[2]}</small></div>}
-    {error && <div className="error-panel">Live journey stopped at this boundary: {error}</div>}
-    <div className="journey-controls">
-      {status === 'idle' && <button className="button button-primary" onClick={() => void advance()}>Start the live path</button>}
-      {status === 'running' && <button className="button button-secondary" disabled>Running on Flightpath…</button>}
-      {status === 'paused' && <button className="button button-primary" onClick={() => void advance()}>Next boundary →</button>}
-      {status === 'error' && <button className="button button-primary" onClick={() => { setStep((value) => value - 1); setStatus('paused') }}>Retry boundary</button>}
-      {status === 'complete' && <><button className="button button-secondary" onClick={() => { clearJourneyEvidence(); setEvidence([]); setResults({}); setStep(-1); setStatus('idle') }}>Replay path</button><a className="button button-primary journey-link" href="/">Open guided investigation →</a></>}
+  const reset = () => {
+    clearJourneyEvidence()
+    setEvidence([])
+    setResults({})
+    setPhaseIndex(0)
+    setStatus('idle')
+    setError('')
+  }
+
+  return <SceneFrame scene={scene}>
+    <div className="operator-workspace" data-testid="live-operator-workspace">
+      <div className="workspace-rail" aria-label="Live journey progress">
+        {phases.map((item, index) => <button key={item.id} className={index === phaseIndex ? 'active' : index < phaseIndex ? 'complete' : ''} disabled={index > phaseIndex} onClick={() => index < phaseIndex && setPhaseIndex(index)}><span>{index < phaseIndex ? '✓' : index + 1}</span>{item.label}</button>)}
+      </div>
+
+      <section className="workspace-main">
+        <header className="workspace-act">
+          <div><span>ACT {phaseNumber} OF {phases.length} · {phase.lane}</span><h2>{phase.label}</h2><strong>{phase.kicker}</strong></div>
+          <div className={`workspace-state ${status}`}><i />{status === 'running' ? 'RUNNING LIVE' : status === 'error' ? 'LIVE ERROR' : phaseIndex > 0 ? 'LIVE SESSION' : 'NOT RUN'}</div>
+        </header>
+        <p className="workspace-explanation">{phase.explanation}</p>
+
+        {phase.id === 'ready' && <div className="incident-intake">
+          <div><span>ALARM</span><strong>PTP synchronization degraded</strong><small>synthetic-ptp-001 · production-network profile</small></div>
+          <div><span>AMBIGUITY</span><strong>Hardware or platform timing</strong><small>Same symptom · different operational response</small></div>
+          <div><span>SAFETY</span><strong>Read-only investigation</strong><small>No mutation tools · no remediation authority</small></div>
+        </div>}
+
+        {phase.id === 'run-hardware' && <div className="agent-run">
+          <div className={status === 'running' ? 'running' : ''}><span>01</span><strong>Normalize alarm</strong><small>Validate bounded scenario</small></div>
+          <b>→</b><div className={status === 'running' ? 'running' : ''}><span>02</span><strong>Collect diagnostics</strong><small>3 allowlisted MCP scopes</small></div>
+          <b>→</b><div className={status === 'running' ? 'running' : ''}><span>03</span><strong>Retrieve context</strong><small>Approved versioned sources</small></div>
+          <b>→</b><div className={status === 'running' ? 'running' : ''}><span>04</span><strong>Apply policy</strong><small>Evidence IDs decide</small></div>
+        </div>}
+
+        {phase.id === 'observations' && hardware && <div className="evidence-list">
+          {hardware.current_observations_with_tool_provenance.map((item) => <article key={item.evidence_id} className={hardware.primary_hypothesis.supporting_evidence_ids.includes(item.evidence_id) ? 'supporting' : ''}>
+            <span>{item.scope}</span><strong>{titleCase(item.signal)} · {item.state}</strong><small>{item.evidence_id} · {item.provenance}</small>
+          </article>)}
+        </div>}
+
+        {phase.id === 'history' && hardware && <div className="history-list">
+          {hardware.historical_context_with_source_revision.map((item) => <article key={item.evidence_id}><span>{item.source_id} · {item.source_revision}</span><strong>{item.excerpt}</strong></article>)}
+        </div>}
+
+        {phase.id === 'decision' && hardware && <div className="decision-board">
+          <div><span>SUPPORTED CAUSE</span><strong>{titleCase(hardware.primary_hypothesis.cause)}</strong><small>{hardware.primary_hypothesis.supporting_evidence_ids.join(', ')}</small></div>
+          <div><span>ALTERNATE</span><strong>{hardware.alternate_hypotheses.map(titleCase).join(', ')}</strong><small>{hardware.unknowns_and_conflicts.length ? hardware.unknowns_and_conflicts.join('; ') : 'No conflicting required evidence'}</small></div>
+          <div><span>LLM ROLE</span><strong>{hardware.model_draft?.status ? titleCase(hardware.model_draft.status) : 'Not used'}</strong><small>{hardware.model_draft?.model ?? 'Evidence policy produced the decision; no model authority'}</small></div>
+        </div>}
+
+        {phase.id === 'authority' && hardware && <div className="authority-board">
+          <div><span>NEXT DISCRIMINATING TEST</span><strong>{hardware.next_discriminating_test}</strong></div>
+          <div><span>AGENT RECOMMENDATION</span><strong>{hardware.proposed_action}</strong></div>
+          <div className="authority-stop"><span>AUTHORITY STOP</span><strong>Action executed: {String(hardware.action_executed)}</strong><small>Human approval required: {String(hardware.action_requires_human_approval)}</small></div>
+        </div>}
+
+        {phase.id === 'run-platform' && <div className="condition-change">
+          <div className="prior"><span>COMPLETED CONDITION</span><strong>Hardware signal</strong><small>{hardwareEvidence ? `${titleCase(hardwareEvidence.cause)} · ${hardwareEvidence.latencyMs}ms` : 'Run required'}</small></div>
+          <div className="change-arrow">same workflow →</div>
+          <div className="next"><span>NEW CONDITION</span><strong>Platform signal</strong><small>Architecture and policy unchanged</small></div>
+        </div>}
+
+        {phase.id === 'compare' && hardwareEvidence && platformEvidence && hardware && platform && <div className="comparison-workspace">
+          {[{ label: 'Hardware signal', evidence: hardwareEvidence, result: hardware }, { label: 'Platform signal', evidence: platformEvidence, result: platform }].map((item) => <article key={item.evidence.scenarioId}>
+            <span>{item.label}</span><strong>{titleCase(item.evidence.cause)}</strong><div><b>{item.evidence.observationCount}</b> observations <b>{item.evidence.latencyMs}ms</b> request</div><small>Support: {item.evidence.supportingEvidenceIds.join(', ')} · action executed: {String(item.result.action_executed)}</small>
+          </article>)}
+        </div>}
+
+        <div className="workspace-footer">
+          <div className="runtime-strip">
+            <span>WORKLOAD <b>{currentResult?.alarm_id ?? 'awaiting input'}</b></span>
+            <span>AGENT <b>{currentResult ? 'investigation complete' : status === 'running' ? 'running' : 'ready'}</b></span>
+            <span>LLM <b>{currentResult?.model_draft?.model ?? 'not required'}</b></span>
+            <span>SOURCE <b>{currentResult ? 'LIVE · Flightpath' : 'not collected'}</b></span>
+          </div>
+          {error && <div className="error-panel">Live operation stopped: {error}</div>}
+          <div className="workspace-actions">
+            <button className="button button-secondary" onClick={() => setShowTopology((value) => !value)}>{showTopology ? 'Hide' : 'Inspect'} technical topology</button>
+            {phase.id === 'compare' ? <a className="button button-primary journey-link" href="/">{phase.cta} →</a> : <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running on Flightpath…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button>}
+            {phaseIndex > 0 && <button className="button button-quiet" onClick={reset}>Restart proof</button>}
+          </div>
+        </div>
+      </section>
+
+      <aside className="activity-rail">
+        <span className="rail-label">LIVE ACTIVITY</span>
+        <strong>{status === 'running' ? 'Agent working' : currentResult ? 'Response collected' : 'Waiting for run'}</strong>
+        <ol>
+          <li className={phaseIndex >= 1 ? 'done' : ''}><b>Scenario contract</b><small>Validated input</small></li>
+          <li className={phaseIndex >= 2 ? 'done' : ''}><b>MCP diagnostics</b><small>{currentEvidence ? `${currentEvidence.observationCount} observations` : 'Network · platform · hardware'}</small></li>
+          <li className={phaseIndex >= 3 ? 'done' : ''}><b>Approved retrieval</b><small>{currentEvidence ? `${currentEvidence.historicalSourceCount} sources` : 'Versioned context'}</small></li>
+          <li className={phaseIndex >= 4 ? 'done' : ''}><b>Evidence policy</b><small>{currentEvidence ? titleCase(currentEvidence.cause) : 'Awaiting evidence'}</small></li>
+          <li className={phaseIndex >= 5 ? 'done' : ''}><b>Human boundary</b><small>No action executed</small></li>
+        </ol>
+        <div className="how-it-works"><span>HOW IT WORKS</span><p>The API completed one bounded investigation. Subsequent steps inspect sections of that same response; they do not pretend to launch additional backend work.</p></div>
+      </aside>
     </div>
-    {status !== 'running' && status !== 'complete' && <div className="click-hint">Click anywhere to {step < 0 ? 'start' : 'advance the live path'} →</div>}
-  </div></SceneFrame>
+    {showTopology && <div className="topology-drawer"><TechnicalTopology activeIds={['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator']} running={status === 'running'} /></div>}
+  </SceneFrame>
 }
