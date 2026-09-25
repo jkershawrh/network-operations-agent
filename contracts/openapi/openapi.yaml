@@ -200,6 +200,19 @@ components:
         evidence_ids: {type: array, items: {type: string}}
         model: {type: string}
         runtime: {type: string}
+        prompt:
+          type: object
+          required: [instruction, evidence]
+          properties:
+            instruction: {type: string}
+            evidence:
+              type: object
+              required: [hypothesis, current_observations, historical_context, unknowns]
+              properties:
+                hypothesis: {$ref: '#/components/schemas/Hypothesis'}
+                current_observations: {type: array, items: {$ref: '#/components/schemas/Observation'}}
+                historical_context: {type: array, items: {$ref: '#/components/schemas/HistoricalContext'}}
+                unknowns: {type: array, items: {type: string}}
     Investigation:
       type: object
       required: [schema_version, investigation_id, alarm_id, current_observations_with_tool_provenance, historical_context_with_source_revision, primary_hypothesis, alternate_hypotheses, unknowns_and_conflicts, next_discriminating_test, proposed_action, action_requires_human_approval, action_executed, mode]

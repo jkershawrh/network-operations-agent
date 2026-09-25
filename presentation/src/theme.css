@@ -284,8 +284,18 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .decision-stage.policy strong { color: var(--success); font: 700 1.25rem 'Red Hat Display'; }
 .decision-stage.human { border-color: var(--rh-red); }
 .decision-arrow { color: var(--intel-cyan); font: 700 1rem 'Red Hat Mono'; }
-.llm-bypass { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(180px, .45fr) 1fr; align-items: center; gap: .8rem; padding: .65rem .8rem; border: 1px dashed var(--text-disabled); background: #191919; }
+.llm-bypass { grid-column: 1 / -1; display: grid; gap: .5rem; padding: .55rem .7rem; border: 1px dashed var(--text-disabled); background: #191919; }
 .llm-bypass span { color: var(--warning); }
+.llm-exchange-heading { display: grid; grid-template-columns: auto minmax(160px, .35fr) 1fr; align-items: center; gap: .65rem; }
+.llm-exchange-heading strong { font-size: .7rem; }
+.llm-exchange-heading small { color: var(--text-dim); font-size: .58rem; }
+.llm-exchange { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+.llm-exchange section { min-width: 0; display: grid; align-content: start; gap: .22rem; padding: .45rem .55rem; border-left: 2px solid var(--intel-cyan); background: var(--surface-2); }
+.llm-exchange section:last-child { border-left-color: var(--warning); }
+.llm-exchange strong { font-size: .64rem; line-height: 1.35; }
+.llm-exchange small { color: var(--text-dim); font-size: .53rem; line-height: 1.35; overflow-wrap: anywhere; }
+.llm-not-called { display: flex; gap: .45rem; color: var(--text-dim); font-size: .58rem; }
+.llm-not-called b { color: var(--warning); }
 .agent-run { display: grid; grid-template-columns: repeat(7, auto); align-items: center; justify-content: center; gap: .45rem; }
 .agent-run > div { width: 125px; min-height: 120px; display: grid; align-content: center; gap: .35rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
 .agent-run > div.running { border-color: var(--intel-cyan); background: var(--intel-cyan-dim); }

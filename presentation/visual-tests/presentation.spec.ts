@@ -49,7 +49,19 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
       historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'runbook', source_revision: 'v1', excerpt: 'Compare current timing signals before assigning a cause.' }],
       primary_hypothesis: { cause: hardware ? 'hardware_timing' : 'platform_timing', supporting_evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
       alternate_hypotheses: [hardware ? 'platform_timing' : 'hardware_timing'], unknowns_and_conflicts: [], next_discriminating_test: 'Compare synchronized events', proposed_action: 'Have an operator review the evidence', action_requires_human_approval: true, action_executed: false,
-      model_draft: { status: 'unverified_draft_for_human_review', model: 'granite-3.2-8b-tools', runtime: 'Intel Xeon 6767P', evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
+      model_draft: {
+        status: 'unverified_draft_for_human_review', model: 'granite-3.2-8b-tools', runtime: 'Intel Xeon 6767P',
+        summary: hardware ? 'Current NIC timestamp evidence supports a provisional hardware timing diagnosis for operator review.' : 'Current platform timing evidence supports a provisional host timing diagnosis for operator review.',
+        evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'],
+        prompt: {
+          instruction: 'Draft a brief explanation of the supplied hypothesis, using only the provided evidence.',
+          evidence: {
+            hypothesis: { cause: hardware ? 'hardware_timing' : 'platform_timing', supporting_evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
+            current_observations: [{ evidence_id: hardware ? 'hardware-1' : 'openshift_platform-1' }],
+            historical_context: [{ evidence_id: 'knowledge-1' }], unknowns: [],
+          },
+        },
+      },
     } })
   })
   await page.goto('/?act=2&scene=0')
@@ -74,6 +86,10 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   await expect(page.getByText('hardware timing').first()).toBeVisible()
   await expect(page.getByText('INTEL CPU LIVE', { exact: true })).toBeVisible()
   await expect(page.getByText('granite-3.2-8b-tools').first()).toBeVisible()
+  await expect(page.getByText('PROMPT IN')).toBeVisible()
+  await expect(page.getByText('DRAFT OUT')).toBeVisible()
+  await expect(page.getByText(/provisional hardware timing diagnosis/)).toBeVisible()
+  await expect(page).toHaveScreenshot('live-journey-llm-exchange.png', { fullPage: true })
   await expect(page.getByText('EVIDENCE POLICY')).toBeVisible()
   await page.getByRole('button', { name: 'Inspect technical topology' }).click()
   await expect(page.getByRole('dialog', { name: 'Technical topology detail' })).toBeVisible()

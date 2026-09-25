@@ -34,7 +34,22 @@ type Result = {
   proposed_action: string
   action_requires_human_approval: boolean
   action_executed: boolean
-  model_draft?: { status?: string; model?: string; runtime?: string; summary?: string; evidence_ids?: string[] }
+  model_draft?: {
+    status?: string
+    model?: string
+    runtime?: string
+    summary?: string
+    evidence_ids?: string[]
+    prompt?: {
+      instruction: string
+      evidence: {
+        hypothesis: { cause: string; supporting_evidence_ids: string[] }
+        current_observations: Observation[]
+        historical_context: HistoricalSource[]
+        unknowns: string[]
+      }
+    }
+  }
 }
 
 type ScenarioId = 'ptp-hardware' | 'ptp-platform'
@@ -239,7 +254,11 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
             <span>HUMAN AUTHORITY</span><strong>Review required</strong><small>No automated action</small>
           </motion.div>
           <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
-            <span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{hardware.model_draft?.runtime ? <><b>{hardware.model_draft.runtime}</b> · Draft checked against {hardware.model_draft.evidence_ids?.length ?? 0} evidence IDs.</> : <><b>LLM NOT CALLED</b> · The evidence decision is complete without inference.</>}</small>
+            <div className="llm-exchange-heading"><span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{hardware.model_draft?.runtime ?? 'The evidence decision is complete without inference.'}</small></div>
+            {hardware.model_draft?.prompt && hardware.model_draft.summary ? <div className="llm-exchange">
+              <section><span>PROMPT IN</span><strong>“Draft a brief explanation of the supplied hypothesis, using only the provided evidence.”</strong><small>{titleCase(hardware.model_draft.prompt.evidence.hypothesis.cause)} · current evidence: {hardware.model_draft.prompt.evidence.current_observations.map((item) => item.evidence_id).join(', ')} · approved history: {hardware.model_draft.prompt.evidence.historical_context.map((item) => item.evidence_id).join(', ') || 'none'} · provisional · human review · no action</small></section>
+              <section><span>DRAFT OUT</span><strong>{hardware.model_draft.summary}</strong><small>Cited evidence: {hardware.model_draft.evidence_ids?.join(', ') ?? 'none'} · unverified wording only</small></section>
+            </div> : <div className="llm-not-called"><b>LLM NOT CALLED</b><span>No prompt or draft was produced for this response.</span></div>}
           </motion.div>
         </div>}
 

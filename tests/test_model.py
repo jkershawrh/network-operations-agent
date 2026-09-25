@@ -17,6 +17,10 @@ class ModelTests(unittest.TestCase):
         original = investigate("ptp-hardware")
         enriched = add_model_draft(original, Draft())
         self.assertEqual(enriched["model_draft"]["status"], "unverified_draft_for_human_review")
+        self.assertEqual(enriched["model_draft"]["prompt"]["evidence"]["hypothesis"],
+                         original["primary_hypothesis"])
+        self.assertIn("using only the provided evidence",
+                      enriched["model_draft"]["prompt"]["instruction"])
         self.assertEqual(enriched["primary_hypothesis"], original["primary_hypothesis"])
         self.assertFalse(enriched["action_executed"])
         self.assertNotIn("model_draft", original)
@@ -87,6 +91,10 @@ class ModelTests(unittest.TestCase):
             self.assertEqual(observed["path"], "/v1/chat/completions")
             self.assertEqual(observed["authorization"], "Bearer test-key")
             self.assertEqual(observed["request"]["model"], "fixture-model")
+            self.assertEqual(
+                json.loads(observed["request"]["messages"][1]["content"]),
+                result["model_draft"]["prompt"]["evidence"],
+            )
             self.assertNotIn("test-key", str(result))
         finally:
             server.shutdown()
