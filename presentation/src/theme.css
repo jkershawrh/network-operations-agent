@@ -251,7 +251,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .scene:has(.operator-workspace) > h1,
 .scene:has(.operator-workspace) > .lede { display: none; }
 .scene:has(.operator-workspace) { width: min(1420px, 100%); }
-.operator-workspace { width: min(1420px, 100%); height: auto; max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr) 220px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
+.operator-workspace { width: min(1420px, 100%); min-height: min(520px, calc(100vh - 118px)); max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr) 220px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
 .workspace-rail { display: flex; flex-direction: column; padding: .75rem 0; border-right: 1px solid var(--border); background: #191919; }
 .rail-title { padding: .25rem .75rem .7rem; color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .1em; }
 .workspace-rail button { display: grid; grid-template-columns: 25px 1fr; align-items: center; gap: .5rem; min-height: 46px; padding: .45rem .65rem; color: var(--text-disabled); background: transparent; border: 0; border-left: 3px solid transparent; text-align: left; font-size: .68rem; cursor: default; }
@@ -277,7 +277,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .workspace-state.running i { animation: livePulse .8s infinite alternate; }
 @keyframes livePulse { to { opacity: .25; } }
 .workspace-explanation { min-height: 38px; margin: .65rem 0; color: var(--text-secondary); font-size: .76rem; line-height: 1.4; }
-.incident-intake, .decision-board, .authority-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; align-content: start; }
+.incident-intake, .decision-board, .authority-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; flex: 1; align-content: stretch; }
 .incident-intake > div, .decision-board > div, .authority-board > div { min-width: 0; display: grid; align-content: center; gap: .45rem; min-height: 145px; padding: .9rem; border-top: 3px solid var(--border); background: var(--surface-2); }
 .incident-intake > div:nth-child(1) { border-color: var(--rh-red); }
 .incident-intake > div:nth-child(2), .decision-board > div:nth-child(1) { border-color: var(--intel-cyan); }
@@ -340,7 +340,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .activity-rail li.done::before { background: var(--success); }
 .activity-rail li b { font-size: .66rem; }
 .activity-rail li small { font-size: .57rem; }
-.how-it-works { margin-top: .85rem; padding: .65rem; border-left: 2px solid var(--intel-cyan); background: var(--surface-2); }
+.how-it-works { margin-top: auto; padding: .65rem; border-left: 2px solid var(--intel-cyan); background: var(--surface-2); }
 .how-it-works span { color: var(--intel-cyan); font: 700 .55rem 'Red Hat Mono'; }
 .how-it-works p { margin: .35rem 0 0; color: var(--text-dim); font-size: .6rem; line-height: 1.4; }
 .topology-drawer { position: fixed; inset: 58px 0 0; z-index: 20; display: grid; align-content: center; padding: 3rem; background: rgba(21, 21, 21, .97); }
@@ -484,7 +484,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .scene:has(.operator-workspace) > .eyebrow,
   .scene:has(.operator-workspace) > h1,
   .scene:has(.operator-workspace) > .lede { display: block; }
-  .operator-workspace { height: auto; grid-template-columns: 1fr; overflow: visible; }
+  .operator-workspace { height: auto; min-height: 0; grid-template-columns: 1fr; overflow: visible; }
   .workspace-rail { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
   .rail-title, .checkpoint-count { display: none; }
   .workspace-rail button { min-width: 120px; border-left: 0; border-bottom: 3px solid transparent; }
