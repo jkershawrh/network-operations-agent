@@ -250,7 +250,8 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .scene:has(.operator-workspace) > .eyebrow,
 .scene:has(.operator-workspace) > h1,
 .scene:has(.operator-workspace) > .lede { display: none; }
-.operator-workspace { width: min(1420px, 100%); height: min(720px, calc(100vh - 118px)); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr) 220px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
+.scene:has(.operator-workspace) { width: min(1420px, 100%); }
+.operator-workspace { width: min(1420px, 100%); height: auto; max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr) 220px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
 .workspace-rail { display: flex; flex-direction: column; padding: .75rem 0; border-right: 1px solid var(--border); background: #191919; }
 .rail-title { padding: .25rem .75rem .7rem; color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .1em; }
 .workspace-rail button { display: grid; grid-template-columns: 25px 1fr; align-items: center; gap: .5rem; min-height: 46px; padding: .45rem .65rem; color: var(--text-disabled); background: transparent; border: 0; border-left: 3px solid transparent; text-align: left; font-size: .68rem; cursor: default; }
@@ -276,14 +277,14 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .workspace-state.running i { animation: livePulse .8s infinite alternate; }
 @keyframes livePulse { to { opacity: .25; } }
 .workspace-explanation { min-height: 38px; margin: .65rem 0; color: var(--text-secondary); font-size: .76rem; line-height: 1.4; }
-.incident-intake, .decision-board, .authority-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; flex: 1; align-content: center; }
+.incident-intake, .decision-board, .authority-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; align-content: start; }
 .incident-intake > div, .decision-board > div, .authority-board > div { min-width: 0; display: grid; align-content: center; gap: .45rem; min-height: 145px; padding: .9rem; border-top: 3px solid var(--border); background: var(--surface-2); }
 .incident-intake > div:nth-child(1) { border-color: var(--rh-red); }
 .incident-intake > div:nth-child(2), .decision-board > div:nth-child(1) { border-color: var(--intel-cyan); }
 .incident-intake > div:nth-child(3), .decision-board > div:nth-child(3), .authority-stop { border-color: var(--success) !important; }
 .incident-intake strong, .decision-board strong, .authority-board strong { overflow-wrap: anywhere; font-size: .9rem; line-height: 1.3; }
 .incident-intake small, .decision-board small, .authority-board small { color: var(--text-dim); font-size: .65rem; line-height: 1.35; }
-.decision-transform { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: .5rem; flex: 1; align-content: center; }
+.decision-transform { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: .5rem; align-content: start; }
 .decision-stage { min-width: 0; min-height: 125px; display: grid; align-content: center; gap: .45rem; padding: .85rem; border-top: 3px solid var(--intel-cyan); background: var(--surface-2); }
 .decision-stage span, .llm-bypass span { color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .08em; }
 .decision-stage strong { font-size: .9rem; overflow-wrap: anywhere; }
@@ -294,14 +295,14 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .decision-arrow { color: var(--intel-cyan); font: 700 1rem 'Red Hat Mono'; }
 .llm-bypass { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(180px, .45fr) 1fr; align-items: center; gap: .8rem; padding: .65rem .8rem; border: 1px dashed var(--text-disabled); background: #191919; }
 .llm-bypass span { color: var(--warning); }
-.agent-run { display: grid; grid-template-columns: repeat(7, auto); align-items: center; justify-content: center; gap: .45rem; flex: 1; }
+.agent-run { display: grid; grid-template-columns: repeat(7, auto); align-items: center; justify-content: center; gap: .45rem; }
 .agent-run > div { width: 125px; min-height: 120px; display: grid; align-content: center; gap: .35rem; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
 .agent-run > div.running { border-color: var(--intel-cyan); background: var(--intel-cyan-dim); }
 .agent-run span { color: var(--intel-cyan); font: 700 .6rem 'Red Hat Mono'; }
 .agent-run strong { font-size: .76rem; }
 .agent-run small { color: var(--text-dim); font-size: .62rem; }
 .agent-run > b, .change-arrow { color: var(--intel-cyan); font: 700 .65rem 'Red Hat Mono'; }
-.evidence-list, .history-list { display: grid; gap: .55rem; flex: 1; align-content: center; }
+.evidence-list, .history-list { display: grid; gap: .55rem; align-content: start; }
 .evidence-list article, .history-list article { display: grid; grid-template-columns: 120px minmax(0, 1fr) minmax(180px, .7fr); align-items: center; gap: .75rem; padding: .7rem .8rem; border-left: 3px solid var(--border); background: var(--surface-2); }
 .evidence-list article.supporting { border-left-color: var(--success); }
 .evidence-list span, .history-list span { color: var(--intel-cyan); font: 700 .6rem 'Red Hat Mono'; text-transform: uppercase; }
@@ -310,7 +311,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .history-list article { grid-template-columns: 170px 1fr; }
 .authority-board > div { grid-column: span 3; min-height: auto; grid-template-columns: 175px 1fr; align-items: center; }
 .authority-board .authority-stop { grid-column: span 3; grid-template-columns: 175px 1fr auto; }
-.condition-change, .comparison-workspace { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; flex: 1; }
+.condition-change, .comparison-workspace { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
 .condition-change > div:not(.change-arrow), .comparison-workspace article { display: grid; gap: .5rem; min-height: 155px; align-content: center; padding: 1rem; border: 1px solid var(--border); background: var(--surface-2); }
 .condition-change .prior { border-color: var(--success); }
 .condition-change .next { border-color: var(--intel-cyan); }
@@ -323,7 +324,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .comparison-workspace article > strong { color: var(--success); font: 700 1.25rem 'Red Hat Display'; }
 .comparison-workspace article > div { color: var(--text-secondary); font-size: .7rem; }
 .comparison-workspace b { color: var(--intel-cyan); font: 700 .95rem 'Red Hat Mono'; }
-.workspace-footer { margin-top: auto; display: grid; gap: .55rem; }
+.workspace-footer { margin-top: .75rem; display: grid; gap: .55rem; }
 .runtime-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
 .runtime-strip span { display: grid; gap: .15rem; padding: .45rem .55rem; color: var(--text-disabled); background: #191919; font: 700 .5rem 'Red Hat Mono'; }
 .runtime-strip b { color: var(--text-secondary); font-size: .58rem; overflow-wrap: anywhere; }
@@ -339,7 +340,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .activity-rail li.done::before { background: var(--success); }
 .activity-rail li b { font-size: .66rem; }
 .activity-rail li small { font-size: .57rem; }
-.how-it-works { margin-top: auto; padding: .65rem; border-left: 2px solid var(--intel-cyan); background: var(--surface-2); }
+.how-it-works { margin-top: .85rem; padding: .65rem; border-left: 2px solid var(--intel-cyan); background: var(--surface-2); }
 .how-it-works span { color: var(--intel-cyan); font: 700 .55rem 'Red Hat Mono'; }
 .how-it-works p { margin: .35rem 0 0; color: var(--text-dim); font-size: .6rem; line-height: 1.4; }
 .topology-drawer { position: fixed; inset: 58px 0 0; z-index: 20; display: grid; align-content: center; padding: 3rem; background: rgba(21, 21, 21, .97); }
