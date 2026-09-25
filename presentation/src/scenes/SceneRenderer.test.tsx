@@ -66,7 +66,7 @@ describe('SceneRenderer', () => {
     fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
     await screen.findByText('What did the systems report?')
     expect(screen.getByText('nic timestamp fault · present')).toBeInTheDocument()
-    expect(screen.getByText(/Subsequent steps inspect sections of that same response/)).toBeInTheDocument()
+    expect(screen.getByText(/Each checkpoint inspects the same evidence record/)).toBeInTheDocument()
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(2))
   })
 
@@ -87,9 +87,9 @@ describe('SceneRenderer', () => {
     const scene = scenes.find((item) => item.type === 'guided-architecture')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByText('What exactly happened?')).toBeInTheDocument()
-    expect(screen.queryByText('A validated synthetic event starts the investigation.')).not.toBeInTheDocument()
+    expect(screen.queryByText('A validated event starts the investigation.')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
-    expect(await screen.findByText('A validated synthetic event starts the investigation.')).toBeInTheDocument()
+    expect(await screen.findByText('A validated event starts the investigation.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Ask next question →' }))
     expect(await screen.findByText('What do the systems show right now?')).toBeInTheDocument()
   })
@@ -139,7 +139,22 @@ describe('SceneRenderer', () => {
     expect(await screen.findByText('AGENT ORCHESTRATES')).toBeInTheDocument()
     expect(screen.getByText('POLICY DECIDES')).toBeInTheDocument()
     expect(screen.getByText('LLM NOT CALLED')).toBeInTheDocument()
+    expect(screen.getByText('INTEL CPU TARGET')).toBeInTheDocument()
+    expect(screen.getByText('Not configured on Flightpath')).toBeInTheDocument()
     expect(screen.getByText('HUMAN ACTS')).toBeInTheDocument()
+  })
+
+  it('includes the optional CPU explanation boundary in guided architecture', async () => {
+    const scene = scenes.find((item) => item.type === 'guided-architecture')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    const nextQuestions = ['What do the systems show right now?', 'Has this happened before?', 'Which cause is supported?', 'Where can CPU inference help?']
+    for (const question of nextQuestions) {
+      fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Ask next question →' }))
+      expect(await screen.findByText(question)).toBeInTheDocument()
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
+    expect(await screen.findByText('An optional Granite model can draft operator wording after the evidence decision.')).toBeInTheDocument()
   })
 
   it('renders the custom React scene escape hatch', () => {

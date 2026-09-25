@@ -46,7 +46,7 @@ export function TechnicalTopology({ activeThrough = 'idle', activeIds, running }
           <Node id="operator" kind="authority" title="Human review" detail="zero remediation executed" active={on('operator')} running={running} />
         </div>
       </div>
-      <div className="topology-optional-path"><Edge label="OpenAI-compatible API" active={false} dashed /><Node id="model" kind="external" title="Optional model" detail="wording only · no new evidence or authority" active={false} /></div>
+      <div className="topology-optional-path"><Edge label="OpenAI-compatible API" active={false} dashed /><Node id="model" kind="external" title="Optional Intel CPU target" detail="Granite wording only · live placement unverified" active={false} /></div>
     </div>
   </div>
 }

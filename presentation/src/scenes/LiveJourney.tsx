@@ -49,14 +49,14 @@ const phases: Array<{
   cta: string
   lane: 'workload' | 'agent' | 'decision'
 }> = [
-  { id: 'ready', label: 'Incident intake', kicker: 'What entered the system?', explanation: 'Verify the deployed application and its approved diagnostic boundary before submitting the synthetic PTP alarm.', cta: 'Verify Flightpath readiness', lane: 'workload' },
-  { id: 'run-hardware', label: 'Run investigation', kicker: 'What is running now?', explanation: 'Submit the hardware-signal scenario once. The Network Operations agent collects current diagnostics, retrieves approved context, applies evidence policy, and returns one bounded investigation record.', cta: 'Investigate hardware signal', lane: 'agent' },
-  { id: 'observations', label: 'Current diagnostics', kicker: 'What did the systems report?', explanation: 'Inspect the completed response. These observations describe the current incident and retain the diagnostic scope, collection time, and source provenance.', cta: 'Inspect approved history', lane: 'workload' },
-  { id: 'history', label: 'Historical context', kicker: 'What context was retrieved?', explanation: 'Versioned synthetic cases and runbooks add context. They remain visually and logically separate from current observations.', cta: 'Evaluate the evidence', lane: 'agent' },
-  { id: 'decision', label: 'Evidence decision', kicker: 'Why this cause?', explanation: 'Deterministic policy selects a cause only when the current evidence supports it. Optional model wording cannot change the evidence IDs or hypothesis.', cta: 'Review the authority boundary', lane: 'decision' },
-  { id: 'authority', label: 'Human authority', kicker: 'Where does the agent stop?', explanation: 'The agent recommends the next discriminating test, but executes nothing. A qualified operator owns the next action.', cta: 'Change the incident condition', lane: 'decision' },
-  { id: 'run-platform', label: 'Changed condition', kicker: 'Does the diagnosis follow the evidence?', explanation: 'Run the same workflow with a platform timing signal. The architecture and policy stay fixed; only the observed condition changes.', cta: 'Investigate platform signal', lane: 'agent' },
-  { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'Compare both completed live responses. The alarm class is the same, but the supporting evidence leads to a different cause while the no-action boundary remains intact.', cta: 'Open guided investigation', lane: 'decision' },
+  { id: 'ready', label: 'Incident intake', kicker: 'What entered the system?', explanation: 'Verify the deployed boundary before submitting the alarm.', cta: 'Verify Flightpath readiness', lane: 'workload' },
+  { id: 'run-hardware', label: 'Run investigation', kicker: 'What is running now?', explanation: 'The agent collects diagnostics, retrieves context, and applies evidence policy.', cta: 'Investigate hardware signal', lane: 'agent' },
+  { id: 'observations', label: 'Current diagnostics', kicker: 'What did the systems report?', explanation: 'Current observations retain scope, time, and provenance.', cta: 'Inspect approved history', lane: 'workload' },
+  { id: 'history', label: 'Historical context', kicker: 'What context was retrieved?', explanation: 'Versioned cases add context—not proof.', cta: 'Evaluate the evidence', lane: 'agent' },
+  { id: 'decision', label: 'Evidence decision', kicker: 'Why this cause?', explanation: 'Policy selects a supported cause; CPU inference is optional wording only.', cta: 'Review the authority boundary', lane: 'decision' },
+  { id: 'authority', label: 'Human authority', kicker: 'Where does the agent stop?', explanation: 'The agent recommends. The operator acts.', cta: 'Change the incident condition', lane: 'decision' },
+  { id: 'run-platform', label: 'Changed condition', kicker: 'Does the diagnosis follow the evidence?', explanation: 'Change the signal; keep the workflow and policy fixed.', cta: 'Investigate platform signal', lane: 'agent' },
+  { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'The same alarm produced two evidence-backed causes and no automated action.', cta: 'Open guided investigation', lane: 'decision' },
 ]
 
 const audienceActs = [
@@ -206,7 +206,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
             <span>HUMAN ACTS</span><strong>Review required</strong><small>No remediation executed</small>
           </motion.div>
           <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
-            <span>LLM NOT CALLED</span><strong>The evidence policy did not need model inference.</strong><small>An optional draft may explain a result, but cannot add evidence, change the cause, or authorize action.</small>
+            <span>INTEL CPU TARGET</span><strong>{hardware.model_draft ? 'Optional model returned a draft' : 'Not configured on Flightpath'}</strong><small><b>LLM NOT CALLED</b> · The evidence decision is complete without inference. A future CPU-hosted draft may explain it, never change it.</small>
           </motion.div>
         </div>}
 
@@ -233,7 +233,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           <div className="runtime-strip">
             <span>WORKLOAD <b>{currentResult?.alarm_id ?? 'awaiting input'}</b></span>
             <span>AGENT <b>{currentResult ? 'investigation complete' : status === 'running' ? 'running' : 'ready'}</b></span>
-            <span>LLM <b>{currentResult?.model_draft?.model ?? (currentResult ? 'NOT CALLED · policy path' : 'not required')}</b></span>
+            <span>CPU / LLM <b>{currentResult?.model_draft?.model ?? (currentResult ? 'NOT CONFIGURED · optional path' : 'awaiting response')}</b></span>
             <span>SOURCE <b>{currentResult ? 'LIVE · Flightpath' : 'not collected'}</b></span>
           </div>
           {error && <div className="error-panel">Live operation stopped: {error}</div>}
@@ -255,7 +255,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           <li className={phaseIndex >= 4 ? 'done' : ''}><b>Evidence policy</b><small>{currentEvidence ? titleCase(currentEvidence.cause) : 'Awaiting evidence'}</small></li>
           <li className={phaseIndex >= 5 ? 'done' : ''}><b>Human boundary</b><small>No action executed</small></li>
         </ol>
-        <div className="how-it-works"><span>HOW IT WORKS</span><p>The API completed one bounded investigation. Subsequent steps inspect sections of that same response; they do not pretend to launch additional backend work.</p></div>
+        <div className="how-it-works"><span>ONE LIVE RESPONSE</span><p>Each checkpoint inspects the same evidence record.</p></div>
       </aside>
     </div>
     {showTopology && <div className="topology-drawer"><TechnicalTopology activeIds={['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator']} running={status === 'running'} /></div>}
