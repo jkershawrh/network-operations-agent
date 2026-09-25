@@ -198,6 +198,7 @@ components:
         status: {type: string, enum: [unverified_draft_for_human_review, unavailable_or_rejected, skipped_inconclusive]}
         summary: {type: string}
         evidence_ids: {type: array, items: {type: string}}
+        latency_ms: {type: integer, minimum: 0}
         model: {type: string}
         runtime: {type: string}
         prompt:
@@ -215,7 +216,7 @@ components:
                 unknowns: {type: array, items: {type: string}}
     Investigation:
       type: object
-      required: [schema_version, investigation_id, alarm_id, current_observations_with_tool_provenance, historical_context_with_source_revision, primary_hypothesis, alternate_hypotheses, unknowns_and_conflicts, next_discriminating_test, proposed_action, action_requires_human_approval, action_executed, mode]
+      required: [schema_version, investigation_id, alarm_id, current_observations_with_tool_provenance, historical_context_with_source_revision, decision_policy, primary_hypothesis, alternate_hypotheses, unknowns_and_conflicts, next_discriminating_test, proposed_action, action_requires_human_approval, action_executed, mode]
       properties:
         schema_version: {type: string}
         investigation_id: {type: string}
@@ -226,6 +227,14 @@ components:
         historical_context_with_source_revision:
           type: array
           items: {$ref: '#/components/schemas/HistoricalContext'}
+        decision_policy:
+          type: object
+          required: [name, version, source, rule]
+          properties:
+            name: {type: string}
+            version: {type: string}
+            source: {type: string}
+            rule: {type: string}
         primary_hypothesis: {$ref: '#/components/schemas/Hypothesis'}
         alternate_hypotheses: {type: array, items: {type: string}}
         unknowns_and_conflicts: {type: array, items: {type: string}}

@@ -21,6 +21,8 @@ class ModelTests(unittest.TestCase):
                          original["primary_hypothesis"])
         self.assertIn("using only the provided evidence",
                       enriched["model_draft"]["prompt"]["instruction"])
+        self.assertIsInstance(enriched["model_draft"]["latency_ms"], int)
+        self.assertGreaterEqual(enriched["model_draft"]["latency_ms"], 0)
         self.assertEqual(enriched["primary_hypothesis"], original["primary_hypothesis"])
         self.assertFalse(enriched["action_executed"])
         self.assertNotIn("model_draft", original)

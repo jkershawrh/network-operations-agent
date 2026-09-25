@@ -27,6 +27,7 @@ type Result = {
   mode?: string
   current_observations_with_tool_provenance: Observation[]
   historical_context_with_source_revision: HistoricalSource[]
+  decision_policy: { name: string; version: string; source: string; rule: string }
   primary_hypothesis: { cause: string; supporting_evidence_ids: string[] }
   alternate_hypotheses: string[]
   unknowns_and_conflicts: string[]
@@ -40,6 +41,7 @@ type Result = {
     runtime?: string
     summary?: string
     evidence_ids?: string[]
+    latency_ms?: number
     prompt?: {
       instruction: string
       evidence: {
@@ -151,6 +153,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
       model: result.model_draft?.model,
       modelRuntime: result.model_draft?.runtime,
       modelStatus: result.model_draft?.status,
+      modelLatencyMs: result.model_draft?.latency_ms,
       latencyMs,
       collectedAt: new Date().toISOString(),
     })
@@ -247,14 +250,14 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           </motion.div>
           <div className="decision-arrow">→</div>
           <motion.div className="decision-stage policy" initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .12 }}>
-            <span>EVIDENCE POLICY</span><strong>{titleCase(hardware.primary_hypothesis.cause)}</strong><small>{hardware.primary_hypothesis.supporting_evidence_ids.length} observations support this cause</small>
+            <span>DETERMINISTIC POLICY</span><strong>{titleCase(hardware.primary_hypothesis.cause)}</strong><small>{hardware.decision_policy.name}/{hardware.decision_policy.version} · {hardware.primary_hypothesis.supporting_evidence_ids.length} fault supports this cause</small><small>{hardware.decision_policy.rule}</small><em>{hardware.decision_policy.source} · reviewed code, not learned by the LLM</em>
           </motion.div>
           <div className="decision-arrow">→</div>
           <motion.div className="decision-stage human" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .24 }}>
             <span>HUMAN AUTHORITY</span><strong>Review required</strong><small>No automated action</small>
           </motion.div>
           <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
-            <div className="llm-exchange-heading"><span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{hardware.model_draft?.runtime ?? 'The evidence decision is complete without inference.'}</small></div>
+            <div className="llm-exchange-heading"><span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{hardware.model_draft?.runtime ?? 'The evidence decision is complete without inference.'}{hardware.model_draft?.latency_ms !== undefined ? ` · ${hardware.model_draft.latency_ms}ms inference` : ''}</small></div>
             {hardware.model_draft?.prompt && hardware.model_draft.summary ? <div className="llm-exchange">
               <section><span>PROMPT IN</span><strong>“Draft a brief explanation of the supplied hypothesis, using only the provided evidence.”</strong><small>{titleCase(hardware.model_draft.prompt.evidence.hypothesis.cause)} · current evidence: {hardware.model_draft.prompt.evidence.current_observations.map((item) => item.evidence_id).join(', ')} · approved history: {hardware.model_draft.prompt.evidence.historical_context.map((item) => item.evidence_id).join(', ') || 'none'} · provisional · human review · no action</small></section>
               <section><span>DRAFT OUT</span><strong>{hardware.model_draft.summary}</strong><small>Cited evidence: {hardware.model_draft.evidence_ids?.join(', ') ?? 'none'} · unverified wording only</small></section>
@@ -266,12 +269,19 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           <div className="comparison-thesis"><span>SAME ALARM</span><strong>PTP synchronization degraded</strong><small>Evidence—not the label—changed the decision.</small></div>
           {[{ label: 'Hardware signal', evidence: hardwareEvidence, result: hardware }, { label: 'Platform signal', evidence: platformEvidence, result: platform }].map((item) => <article key={item.evidence.scenarioId}>
             <span>{item.label}</span><strong>{titleCase(item.evidence.cause)}</strong>
+            <div className="comparison-journey" aria-label={`${item.label} journey from alarm to human review`}>
+              <div><b>1</b><span>ALARM</span><small>{item.result.alarm_id}</small></div>
+              <i>→</i><div><b>2</b><span>EVIDENCE</span><small>{item.evidence.observationCount} observations</small></div>
+              <i>→</i><div><b>3</b><span>POLICY</span><small>{item.result.decision_policy.name}/{item.result.decision_policy.version}</small></div>
+              <i>→</i><div><b>4</b><span>LLM DRAFT</span><small>{item.evidence.modelLatencyMs !== undefined ? `${item.evidence.modelLatencyMs}ms` : 'not called'}</small></div>
+              <i>→</i><div><b>5</b><span>HUMAN REVIEW</span><small>no action</small></div>
+            </div>
             <div className="comparison-evidence-log" aria-label={`${item.label} evidence records`}>
               {item.result.current_observations_with_tool_provenance.map((observation) => <code className={item.result.primary_hypothesis.supporting_evidence_ids.includes(observation.evidence_id) ? 'supporting' : ''} key={observation.evidence_id}>
                 <b>{observedTime(observation.observed_at)}</b><span>{observationTitle(observation)}</span><em>{observationState(observation)}</em>
               </code>)}
             </div>
-            <small>Supported by {item.evidence.supportingEvidenceIds.join(', ')} · no automated action</small>
+            <small>Supported by {item.evidence.supportingEvidenceIds.join(', ')} · {item.evidence.latencyMs}ms alarm-to-review · no automated action</small>
           </article>)}
         </div>}
 

@@ -8,6 +8,7 @@ export type InvestigationEvidence = {
   model?: string
   modelRuntime?: string
   modelStatus?: string
+  modelLatencyMs?: number
   latencyMs: number
   collectedAt: string
 }

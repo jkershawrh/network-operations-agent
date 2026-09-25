@@ -11,6 +11,10 @@ class InvestigationTests(unittest.TestCase):
         self.assertTrue(result["action_requires_human_approval"])
         self.assertFalse(result["action_executed"])
         self.assertNotIn("upstream_timing", result["alternate_hypotheses"])
+        self.assertEqual(result["decision_policy"]["name"], "single-present-cause")
+        self.assertEqual(result["decision_policy"]["version"], "v1")
+        self.assertEqual(result["decision_policy"]["source"], "checked-in application rule")
+        self.assertIn("exactly one mapped fault", result["decision_policy"]["rule"])
 
     def test_distinguishes_platform_scenario(self):
         result = investigate("ptp-platform")

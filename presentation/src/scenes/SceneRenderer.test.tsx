@@ -63,6 +63,7 @@ describe('SceneRenderer', () => {
       investigation_id: 'run-1', alarm_id: 'synthetic-ptp-001', mode: 'deterministic_fixture_proof',
       current_observations_with_tool_provenance: [{ evidence_id: 'hardware-1', scope: 'hardware', signal: 'nic_timestamp_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'fixture-v1' }],
       historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'ptp-runbook', source_revision: 'v1', excerpt: 'Compare current signals.' }],
+      decision_policy: { name: 'single-present-cause', version: 'v1', source: 'checked-in application rule', rule: 'Exactly one mapped fault is required.' },
       primary_hypothesis: { cause: 'hardware_timing', supporting_evidence_ids: ['hardware-1'] }, alternate_hypotheses: ['platform_timing'], unknowns_and_conflicts: [],
       next_discriminating_test: 'Compare lock state', proposed_action: 'Have an operator review', action_requires_human_approval: true, action_executed: false,
     }
@@ -140,6 +141,7 @@ describe('SceneRenderer', () => {
       investigation_id: 'run-1', alarm_id: 'synthetic-ptp-001', mode: 'deterministic_fixture_proof',
       current_observations_with_tool_provenance: [{ evidence_id: 'hardware-1', scope: 'hardware', signal: 'nic_timestamp_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'fixture-v1' }],
       historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'ptp-runbook', source_revision: 'v1', excerpt: 'Compare current signals.' }],
+      decision_policy: { name: 'single-present-cause', version: 'v1', source: 'checked-in application rule', rule: 'Exactly one mapped fault is required.' },
       primary_hypothesis: { cause: 'hardware_timing', supporting_evidence_ids: ['hardware-1'] }, alternate_hypotheses: ['platform_timing'], unknowns_and_conflicts: [],
       next_discriminating_test: 'Compare lock state', proposed_action: 'Have an operator review', action_requires_human_approval: true, action_executed: false,
     }
@@ -152,7 +154,8 @@ describe('SceneRenderer', () => {
     await screen.findByText('What did the agent find?')
     fireEvent.click(screen.getByRole('button', { name: /Follow the evidence/ }))
     expect(await screen.findByText('AGENT')).toBeInTheDocument()
-    expect(screen.getByText('EVIDENCE POLICY')).toBeInTheDocument()
+    expect(screen.getByText('DETERMINISTIC POLICY')).toBeInTheDocument()
+    expect(screen.getByText(/reviewed code, not learned by the LLM/)).toBeInTheDocument()
     expect(screen.getByText('LLM NOT CALLED')).toBeInTheDocument()
     expect(screen.getByText('INTEL CPU TARGET')).toBeInTheDocument()
     expect(screen.getByText('Not configured in this environment')).toBeInTheDocument()

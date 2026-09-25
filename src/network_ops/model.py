@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from time import perf_counter
 from typing import Protocol
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
@@ -98,7 +99,9 @@ def add_model_draft(result: dict, model: ModelClient) -> dict:
     )}
     supporting = set(result["primary_hypothesis"]["supporting_evidence_ids"])
     try:
+        started_at = perf_counter()
         draft = model.draft(result)
+        latency_ms = max(0, round((perf_counter() - started_at) * 1000))
         if not isinstance(draft, dict) or set(draft) != {"summary", "evidence_ids"}:
             raise ValueError("Invalid draft shape")
         summary, cited = draft["summary"], draft["evidence_ids"]
@@ -112,6 +115,7 @@ def add_model_draft(result: dict, model: ModelClient) -> dict:
             "status": "unverified_draft_for_human_review",
             "summary": summary,
             "evidence_ids": cited,
+            "latency_ms": latency_ms,
             "prompt": {
                 "instruction": MODEL_INSTRUCTION,
                 "evidence": build_model_prompt(result),

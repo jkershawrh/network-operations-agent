@@ -27,6 +27,15 @@ SIGNAL_CAUSES = {
     "upstream_timing_fault": "upstream_timing",
 }
 DEFAULT_SCOPES = ("network", "openshift_platform", "hardware")
+DECISION_POLICY = {
+    "name": "single-present-cause",
+    "version": "v1",
+    "source": "checked-in application rule",
+    "rule": (
+        "Require every declared diagnostic scope. Support a cause only when exactly "
+        "one mapped fault is present; otherwise return inconclusive."
+    ),
+}
 
 
 def _stable_id(alarm: dict) -> str:
@@ -156,6 +165,7 @@ def investigate(
         "alarm_id": alarm["alarm_id"],
         "current_observations_with_tool_provenance": observations,
         "historical_context_with_source_revision": context,
+        "decision_policy": dict(DECISION_POLICY),
         "primary_hypothesis": {"cause": cause, "supporting_evidence_ids": support},
         "alternate_hypotheses": (
             relevant_causes if cause == "inconclusive"

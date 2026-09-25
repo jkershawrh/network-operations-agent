@@ -65,10 +65,11 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
         { evidence_id: 'control-1', scope: hardware ? 'openshift_platform' : 'hardware', signal: hardware ? 'platform_timing_fault' : 'nic_timestamp_fault', state: 'absent', observed_at: '2026-09-22T08:01:00Z', provenance: 'live-test' },
       ],
       historical_context_with_source_revision: [{ evidence_id: 'knowledge-1', source_id: 'runbook', source_revision: 'v1', excerpt: 'Compare current timing signals before assigning a cause.' }],
+      decision_policy: { name: 'single-present-cause', version: 'v1', source: 'checked-in application rule', rule: 'Require every declared diagnostic scope. Support a cause only when exactly one mapped fault is present; otherwise return inconclusive.' },
       primary_hypothesis: { cause: hardware ? 'hardware_timing' : 'platform_timing', supporting_evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'] },
       alternate_hypotheses: [hardware ? 'platform_timing' : 'hardware_timing'], unknowns_and_conflicts: [], next_discriminating_test: 'Compare synchronized events', proposed_action: 'Have an operator review the evidence', action_requires_human_approval: true, action_executed: false,
       model_draft: {
-        status: 'unverified_draft_for_human_review', model: 'granite-3.2-8b-tools', runtime: 'Intel Xeon 6767P',
+        status: 'unverified_draft_for_human_review', model: 'granite-3.2-8b-tools', runtime: 'Intel Xeon 6767P', latency_ms: hardware ? 10119 : 11677,
         summary: hardware ? 'Current NIC timestamp evidence supports a provisional hardware timing diagnosis for operator review.' : 'Current platform timing evidence supports a provisional host timing diagnosis for operator review.',
         evidence_ids: [hardware ? 'hardware-1' : 'openshift_platform-1'],
         prompt: {
@@ -108,7 +109,9 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   await expect(page.getByText('DRAFT OUT')).toBeVisible()
   await expect(page.getByText(/provisional hardware timing diagnosis/)).toBeVisible()
   await expect(page).toHaveScreenshot('live-journey-llm-exchange.png', { fullPage: true })
-  await expect(page.getByText('EVIDENCE POLICY')).toBeVisible()
+  await expect(page.getByText('DETERMINISTIC POLICY')).toBeVisible()
+  await expect(page.getByText(/single-present-cause\/v1/)).toBeVisible()
+  await expect(page.getByText(/reviewed code, not learned by the LLM/)).toBeVisible()
   await page.getByRole('button', { name: 'Inspect technical topology' }).click()
   await expect(page.getByRole('dialog', { name: 'Technical topology detail' })).toBeVisible()
   await expect(page.locator('[data-node="policy"]')).toHaveClass(/focus/)
@@ -128,6 +131,9 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
   await expect(page.getByLabel('Platform signal evidence records')).toContainText('Platform timing service')
   await expect(page.getByLabel('Platform signal evidence records')).toContainText('FAULT DETECTED')
   await expect(page.getByText(/Evidence—not the label—changed the decision/)).toBeVisible()
+  await expect(page.getByLabel('Hardware signal journey from alarm to human review')).toContainText('10119ms')
+  await expect(page.getByLabel('Platform signal journey from alarm to human review')).toContainText('11677ms')
+  await expect(page.getByText(/alarm-to-review/).first()).toBeVisible()
   await expect(page).toHaveScreenshot('live-journey-comparison.png', { fullPage: true })
   await expect(page).toHaveURL(/act=2/)
   await page.goto('/?act=4&scene=0')
