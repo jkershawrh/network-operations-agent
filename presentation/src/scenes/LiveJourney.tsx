@@ -56,7 +56,7 @@ const phases: Array<{
   { id: 'decision', label: 'Evidence decision', kicker: 'Why this cause?', explanation: 'Policy selects a supported cause; CPU inference is optional wording only.', cta: 'Review the authority boundary', lane: 'decision' },
   { id: 'authority', label: 'Human authority', kicker: 'Where does the agent stop?', explanation: 'The agent recommends. The operator acts.', cta: 'Change the incident condition', lane: 'decision' },
   { id: 'run-platform', label: 'Changed condition', kicker: 'Does the diagnosis follow the evidence?', explanation: 'Change the signal; keep the workflow and policy fixed.', cta: 'Investigate platform signal', lane: 'agent' },
-  { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'The same alarm produced two evidence-backed causes and no automated action.', cta: 'Open guided investigation', lane: 'decision' },
+  { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'The same alarm produced two evidence-backed causes and no automated action.', cta: '', lane: 'decision' },
 ]
 
 const audienceActs = [
@@ -144,10 +144,6 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
         await runRequest('ptp-platform')
       }
 
-      if (phase.id === 'compare') {
-        window.location.assign('/')
-        return
-      }
       setPhaseIndex((current) => Math.min(current + 1, phases.length - 1))
       setStatus(phaseIndex >= phases.length - 2 ? 'complete' : 'paused')
     } catch (cause) {
@@ -270,7 +266,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           {error && <div className="error-panel">Live operation stopped: {error}</div>}
           <div className="workspace-actions">
             <button className="button button-secondary" onClick={() => setShowTopology((value) => !value)}>{showTopology ? 'Hide' : 'Inspect'} technical topology</button>
-            {phase.id === 'compare' ? <a className="button button-primary journey-link" href="/">{phase.cta} →</a> : <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running on Flightpath…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button>}
+            {phase.id !== 'compare' && <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running on Flightpath…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button>}
             {phaseIndex > 0 && <button className="button button-quiet" onClick={reset}>Restart proof</button>}
           </div>
         </div>
