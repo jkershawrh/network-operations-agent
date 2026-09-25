@@ -55,7 +55,7 @@ type Result = {
 }
 
 type ScenarioId = 'ptp-hardware' | 'ptp-platform'
-type Phase = 'alarm' | 'investigate' | 'decide' | 'compare'
+type Phase = 'alarm' | 'investigate' | 'decide' | 'compare' | 'summary'
 type Status = 'idle' | 'running' | 'paused' | 'complete' | 'error'
 
 const phases: Array<{
@@ -68,15 +68,17 @@ const phases: Array<{
 }> = [
   { id: 'alarm', label: 'Alarm', kicker: 'What happened?', explanation: 'One PTP alarm can point to hardware or platform timing.', cta: 'Run live investigation', lane: 'workload' },
   { id: 'investigate', label: 'Investigate', kicker: 'What did the agent find?', explanation: 'The agent collected current diagnostics and approved history with provenance.', cta: 'Follow the evidence', lane: 'agent' },
-  { id: 'decide', label: 'Decide', kicker: 'What does the evidence support?', explanation: 'Policy supports the cause. CPU inference may explain it. The operator retains authority.', cta: 'Change the evidence', lane: 'decision' },
-  { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'The same alarm produced two evidence-backed causes and no automated action.', cta: '', lane: 'decision' },
+  { id: 'decide', label: 'Decide', kicker: 'What does the first condition support?', explanation: 'Policy supports the cause. CPU inference may explain it. The operator retains authority.', cta: 'Run changed condition', lane: 'decision' },
+  { id: 'compare', label: 'Changed condition', kicker: 'What does the second condition support?', explanation: 'The same alarm now enters with a platform fault instead of a NIC fault.', cta: 'Compare outcomes', lane: 'decision' },
+  { id: 'summary', label: 'Measured comparison', kicker: 'What changed?', explanation: 'The same alarm produced two evidence-backed causes and no automated action.', cta: '', lane: 'decision' },
 ]
 
 const audienceActs = [
   { label: 'Alarm', detail: 'Frame the ambiguity', start: 0, end: 0 },
   { label: 'Investigate', detail: 'Collect live evidence', start: 1, end: 1 },
   { label: 'Decide', detail: 'Bound the conclusion', start: 2, end: 2 },
-  { label: 'Compare', detail: 'Change the evidence', start: 3, end: 3 },
+  { label: 'Change', detail: 'Run condition two', start: 3, end: 3 },
+  { label: 'Compare', detail: 'Close the proof', start: 4, end: 4 },
 ]
 
 const titleCase = (value: string) => value.replaceAll('_', ' ')
@@ -111,6 +113,30 @@ const topologyForPhase: Record<Phase, { active: TopologyNodeId[]; focus: Topolog
   investigate: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history'], focus: ['diagnostics-service', 'mcp', 'history'] },
   decide: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
   compare: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
+  summary: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
+}
+
+function DecisionView({ result, condition }: { result: Result; condition: string }) {
+  return <div className="decision-transform" aria-label={`${condition} evidence to decision boundaries`}>
+    <motion.div className="decision-stage agent" initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}>
+      <span>AGENT</span><strong>{result.current_observations_with_tool_provenance.length} observations collected</strong><small>Preserves source and provenance</small>
+    </motion.div>
+    <div className="decision-arrow">→</div>
+    <motion.div className="decision-stage policy" initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .12 }}>
+      <span>DETERMINISTIC POLICY</span><strong>{titleCase(result.primary_hypothesis.cause)}</strong><small>{result.decision_policy.name}/{result.decision_policy.version} · {result.primary_hypothesis.supporting_evidence_ids.length} fault supports this cause</small><small>{result.decision_policy.rule}</small><em>{result.decision_policy.source} · reviewed code, not learned by the LLM</em>
+    </motion.div>
+    <div className="decision-arrow">→</div>
+    <motion.div className="decision-stage human" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .24 }}>
+      <span>HUMAN AUTHORITY</span><strong>Review required</strong><small>No automated action</small>
+    </motion.div>
+    <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
+      <div className="llm-exchange-heading"><span>{result.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{result.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{result.model_draft?.runtime ?? 'The evidence decision is complete without inference.'}{result.model_draft?.latency_ms !== undefined ? ` · ${result.model_draft.latency_ms}ms inference` : ''}</small></div>
+      {result.model_draft?.prompt && result.model_draft.summary ? <div className="llm-exchange">
+        <section><span>PROMPT IN</span><strong>“Draft a brief explanation of the supplied hypothesis, using only the provided evidence.”</strong><small>{titleCase(result.model_draft.prompt.evidence.hypothesis.cause)} · current evidence: {result.model_draft.prompt.evidence.current_observations.map((item) => item.evidence_id).join(', ')} · approved history: {result.model_draft.prompt.evidence.historical_context.map((item) => item.evidence_id).join(', ') || 'none'} · provisional · human review · no action</small></section>
+        <section><span>DRAFT OUT</span><strong>{result.model_draft.summary}</strong><small>Cited evidence: {result.model_draft.evidence_ids?.join(', ') ?? 'none'} · unverified wording only</small></section>
+      </div> : <div className="llm-not-called"><b>LLM NOT CALLED</b><span>No prompt or draft was produced for this response.</span></div>}
+    </motion.div>
+  </div>
 }
 
 export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
@@ -190,8 +216,8 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const platformEvidence = evidence.find((item) => item.scenarioId === 'ptp-platform')
   const hardware = results['ptp-hardware']
   const platform = results['ptp-platform']
-  const currentResult = phase.id === 'compare' ? platform : hardware
-  const currentEvidence = phase.id === 'compare' ? platformEvidence : hardwareEvidence
+  const currentResult = phase.id === 'compare' || phase.id === 'summary' ? platform : hardware
+  const currentEvidence = phase.id === 'compare' || phase.id === 'summary' ? platformEvidence : hardwareEvidence
   const phaseNumber = phaseIndex + 1
   const audienceActIndex = audienceActs.findIndex((act) => phaseIndex >= act.start && phaseIndex <= act.end)
   const topologyState = topologyForPhase[phase.id]
@@ -245,48 +271,19 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           </motion.article>
         </div>}
 
-        {phase.id === 'decide' && hardware && <div className="decision-transform" aria-label="Evidence to decision boundaries">
-          <motion.div className="decision-stage agent" initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }}>
-            <span>AGENT</span><strong>{hardware.current_observations_with_tool_provenance.length} observations collected</strong><small>Preserves source and provenance</small>
-          </motion.div>
-          <div className="decision-arrow">→</div>
-          <motion.div className="decision-stage policy" initial={{ opacity: 0, scale: .94 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: .12 }}>
-            <span>DETERMINISTIC POLICY</span><strong>{titleCase(hardware.primary_hypothesis.cause)}</strong><small>{hardware.decision_policy.name}/{hardware.decision_policy.version} · {hardware.primary_hypothesis.supporting_evidence_ids.length} fault supports this cause</small><small>{hardware.decision_policy.rule}</small><em>{hardware.decision_policy.source} · reviewed code, not learned by the LLM</em>
-          </motion.div>
-          <div className="decision-arrow">→</div>
-          <motion.div className="decision-stage human" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: .24 }}>
-            <span>HUMAN AUTHORITY</span><strong>Review required</strong><small>No automated action</small>
-          </motion.div>
-          <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
-            <div className="llm-exchange-heading"><span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{hardware.model_draft?.runtime ?? 'The evidence decision is complete without inference.'}{hardware.model_draft?.latency_ms !== undefined ? ` · ${hardware.model_draft.latency_ms}ms inference` : ''}</small></div>
-            {hardware.model_draft?.prompt && hardware.model_draft.summary ? <div className="llm-exchange">
-              <section><span>PROMPT IN</span><strong>“Draft a brief explanation of the supplied hypothesis, using only the provided evidence.”</strong><small>{titleCase(hardware.model_draft.prompt.evidence.hypothesis.cause)} · current evidence: {hardware.model_draft.prompt.evidence.current_observations.map((item) => item.evidence_id).join(', ')} · approved history: {hardware.model_draft.prompt.evidence.historical_context.map((item) => item.evidence_id).join(', ') || 'none'} · provisional · human review · no action</small></section>
-              <section><span>DRAFT OUT</span><strong>{hardware.model_draft.summary}</strong><small>Cited evidence: {hardware.model_draft.evidence_ids?.join(', ') ?? 'none'} · unverified wording only</small></section>
-            </div> : <div className="llm-not-called"><b>LLM NOT CALLED</b><span>No prompt or draft was produced for this response.</span></div>}
-          </motion.div>
-        </div>}
+        {phase.id === 'decide' && hardware && <DecisionView result={hardware} condition="First condition" />}
+        {phase.id === 'compare' && platform && <DecisionView result={platform} condition="Changed condition" />}
 
-        {phase.id === 'compare' && hardwareEvidence && platformEvidence && hardware && platform && <div className="comparison-workspace">
+        {phase.id === 'summary' && hardwareEvidence && platformEvidence && hardware && platform && <div className="comparison-workspace">
           <div className="comparison-thesis"><span>SAME ALARM</span><strong>PTP synchronization degraded</strong><small>Evidence—not the label—changed the decision.</small></div>
           {[{ label: 'Hardware signal', evidence: hardwareEvidence, result: hardware }, { label: 'Platform signal', evidence: platformEvidence, result: platform }].map((item) => <article key={item.evidence.scenarioId}>
             <span>{item.label}</span><strong>{titleCase(item.evidence.cause)}</strong>
-            <div className="comparison-journey" aria-label={`${item.label} journey from alarm to human review`}>
-              <div><b>1</b><span>ALARM</span><small>{item.result.alarm_id}</small></div>
-              <i>→</i><div><b>2</b><span>EVIDENCE</span><small>{item.evidence.observationCount} observations</small></div>
-              <i>→</i><div><b>3</b><span>POLICY</span><small>{item.result.decision_policy.name}/{item.result.decision_policy.version}</small></div>
-              <i>→</i><div><b>4</b><span>LLM DRAFT</span><small>{item.evidence.modelLatencyMs !== undefined ? `${item.evidence.modelLatencyMs}ms` : 'not called'}</small></div>
-              <i>→</i><div><b>5</b><span>HUMAN REVIEW</span><small>no action</small></div>
-            </div>
-            {item.result.model_draft?.prompt && item.result.model_draft.summary ? <div className="comparison-llm-exchange" aria-label={`${item.label} LLM exchange`}>
-              <section><span>PROMPT IN</span><strong>“Draft a brief explanation using only the provided evidence.”</strong><small>{titleCase(item.result.model_draft.prompt.evidence.hypothesis.cause)} · evidence: {item.result.model_draft.prompt.evidence.current_observations.map((observation) => observation.evidence_id).join(', ')} · history: {item.result.model_draft.prompt.evidence.historical_context.map((source) => source.evidence_id).join(', ') || 'none'}</small></section>
-              <section><span>DRAFT OUT</span><strong>{item.result.model_draft.summary}</strong><small>{item.result.model_draft.model} · {item.result.model_draft.latency_ms}ms · cited: {item.result.model_draft.evidence_ids?.join(', ') ?? 'none'} · human review required</small></section>
-            </div> : <div className="llm-not-called"><b>LLM NOT CALLED</b><span>No prompt or draft was produced for this condition.</span></div>}
             <div className="comparison-evidence-log" aria-label={`${item.label} evidence records`}>
               {item.result.current_observations_with_tool_provenance.map((observation) => <code className={item.result.primary_hypothesis.supporting_evidence_ids.includes(observation.evidence_id) ? 'supporting' : ''} key={observation.evidence_id}>
                 <b>{observedTime(observation.observed_at)}</b><span>{observationTitle(observation)}</span><em>{observationState(observation)}</em>
               </code>)}
             </div>
-            <small>Supported by {item.evidence.supportingEvidenceIds.join(', ')} · {item.evidence.latencyMs}ms alarm-to-review · no automated action</small>
+            <small>{item.evidence.observationCount} observations · {item.evidence.modelLatencyMs ?? 'no'}ms model · {item.evidence.latencyMs}ms alarm-to-review · no automated action</small>
           </article>)}
         </div>}
 
@@ -300,8 +297,8 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
           {error && <div className="error-panel">Live operation stopped: {error}</div>}
           <div className="workspace-actions">
             <button className="button button-secondary" onClick={() => setShowTopology((value) => !value)}>{showTopology ? 'Hide' : 'Inspect'} technical topology</button>
-            {phase.id !== 'compare' ? <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running live…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button> : <span className="action-placeholder" aria-hidden="true" />}
-            {phase.id === 'compare' ? <button className="button button-quiet" onClick={reset}>Restart proof</button> : <span className="action-placeholder" aria-hidden="true" />}
+            {phase.id !== 'summary' ? <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running live…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button> : <span className="action-placeholder" aria-hidden="true" />}
+            {phase.id === 'summary' ? <button className="button button-quiet" onClick={reset}>Restart proof</button> : <span className="action-placeholder" aria-hidden="true" />}
           </div>
         </div>
       </section>

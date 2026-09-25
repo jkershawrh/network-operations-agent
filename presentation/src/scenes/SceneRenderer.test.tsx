@@ -32,7 +32,7 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('PTP synchronization degraded')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Run live investigation/ })).toBeInTheDocument()
     expect(screen.queryByLabelText('Live technical deployment topology')).not.toBeInTheDocument()
-    expect(screen.getByLabelText('Live journey progress').querySelectorAll('button')).toHaveLength(4)
+    expect(screen.getByLabelText('Live journey progress').querySelectorAll('button')).toHaveLength(5)
     fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
     expect(screen.getByLabelText('Live technical deployment topology')).toBeInTheDocument()
     expect(screen.getByRole('dialog', { name: 'Technical topology detail' })).toBeInTheDocument()
