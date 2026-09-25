@@ -103,7 +103,6 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
     return <SceneFrame scene={scene}><div className="evidence-payoff">
       {evidence.length ? <>
         <div className="evidence-payoff-status"><span className="source-badge source-live">LIVE</span><strong>{evidence.length} investigations · one alarm · two evidence paths</strong></div>
-        <div className="payoff-thesis"><span>THE RESULT</span><strong>{scene.line1}</strong><h2>{scene.line2}</h2></div>
         <div className="payoff-metrics" aria-label="Live proof metrics">
           <div><span>INVESTIGATIONS</span><strong>{evidence.length}</strong></div>
           <div><span>OBSERVATIONS</span><strong>{observationCount}</strong></div>

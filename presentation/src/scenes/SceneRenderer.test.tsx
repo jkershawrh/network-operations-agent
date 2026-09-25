@@ -130,7 +130,7 @@ describe('SceneRenderer', () => {
     expect(screen.getByText(/3 current observations · 1 approved sources/)).toBeInTheDocument()
     expect(screen.getByText('granite-3.2-8b-tools')).toBeInTheDocument()
     expect(screen.getByText(/Intel Xeon 6767P/)).toBeInTheDocument()
-    expect(screen.getByText('THE RESULT')).toBeInTheDocument()
+    expect(screen.queryByText('THE RESULT')).not.toBeInTheDocument()
     expect(screen.getByText('HUMAN AUTHORITY')).toBeInTheDocument()
     expect(screen.getByText('Zero automated actions')).toBeInTheDocument()
     expect(screen.getByLabelText('Live proof metrics')).toHaveTextContent('2')

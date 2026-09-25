@@ -277,6 +277,10 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
               <i>→</i><div><b>4</b><span>LLM DRAFT</span><small>{item.evidence.modelLatencyMs !== undefined ? `${item.evidence.modelLatencyMs}ms` : 'not called'}</small></div>
               <i>→</i><div><b>5</b><span>HUMAN REVIEW</span><small>no action</small></div>
             </div>
+            {item.result.model_draft?.prompt && item.result.model_draft.summary ? <div className="comparison-llm-exchange" aria-label={`${item.label} LLM exchange`}>
+              <section><span>PROMPT IN</span><strong>“Draft a brief explanation using only the provided evidence.”</strong><small>{titleCase(item.result.model_draft.prompt.evidence.hypothesis.cause)} · evidence: {item.result.model_draft.prompt.evidence.current_observations.map((observation) => observation.evidence_id).join(', ')} · history: {item.result.model_draft.prompt.evidence.historical_context.map((source) => source.evidence_id).join(', ') || 'none'}</small></section>
+              <section><span>DRAFT OUT</span><strong>{item.result.model_draft.summary}</strong><small>{item.result.model_draft.model} · {item.result.model_draft.latency_ms}ms · cited: {item.result.model_draft.evidence_ids?.join(', ') ?? 'none'} · human review required</small></section>
+            </div> : <div className="llm-not-called"><b>LLM NOT CALLED</b><span>No prompt or draft was produced for this condition.</span></div>}
             <div className="comparison-evidence-log" aria-label={`${item.label} evidence records`}>
               {item.result.current_observations_with_tool_provenance.map((observation) => <code className={item.result.primary_hypothesis.supporting_evidence_ids.includes(observation.evidence_id) ? 'supporting' : ''} key={observation.evidence_id}>
                 <b>{observedTime(observation.observed_at)}</b><span>{observationTitle(observation)}</span><em>{observationState(observation)}</em>

@@ -336,6 +336,12 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .comparison-journey > div > span { color: var(--text-secondary); font-size: .46rem; letter-spacing: .04em; }
 .comparison-journey > div > small { max-width: 76px; color: var(--text-dim); font-size: .48rem; line-height: 1.15; overflow-wrap: anywhere; }
 .comparison-journey > i { color: var(--intel-cyan); font: normal 700 .55rem 'Red Hat Mono'; }
+.comparison-llm-exchange { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: .3rem; }
+.comparison-llm-exchange section { min-width: 0; display: grid; align-content: start; gap: .18rem; padding: .4rem .45rem; text-align: left; border-left: 2px solid var(--intel-cyan); background: #191919; }
+.comparison-llm-exchange section:last-child { border-left-color: var(--warning); }
+.comparison-llm-exchange section > span { color: var(--warning); font-size: .5rem; }
+.comparison-llm-exchange strong { font-size: .54rem; line-height: 1.28; }
+.comparison-llm-exchange small { color: var(--text-dim); font-size: .46rem; line-height: 1.25; overflow-wrap: anywhere; }
 .comparison-evidence-log { display: grid; gap: .22rem; }
 .comparison-evidence-log code { display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: .45rem; padding: .3rem .4rem; color: var(--text-dim); background: #191919; border-left: 2px solid var(--border); font: .54rem 'Red Hat Mono'; }
 .comparison-evidence-log code.supporting { color: var(--text-secondary); border-left-color: var(--success); }
