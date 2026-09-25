@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'motion/react'
 import type { LiveJourneyScene } from '../types'
 import { SceneFrame } from './SceneFrame'
+import { TechnicalTopology } from './TechnicalTopology'
 
 type Result = {
   alarm_id: string
@@ -14,20 +14,10 @@ type Result = {
   action_executed: boolean
 }
 
-const stages = [
-  { id: 'alarm', label: 'Timing alarm', detail: 'validated event' },
-  { id: 'agent', label: 'OpenShift agent', detail: 'bounded orchestration' },
-  { id: 'mcp', label: 'Read-only MCP', detail: '3 current diagnostics' },
-  { id: 'history', label: 'Approved history', detail: 'versioned context' },
-  { id: 'policy', label: 'Evidence policy', detail: 'compare or abstain' },
-  { id: 'wording', label: 'Optional wording', detail: 'never authority' },
-  { id: 'operator', label: 'NOC operator', detail: 'human decision' },
-]
-
 const journeySteps = [
-  { title: 'Verify the deployed system', subtitle: 'Readiness must include the approved diagnostic boundary.', active: 2 },
-  { title: 'Investigate the hardware signal', subtitle: 'Current observations activate the evidence path.', active: 6, scenario: 'ptp-hardware' },
-  { title: 'Change the evidence', subtitle: 'The same architecture must select a different cause.', active: 6, scenario: 'ptp-platform' },
+  { title: 'Verify the deployed system', subtitle: 'The app pod reaches only the approved MCP diagnostic service.', phase: 'ready' as const },
+  { title: 'Investigate the hardware signal', subtitle: 'The API orchestrates current diagnostics, history, and deterministic evidence policy.', phase: 'investigation' as const, scenario: 'ptp-hardware' },
+  { title: 'Change the evidence', subtitle: 'The same deployed path must select a different supported cause.', phase: 'investigation' as const, scenario: 'ptp-platform' },
 ]
 
 export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
@@ -62,15 +52,9 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
     }
   }
 
-  const active = step < 0 ? -1 : journeySteps[step].active
   return <SceneFrame scene={scene}>
     <div className="journey-status"><span className={`source-badge source-${source === 'LIVE' ? 'live' : 'offline'}`}>{source}</span><strong>{step < 0 ? 'Ready to begin' : journeySteps[step].title}</strong><span>{step < 0 ? 'The diagram will activate from the deployed responses.' : journeySteps[step].subtitle}</span></div>
-    <div className="system-flow" aria-label="Live network operations architecture">
-      {stages.map((stage, index) => <div className="system-flow-wrap" key={stage.id}>
-        <motion.div className={`system-node ${index <= active ? 'active' : ''} ${index < active ? 'done' : ''}`} animate={index === active && status === 'running' ? { scale: [1, 1.03, 1] } : { scale: 1 }} transition={{ repeat: index === active && status === 'running' ? Infinity : 0, duration: 1 }}><strong>{stage.label}</strong><span>{stage.detail}</span></motion.div>
-        {index < stages.length - 1 && <div className={`system-edge ${index < active ? 'active' : ''}`}><span>→</span></div>}
-      </div>)}
-    </div>
+    <TechnicalTopology activeThrough={step < 0 ? 'idle' : journeySteps[step].phase} running={status === 'running'} />
     {result && <div className="journey-evidence">
       <div><span>Supported cause</span><strong>{result.primary_hypothesis.cause}</strong></div>
       <div><span>Current evidence</span><strong>{result.current_observations_with_tool_provenance.length} observations</strong><small>{result.primary_hypothesis.supporting_evidence_ids.join(', ')}</small></div>

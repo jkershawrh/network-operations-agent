@@ -25,9 +25,12 @@ describe('SceneRenderer', () => {
   it('renders a live infrastructure journey with the complete architecture flow', () => {
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
-    expect(screen.getByLabelText('Live network operations architecture')).toBeInTheDocument()
-    expect(screen.getByText('OpenShift agent')).toBeInTheDocument()
-    expect(screen.getByText('Read-only MCP')).toBeInTheDocument()
+    expect(screen.getByLabelText('Live technical deployment topology')).toBeInTheDocument()
+    expect(screen.getByText('network-operations-demo · Flightpath')).toBeInTheDocument()
+    expect(screen.getByText('NetworkPolicy: app pods only')).toBeInTheDocument()
+    expect(screen.getByText('app Deployment')).toBeInTheDocument()
+    expect(screen.getByText('diagnostics Deployment')).toBeInTheDocument()
+    expect(screen.getByText(':8095/mcp')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Run the live journey' })).toBeInTheDocument()
   })
 
