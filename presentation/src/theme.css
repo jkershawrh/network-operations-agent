@@ -116,7 +116,8 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .incident-cause.tone-primary { border-top-color: var(--rh-red); }
 .incident-cause > strong { font-size: 1.15rem; }
 .incident-decision { padding: .75rem 1rem; color: var(--intel-cyan); font-weight: 700; background: var(--intel-cyan-dim); border-radius: var(--radius-sm); }
-.incident-open { position: relative; min-height: 430px; display: grid; place-items: center; }
+.incident-open { position: relative; min-height: 430px; display: grid; place-items: center; cursor: pointer; }
+.incident-open:focus-visible { outline: 2px solid var(--intel-cyan); outline-offset: 8px; }
 .scene:has(.incident-open) > .eyebrow,
 .scene:has(.incident-open) > h1,
 .scene:has(.incident-open) > .lede { display: none; }
@@ -166,7 +167,8 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-legend .legend-live { background: var(--success); }
 .topology-legend .legend-policy { border-top: 2px dashed var(--rh-red); background: transparent; }
 .topology-legend .legend-optional { border-top: 2px dashed var(--text-disabled); background: transparent; }
-.topology-graph { display: grid; grid-template-columns: 112px 48px 1fr; align-items: center; text-align: left; }
+.topology-graph { display: grid; grid-template-columns: 112px 42px minmax(720px, 1fr) 42px 175px; align-items: center; text-align: left; }
+.openshift-boundary { grid-column: 3; grid-row: 1; }
 .openshift-boundary { position: relative; padding: 1.25rem .8rem .75rem; border: 2px dashed rgba(238, 0, 0, .72); border-radius: var(--radius-md); background: rgba(238, 0, 0, .025); }
 .boundary-title { position: absolute; top: -.65rem; left: 1rem; display: flex; align-items: center; gap: .55rem; padding: .1rem .5rem; background: var(--bg); font: .62rem 'Red Hat Mono'; }
 .boundary-title strong { color: var(--rh-red); text-transform: uppercase; }
@@ -194,7 +196,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-policy small { color: var(--text-dim); font-size: .55rem; }
 .topology-policy:not(.active) { border-color: var(--border); background: var(--surface-1); color: var(--text-disabled); }
 .topology-policy:not(.active) span { color: var(--text-disabled); }
-.topology-optional-path { grid-column: 3; display: flex; justify-content: flex-end; align-items: center; margin-top: .35rem; opacity: .72; }
+.topology-optional-path { grid-column: 4 / 6; grid-row: 1; display: flex; justify-content: flex-start; align-items: center; margin-left: .35rem; opacity: .72; }
 .topology-optional-path .topology-node { width: 175px; min-height: 54px; }
 .guided-technical { grid-template-columns: 180px 1fr; gap: .75rem 1rem; margin-top: .5rem; }
 .scene:has(.guided-technical) { width: min(1400px, 100%); }

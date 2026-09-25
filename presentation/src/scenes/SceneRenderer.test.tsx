@@ -52,9 +52,9 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('02:17 · PRODUCTION NETWORK')).toBeInTheDocument()
     expect(screen.getByText('One alarm is not one cause.')).toBeInTheDocument()
     expect(screen.queryByText('Hardware timing')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Reveal the ambiguity/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Advance incident story' }))
     expect(await screen.findByText('Hardware timing')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Reframe the decision/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Advance incident story' }))
     expect(await screen.findByText(/The operator needs evidence/)).toBeInTheDocument()
   })
 
