@@ -30,7 +30,7 @@ describe('SceneRenderer', () => {
     expect(screen.getByTestId('live-operator-workspace')).toBeInTheDocument()
     expect(screen.getByText('What entered the system?')).toBeInTheDocument()
     expect(screen.getByText('PTP synchronization degraded')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Verify Flightpath readiness/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Verify live system/ })).toBeInTheDocument()
     expect(screen.queryByLabelText('Live technical deployment topology')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Live journey progress').querySelectorAll('button')).toHaveLength(4)
     fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
@@ -71,7 +71,7 @@ describe('SceneRenderer', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(response), { status: 200 }))
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
-    fireEvent.click(screen.getByRole('button', { name: /Verify Flightpath readiness/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Verify live system/ }))
     await screen.findByText('What is running now?')
     fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
     await screen.findByText('What did the systems report?')
@@ -148,7 +148,7 @@ describe('SceneRenderer', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(response), { status: 200 }))
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
-    fireEvent.click(screen.getByRole('button', { name: /Verify Flightpath readiness/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Verify live system/ }))
     await screen.findByText('What is running now?')
     fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
     await screen.findByText('What did the systems report?')
@@ -158,7 +158,7 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('POLICY DECIDES')).toBeInTheDocument()
     expect(screen.getByText('LLM NOT CALLED')).toBeInTheDocument()
     expect(screen.getByText('INTEL CPU TARGET')).toBeInTheDocument()
-    expect(screen.getByText('Not configured on Flightpath')).toBeInTheDocument()
+    expect(screen.getByText('Not configured in this environment')).toBeInTheDocument()
     expect(screen.getByText('HUMAN ACTS')).toBeInTheDocument()
   })
 

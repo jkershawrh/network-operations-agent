@@ -53,7 +53,7 @@ test('live journey runs both conditions and accumulates returned evidence', asyn
     } })
   })
   await page.goto('/?act=2&scene=0')
-  await page.getByRole('button', { name: /Verify Flightpath readiness/ }).click()
+  await page.getByRole('button', { name: /Verify live system/ }).click()
   await expect(page.getByText('What is running now?')).toBeVisible()
   await page.getByRole('button', { name: /Investigate hardware signal/ }).click()
   await expect(page.getByText('What did the systems report?')).toBeVisible()

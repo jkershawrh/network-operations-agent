@@ -49,7 +49,7 @@ const phases: Array<{
   cta: string
   lane: 'workload' | 'agent' | 'decision'
 }> = [
-  { id: 'ready', label: 'Incident intake', kicker: 'What entered the system?', explanation: 'Verify the deployed boundary before submitting the alarm.', cta: 'Verify Flightpath readiness', lane: 'workload' },
+  { id: 'ready', label: 'Incident intake', kicker: 'What entered the system?', explanation: 'Verify the deployed boundary before submitting the alarm.', cta: 'Verify live system', lane: 'workload' },
   { id: 'run-hardware', label: 'Run investigation', kicker: 'What is running now?', explanation: 'The agent collects diagnostics, retrieves context, and applies evidence policy.', cta: 'Investigate hardware signal', lane: 'agent' },
   { id: 'observations', label: 'Current diagnostics', kicker: 'What did the systems report?', explanation: 'Current observations retain scope, time, and provenance.', cta: 'Inspect approved history', lane: 'workload' },
   { id: 'history', label: 'Historical context', kicker: 'What context was retrieved?', explanation: 'Versioned cases add context—not proof.', cta: 'Evaluate the evidence', lane: 'agent' },
@@ -135,7 +135,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
       if (phase.id === 'ready') {
         setStatus('running')
         const response = await fetch('/ready', { signal: controller.current.signal })
-        if (!response.ok || (await response.json()).status !== 'ready') throw new Error('Flightpath is not ready')
+        if (!response.ok || (await response.json()).status !== 'ready') throw new Error('The live system is not ready')
       } else if (phase.id === 'run-hardware') {
         setStatus('running')
         await runRequest('ptp-hardware')
@@ -164,7 +164,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const topologyState = topologyForPhase[phase.id]
   const topologyResult = currentResult ?? hardware ?? platform
   const topologyMetrics: Partial<Record<TopologyNodeId, string>> = {
-    route: status === 'running' ? 'request in flight' : phaseIndex > 0 ? 'Flightpath live' : undefined,
+    route: status === 'running' ? 'request in flight' : phaseIndex > 0 ? 'OpenShift live' : undefined,
     app: topologyResult?.alarm_id ? topologyResult.alarm_id : phaseIndex > 0 ? 'readiness verified' : undefined,
     mcp: topologyResult ? `${topologyResult.current_observations_with_tool_provenance.length} live observations` : status === 'running' ? 'collecting diagnostics' : undefined,
     history: topologyResult ? `${topologyResult.historical_context_with_source_revision.length} versioned sources` : status === 'running' ? 'retrieving context' : undefined,
@@ -233,7 +233,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
             <span>HUMAN ACTS</span><strong>Review required</strong><small>No remediation executed</small>
           </motion.div>
           <motion.div className="llm-bypass" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .34 }}>
-            <span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured on Flightpath'}</strong><small>{hardware.model_draft?.runtime ? <><b>{hardware.model_draft.runtime}</b> · Draft checked against {hardware.model_draft.evidence_ids?.length ?? 0} evidence IDs.</> : <><b>LLM NOT CALLED</b> · The evidence decision is complete without inference.</>}</small>
+            <span>{hardware.model_draft?.model ? 'INTEL CPU LIVE' : 'INTEL CPU TARGET'}</span><strong>{hardware.model_draft?.model ?? 'Not configured in this environment'}</strong><small>{hardware.model_draft?.runtime ? <><b>{hardware.model_draft.runtime}</b> · Draft checked against {hardware.model_draft.evidence_ids?.length ?? 0} evidence IDs.</> : <><b>LLM NOT CALLED</b> · The evidence decision is complete without inference.</>}</small>
           </motion.div>
         </div>}
 
@@ -261,12 +261,12 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
             <span>WORKLOAD <b>{currentResult?.alarm_id ?? 'awaiting input'}</b></span>
             <span>AGENT <b>{currentResult ? 'investigation complete' : status === 'running' ? 'running' : 'ready'}</b></span>
             <span>CPU / LLM <b>{currentResult?.model_draft?.model ?? (currentResult ? 'NOT CONFIGURED · optional path' : 'awaiting response')}</b></span>
-            <span>SOURCE <b>{currentResult ? 'LIVE · Flightpath' : 'not collected'}</b></span>
+            <span>SOURCE <b>{currentResult ? 'LIVE · OpenShift' : 'not collected'}</b></span>
           </div>
           {error && <div className="error-panel">Live operation stopped: {error}</div>}
           <div className="workspace-actions">
             <button className="button button-secondary" onClick={() => setShowTopology((value) => !value)}>{showTopology ? 'Hide' : 'Inspect'} technical topology</button>
-            {phase.id !== 'compare' && <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running on Flightpath…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button>}
+            {phase.id !== 'compare' && <button className="button button-primary" disabled={status === 'running'} onClick={() => void execute()}>{status === 'running' ? 'Running live…' : status === 'error' ? 'Retry live operation' : phase.cta} →</button>}
             {phaseIndex > 0 && <button className="button button-quiet" onClick={reset}>Restart proof</button>}
           </div>
         </div>

@@ -52,7 +52,7 @@ export const demoConfig: DemoConfig = {
     },
     {
       id: 'payoff', label: '04', title: 'Evidence & Handoff', scenes: [
-        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'What Flightpath proved', emptyState: 'Run both live investigations first.', line1: 'Same alarm. Different evidence.', line2: 'The evidence changed the decision.', speakerPrompt: 'Close on three verified boundaries: evidence chose the cause, Granite explained it on Intel CPU, and the operator retained authority.' },
+        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'What the live system proved', emptyState: 'Run both live investigations first.', line1: 'Same alarm. Different evidence.', line2: 'The evidence changed the decision.', speakerPrompt: 'Close on three verified boundaries: evidence chose the cause, Granite explained it on Intel CPU, and the operator retained authority.' },
       ],
     },
   ],

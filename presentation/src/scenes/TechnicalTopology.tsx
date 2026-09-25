@@ -36,7 +36,7 @@ export function TechnicalTopology({ activeThrough = 'idle', activeIds, focusIds 
       <Node id="browser" kind="operator" title="NOC browser" detail="story + workspace" active={on('browser')} focus={focused('browser')} metric={metrics.browser} running={running} />
       <Edge label="HTTPS" active={on('route')} />
       <div className="openshift-boundary">
-        <div className="boundary-title"><strong>OpenShift namespace</strong><span>network-operations-demo · Flightpath</span></div>
+        <div className="boundary-title"><strong>OpenShift namespace</strong><span>network-operations-demo</span></div>
         <div className="topology-main-path">
           <Node id="route" kind="route" title="Route" detail="edge TLS termination" port="443 → 8080" active={on('route')} focus={focused('route')} metric={metrics.route} running={running} />
           <Edge label="HTTP" active={on('app-service')} />

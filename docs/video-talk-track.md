@@ -87,11 +87,11 @@ Every claim now has a source, every decision has a boundary, and every action ha
 
 ## Live Walkthrough
 
-Now we’ll run two conditions through the same deployed architecture on Flightpath.
+Now we’ll run two conditions through the same deployed architecture on OpenShift.
 
 ### Checkpoint 1: Readiness
 
-**Click:** Verify Flightpath readiness.
+**Click:** Verify live system.
 
 Before making any claim, the application verifies that the deployed services and diagnostics boundary are ready.
 
@@ -200,7 +200,7 @@ Red Hat provides the governed application platform and operational boundaries. I
 ## Recording Checklist
 
 - Record at 1920×1080 in fullscreen.
-- Confirm Flightpath readiness before starting.
+- Confirm the live system is ready before starting.
 - Verify both live investigations complete successfully.
 - Confirm `granite-3.2-8b-tools` and Intel Xeon appear in the live proof.
 - Confirm the payoff shows two causes and zero automated actions.
