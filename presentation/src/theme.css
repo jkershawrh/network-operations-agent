@@ -174,8 +174,10 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-node strong { font-size: .72rem; line-height: 1.15; }
 .topology-node small { font-size: .57rem; line-height: 1.2; }
 .topology-node code { color: var(--text-dim); font: .54rem 'Red Hat Mono'; }
+.topology-node em, .topology-policy em { margin-top: .12rem; color: var(--success); font: normal 700 .5rem/1.2 'Red Hat Mono'; overflow-wrap: anywhere; }
 .topology-kind { color: var(--text-disabled); font: 700 .5rem 'Red Hat Mono'; letter-spacing: .07em; text-transform: uppercase; }
 .topology-node.active { color: var(--text); border-color: var(--intel-cyan); background: var(--intel-cyan-dim); box-shadow: 0 0 12px rgba(0, 174, 239, .12); }
+.topology-node.focus, .topology-policy.focus { outline: 2px solid var(--warning); outline-offset: 2px; box-shadow: 0 0 22px rgba(245, 166, 35, .18); }
 .topology-node.active .topology-kind { color: var(--intel-cyan); }
 .topology-authority.active { border-color: var(--success); background: var(--success-dim); }
 .topology-edge { width: 48px; display: grid; justify-items: center; gap: .05rem; color: var(--text-disabled); text-align: center; }
@@ -192,7 +194,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .topology-optional-path { grid-column: 3; display: flex; justify-content: flex-end; align-items: center; margin-top: .35rem; opacity: .72; }
 .topology-optional-path .topology-node { width: 175px; min-height: 54px; }
 .guided-technical { grid-template-columns: 180px 1fr; gap: .75rem 1rem; margin-top: .5rem; }
-.guided-technical .architecture-map { grid-template-columns: repeat(5, 1fr); grid-column: 1 / -1; }
+.guided-technical .architecture-map { grid-template-columns: repeat(6, 1fr); grid-column: 1 / -1; }
 .guided-technical .architecture-map-item { grid-template-columns: 22px 1fr; padding: .4rem .55rem; font-size: .68rem; }
 .guided-technical .architecture-map-item > span { width: 20px; height: 20px; }
 .guided-technical .architecture-dialog { grid-column: 1 / -1; min-height: 190px; padding: 1rem 1.25rem; gap: .55rem; }
@@ -323,7 +325,12 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .how-it-works span { color: var(--intel-cyan); font: 700 .55rem 'Red Hat Mono'; }
 .how-it-works p { margin: .35rem 0 0; color: var(--text-dim); font-size: .6rem; line-height: 1.4; }
 .topology-drawer { position: fixed; inset: 58px 0 0; z-index: 20; display: grid; align-content: center; padding: 3rem; background: rgba(21, 21, 21, .97); }
-.topology-drawer .technical-topology { width: min(1100px, 100%); margin: auto; }
+.topology-drawer-panel { width: min(1180px, 100%); margin: auto; }
+.topology-drawer-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; padding-bottom: .8rem; border-bottom: 1px solid var(--border); text-align: left; }
+.topology-drawer-header > div { display: grid; gap: .25rem; }
+.topology-drawer-header span { color: var(--intel-cyan); font: 700 .62rem 'Red Hat Mono'; letter-spacing: .08em; }
+.topology-drawer-header strong { color: var(--text-secondary); font-size: .78rem; }
+.topology-drawer .technical-topology { width: 100%; margin: auto; }
 .architecture-flow { display: flex; justify-content: center; align-items: stretch; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
 .architecture-flow .architecture-node { min-width: 148px; max-width: 160px; padding-inline: var(--space-2); }
 .flow-wrap { display: flex; align-items: center; gap: var(--space-2); }

@@ -24,7 +24,7 @@ describe('SceneRenderer', () => {
     expect(await screen.findByText('rehearsal')).toBeInTheDocument()
   })
 
-  it('opens the live journey as an incident workspace instead of a topology', () => {
+  it('opens and closes the phase-aware technical topology', () => {
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByTestId('live-operator-workspace')).toBeInTheDocument()
@@ -35,6 +35,15 @@ describe('SceneRenderer', () => {
     expect(screen.getByLabelText('Live journey progress').querySelectorAll('button')).toHaveLength(4)
     fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
     expect(screen.getByLabelText('Live technical deployment topology')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Technical topology detail' })).toBeInTheDocument()
+    expect(screen.getByText(/LIVE ARCHITECTURE · Incident intake/)).toBeInTheDocument()
+    expect(document.querySelector('[data-node="app"]')).toHaveClass('active', 'focus')
+    expect(document.querySelector('[data-node="mcp"]')).not.toHaveClass('active')
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Technical topology detail' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close topology ×' }))
+    expect(screen.queryByRole('dialog', { name: 'Technical topology detail' })).not.toBeInTheDocument()
   })
 
   it('paces the opening as three sparse internal beats', async () => {
@@ -85,13 +94,19 @@ describe('SceneRenderer', () => {
 
   it('guides architecture as operator questions and revealed answers', async () => {
     const scene = scenes.find((item) => item.type === 'guided-architecture')!
-    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    const { container } = render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByText('What exactly happened?')).toBeInTheDocument()
     expect(screen.queryByText('A validated event starts the investigation.')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
     expect(await screen.findByText('A validated event starts the investigation.')).toBeInTheDocument()
+    expect(container.querySelector('[data-node="app"]')).toHaveClass('active', 'focus')
+    expect(container.querySelector('[data-node="mcp"]')).not.toHaveClass('active')
     fireEvent.click(screen.getByRole('button', { name: 'Ask next question →' }))
     expect(await screen.findByText('What do the systems show right now?')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Reveal technical boundary' }))
+    expect(container.querySelector('[data-node="app"]')).toHaveClass('active')
+    expect(container.querySelector('[data-node="app"]')).not.toHaveClass('focus')
+    expect(container.querySelector('[data-node="mcp"]')).toHaveClass('active', 'focus')
   })
 
   it('keeps the presenter pitch at seven scenes or fewer', () => {

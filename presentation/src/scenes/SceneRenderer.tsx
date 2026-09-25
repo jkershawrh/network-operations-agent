@@ -4,15 +4,27 @@ import type { SceneConfig } from '../types'
 import { LiveProof } from './LiveProof'
 import { LiveJourney } from './LiveJourney'
 import { SceneFrame } from './SceneFrame'
+import { TechnicalTopology, type TopologyNodeId } from './TechnicalTopology'
 import { readJourneyEvidence } from '../live/journeyEvidence'
 
 const toneClass = (tone?: string) => tone ? `tone-${tone}` : ''
+
+const architectureNodes: TopologyNodeId[][] = [
+  ['browser', 'route', 'app-service', 'app'],
+  ['diagnostics-service', 'mcp'],
+  ['history'],
+  ['policy'],
+  ['model'],
+  ['operator'],
+]
 
 function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'guided-architecture' }> }) {
   const [step, setStep] = useState(0)
   const [revealed, setRevealed] = useState(false)
   const layer = scene.layers[step]
   const complete = step === scene.layers.length
+  const earnedNodes = architectureNodes.slice(0, complete ? architectureNodes.length : step + (revealed ? 1 : 0)).flat()
+  const focusedNodes = !complete && revealed ? architectureNodes[step] : []
   const advance = () => {
     if (!revealed) setRevealed(true)
     else { setStep((value) => value + 1); setRevealed(false) }
@@ -20,7 +32,7 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
 
   return (
     <SceneFrame scene={scene}>
-      <div className="guided-architecture" data-testid="guided-architecture">
+      <div className="guided-architecture guided-technical" data-testid="guided-architecture">
         <div className="architecture-map" aria-label="Architecture progress">
           {scene.layers.map((item, index) => (
             <div className={`architecture-map-item ${toneClass(item.tone)} ${index < step ? 'done' : ''} ${index === step ? 'active' : ''}`} key={item.id}>
@@ -46,6 +58,7 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
             </motion.div>
           )}
         </AnimatePresence>
+        <TechnicalTopology activeIds={earnedNodes} focusIds={focusedNodes} running={revealed} />
       </div>
     </SceneFrame>
   )

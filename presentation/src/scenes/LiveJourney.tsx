@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import type { LiveJourneyScene } from '../types'
 import { SceneFrame } from './SceneFrame'
-import { TechnicalTopology } from './TechnicalTopology'
+import { TechnicalTopology, type TopologyNodeId } from './TechnicalTopology'
 import { clearJourneyEvidence, readJourneyEvidence, recordJourneyEvidence, type InvestigationEvidence } from '../live/journeyEvidence'
 
 type Observation = {
@@ -68,6 +68,17 @@ const audienceActs = [
 
 const titleCase = (value: string) => value.replaceAll('_', ' ')
 
+const topologyForPhase: Record<Phase, { active: TopologyNodeId[]; focus: TopologyNodeId[] }> = {
+  ready: { active: ['browser', 'route', 'app-service', 'app'], focus: ['browser', 'route', 'app-service', 'app'] },
+  'run-hardware': { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model'], focus: ['diagnostics-service', 'mcp', 'history', 'policy', 'model'] },
+  observations: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp'], focus: ['diagnostics-service', 'mcp'] },
+  history: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history'], focus: ['history'] },
+  decision: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model'], focus: ['policy', 'model'] },
+  authority: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['operator'] },
+  'run-platform': { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model'], focus: ['diagnostics-service', 'mcp', 'history', 'policy', 'model'] },
+  compare: { active: ['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'model', 'operator'], focus: ['policy', 'model', 'operator'] },
+}
+
 export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const [phaseIndex, setPhaseIndex] = useState(0)
   const [status, setStatus] = useState<Status>('idle')
@@ -79,6 +90,12 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const phase = phases[phaseIndex]
 
   useEffect(() => () => controller.current?.abort(), [])
+  useEffect(() => {
+    if (!showTopology) return
+    const close = (event: KeyboardEvent) => event.key === 'Escape' && setShowTopology(false)
+    window.addEventListener('keydown', close)
+    return () => window.removeEventListener('keydown', close)
+  }, [showTopology])
 
   const runRequest = async (scenarioId: ScenarioId) => {
     const startedAt = performance.now()
@@ -148,6 +165,17 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const currentEvidence = phase.id === 'run-platform' || phase.id === 'compare' ? platformEvidence : hardwareEvidence
   const phaseNumber = phaseIndex + 1
   const audienceActIndex = audienceActs.findIndex((act) => phaseIndex >= act.start && phaseIndex <= act.end)
+  const topologyState = topologyForPhase[phase.id]
+  const topologyResult = currentResult ?? hardware ?? platform
+  const topologyMetrics: Partial<Record<TopologyNodeId, string>> = {
+    route: status === 'running' ? 'request in flight' : phaseIndex > 0 ? 'Flightpath live' : undefined,
+    app: topologyResult?.alarm_id ? topologyResult.alarm_id : phaseIndex > 0 ? 'readiness verified' : undefined,
+    mcp: topologyResult ? `${topologyResult.current_observations_with_tool_provenance.length} live observations` : status === 'running' ? 'collecting diagnostics' : undefined,
+    history: topologyResult ? `${topologyResult.historical_context_with_source_revision.length} versioned sources` : status === 'running' ? 'retrieving context' : undefined,
+    policy: topologyResult ? titleCase(topologyResult.primary_hypothesis.cause) : status === 'running' ? 'evaluating evidence' : undefined,
+    model: topologyResult?.model_draft?.model ? topologyResult.model_draft.status : status === 'running' ? 'drafting explanation' : undefined,
+    operator: topologyResult ? `approval ${topologyResult.action_requires_human_approval ? 'required' : 'not required'} · action ${topologyResult.action_executed ? 'executed' : 'stopped'}` : undefined,
+  }
 
   const reset = () => {
     clearJourneyEvidence()
@@ -261,6 +289,6 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
         <div className="how-it-works"><span>ONE LIVE RESPONSE</span><p>Each checkpoint inspects the same evidence record.</p></div>
       </aside>
     </div>
-    {showTopology && <div className="topology-drawer"><TechnicalTopology activeIds={['browser', 'route', 'app-service', 'app', 'diagnostics-service', 'mcp', 'history', 'policy', 'operator']} running={status === 'running'} /></div>}
+    {showTopology && <div className="topology-drawer" role="dialog" aria-modal="true" aria-label="Technical topology detail" onClick={() => setShowTopology(false)}><div className="topology-drawer-panel" onClick={(event) => event.stopPropagation()}><div className="topology-drawer-header"><div><span>LIVE ARCHITECTURE · {phase.label}</span><strong>{phase.explanation}</strong></div><button className="button button-secondary" autoFocus onClick={() => setShowTopology(false)}>Close topology ×</button></div><TechnicalTopology activeIds={topologyState.active} focusIds={topologyState.focus} metrics={topologyMetrics} model={{ name: topologyResult?.model_draft?.model, runtime: topologyResult?.model_draft?.runtime }} running={status === 'running'} /></div></div>}
   </SceneFrame>
 }
