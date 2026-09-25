@@ -129,6 +129,24 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .architecture-answer h3 { color: var(--success); font-size: 1.25rem; margin: .4rem 0; }
 .architecture-answer p, .architecture-complete p { color: var(--text-secondary); line-height: 1.55; }
 .architecture-dialog .button { align-self: flex-start; margin-top: auto; }
+.journey-status { display: flex; align-items: center; justify-content: center; gap: var(--space-3); margin: var(--space-2) 0 var(--space-4); color: var(--text-secondary); }
+.journey-status > span:last-child { color: var(--text-dim); font-size: .85rem; }
+.system-flow { display: flex; justify-content: center; align-items: stretch; flex-wrap: wrap; gap: .35rem; }
+.system-flow-wrap { display: flex; align-items: center; gap: .35rem; }
+.system-node { width: 128px; min-height: 82px; display: flex; flex-direction: column; justify-content: center; gap: .3rem; padding: .7rem; border: 2px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-1); color: var(--text-disabled); }
+.system-node span { font-size: .7rem; }
+.system-node.active { color: var(--text); border-color: var(--intel-cyan); background: var(--intel-cyan-dim); }
+.system-node.done { border-color: var(--success); }
+.system-edge { width: 18px; color: var(--text-disabled); }
+.system-edge.active { color: var(--success); }
+.journey-evidence { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin-top: var(--space-4); text-align: left; }
+.journey-evidence > div { display: grid; gap: .3rem; padding: var(--space-3); background: var(--surface-1); border-left: 3px solid var(--success); }
+.journey-evidence span { color: var(--text-dim); font: 700 .65rem 'Red Hat Mono'; text-transform: uppercase; }
+.journey-evidence strong { overflow-wrap: anywhere; }
+.journey-evidence small { color: var(--text-dim); overflow-wrap: anywhere; }
+.journey-evidence .journey-next { grid-column: 1 / -1; border-color: var(--intel-cyan); }
+.journey-controls { display: flex; justify-content: center; gap: var(--space-2); margin-top: var(--space-4); }
+.journey-link { text-decoration: none; }
 .architecture-flow { display: flex; justify-content: center; align-items: stretch; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
 .architecture-flow .architecture-node { min-width: 148px; max-width: 160px; padding-inline: var(--space-2); }
 .flow-wrap { display: flex; align-items: center; gap: var(--space-2); }
@@ -212,6 +230,12 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .architecture-map { grid-template-columns: repeat(5, 1fr); }
   .architecture-map-item { grid-template-columns: 1fr; text-align: center; font-size: .65rem; border-left: 0; border-bottom: 3px solid var(--border); }
   .architecture-map-item > span { margin: auto; }
+  .journey-status { align-items: flex-start; flex-direction: column; }
+  .system-flow, .system-flow-wrap { width: 100%; flex-direction: column; }
+  .system-node { width: 100%; min-height: 64px; }
+  .system-edge { transform: rotate(90deg); }
+  .journey-evidence { grid-template-columns: 1fr; }
+  .journey-evidence .journey-next { grid-column: auto; }
   .architecture-compare .reframe-arrow { transform: rotate(90deg); }
 }
 

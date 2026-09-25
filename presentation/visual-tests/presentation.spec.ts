@@ -5,6 +5,8 @@ test('opening and architecture remain visually stable', async ({ page }) => {
   await expect(page).toHaveScreenshot('opening.png', { fullPage: true })
   await page.goto('/?act=1&scene=0')
   await expect(page).toHaveScreenshot('architecture.png', { fullPage: true })
+  await page.goto('/?act=2&scene=0')
+  await expect(page).toHaveScreenshot('live-journey.png', { fullPage: true })
 })
 
 test('core controls are keyboard reachable', async ({ page }) => {

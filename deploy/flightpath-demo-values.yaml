@@ -7,7 +7,7 @@ route:
   name: network-operations-demo
 
 lab:
-  enabled: false
+  enabled: true
 
 resources:
   requests:

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import type { SceneConfig } from '../types'
 import { LiveProof } from './LiveProof'
+import { LiveJourney } from './LiveJourney'
 import { SceneFrame } from './SceneFrame'
 
 const toneClass = (tone?: string) => tone ? `tone-${tone}` : ''
@@ -50,6 +51,7 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
     return <Custom />
   }
   if (scene.type === 'live-proof') return <LiveProof scene={scene} />
+  if (scene.type === 'live-journey') return <LiveJourney scene={scene} />
   if (scene.type === 'guided-architecture') return <GuidedArchitecture scene={scene} />
 
   if (scene.type === 'intro') {

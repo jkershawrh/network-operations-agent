@@ -37,14 +37,8 @@ export const demoConfig: DemoConfig = {
       ],
     },
     {
-      id: 'proof', label: '02', title: 'Live Proof', scenes: [
-        { id: 'hardware-proof', type: 'live-proof', beat: 'live-proof', eyebrow: 'Live proof · investigation one', title: 'The evidence—not the alarm label—selects the cause', body: 'Run the hardware case here. Then continue into the Workspace to switch evidence and compare the platform case without extending the presentation.', adapterId: 'hardware-investigation', cta: 'Run live investigation', resultFields: [
-          { key: 'alarm', label: 'Alarm' }, { key: 'cause', label: 'Supported cause' }, { key: 'observations', label: 'Current observations' }, { key: 'support', label: 'Supporting evidence' }, { key: 'approval', label: 'Human approval' }, { key: 'executed', label: 'Action executed' },
-        ], speakerPrompt: 'Call out LIVE, REHEARSAL, or OFFLINE before discussing the result. Never imply a fixture is live.' },
-        { id: 'proof-boundary', type: 'comparison', beat: 'trials', title: 'Same alarm family. Different evidence. Different hypothesis.', columns: [
-          { label: 'Hardware case', value: 'hardware_timing', detail: 'NIC timestamp fault present; platform timing remains healthy', tone: 'partner' },
-          { label: 'Platform case', value: 'platform_timing', detail: 'Platform timing fault present; NIC timestamping remains healthy', tone: 'success' },
-        ], body: 'The second case belongs in the operator workspace, where the audience can inspect observations, unknowns, provenance, and the next test.', speakerPrompt: 'End the pitch here if time is short. Open the Workspace for the five-to-ten-minute demonstration.' },
+      id: 'proof', label: '02', title: 'Live Walkthrough', scenes: [
+        { id: 'live-journey', type: 'live-journey', beat: 'live-proof', eyebrow: 'Live infrastructure · guided walkthrough', title: 'Watch the evidence move through the architecture', body: 'The journey verifies readiness, runs both investigations against the deployed MCP diagnostics, and pauses after each live act.', speakerPrompt: 'Narrate the active node and returned evidence. Pause after each act; the diagram, cause, and evidence IDs must agree before continuing.' },
       ],
     },
     {

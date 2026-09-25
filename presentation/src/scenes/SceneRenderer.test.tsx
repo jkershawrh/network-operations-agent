@@ -16,10 +16,19 @@ describe('SceneRenderer', () => {
   }
 
   it('labels rehearsal data instead of presenting it as live', async () => {
-    const scene = scenes.find((item) => item.type === 'live-proof')!
+    const scene: SceneConfig = { id: 'fallback-proof', type: 'live-proof', beat: 'live-proof', title: 'Fallback proof', adapterId: 'hardware-investigation', cta: 'Run proof', resultFields: [{ key: 'cause', label: 'Cause' }] }
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     fireEvent.click(screen.getByRole('button', { name: scene.type === 'live-proof' ? scene.cta : '' }))
     expect(await screen.findByText('rehearsal')).toBeInTheDocument()
+  })
+
+  it('renders a live infrastructure journey with the complete architecture flow', () => {
+    const scene = scenes.find((item) => item.type === 'live-journey')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    expect(screen.getByLabelText('Live network operations architecture')).toBeInTheDocument()
+    expect(screen.getByText('OpenShift agent')).toBeInTheDocument()
+    expect(screen.getByText('Read-only MCP')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run the live journey' })).toBeInTheDocument()
   })
 
   it('renders the statistic-grid scene', () => {
