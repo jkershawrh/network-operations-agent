@@ -253,7 +253,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .scene:has(.operator-workspace) > h1,
 .scene:has(.operator-workspace) > .lede { display: none; }
 .scene:has(.operator-workspace) { width: min(1420px, 100%); }
-.operator-workspace { width: min(1420px, 100%); min-height: min(520px, calc(100vh - 118px)); max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr) 220px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
+.operator-workspace { width: min(1420px, 100%); min-height: min(520px, calc(100vh - 118px)); max-height: calc(100vh - 118px); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
 .workspace-rail { display: flex; flex-direction: column; padding: .75rem 0; border-right: 1px solid var(--border); background: #191919; }
 .rail-title { padding: .25rem .75rem .7rem; color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .1em; }
 .workspace-rail button { display: grid; grid-template-columns: 25px 1fr; align-items: center; gap: .5rem; min-height: 46px; padding: .45rem .65rem; color: var(--text-disabled); background: transparent; border: 0; border-left: 3px solid transparent; text-align: left; font-size: .68rem; cursor: default; }

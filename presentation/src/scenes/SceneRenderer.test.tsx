@@ -28,15 +28,15 @@ describe('SceneRenderer', () => {
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
     expect(screen.getByTestId('live-operator-workspace')).toBeInTheDocument()
-    expect(screen.getByText('What entered the system?')).toBeInTheDocument()
+    expect(screen.getByText('What happened?')).toBeInTheDocument()
     expect(screen.getByText('PTP synchronization degraded')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Verify live system/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Run live investigation/ })).toBeInTheDocument()
     expect(screen.queryByLabelText('Live technical deployment topology')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Live journey progress').querySelectorAll('button')).toHaveLength(4)
     fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
     expect(screen.getByLabelText('Live technical deployment topology')).toBeInTheDocument()
     expect(screen.getByRole('dialog', { name: 'Technical topology detail' })).toBeInTheDocument()
-    expect(screen.getByText(/LIVE ARCHITECTURE · Incident intake/)).toBeInTheDocument()
+    expect(screen.getByText(/LIVE ARCHITECTURE · Alarm/)).toBeInTheDocument()
     expect(document.querySelector('[data-node="app"]')).toHaveClass('active', 'focus')
     expect(document.querySelector('[data-node="mcp"]')).not.toHaveClass('active')
     fireEvent.keyDown(window, { key: 'Escape' })
@@ -58,7 +58,7 @@ describe('SceneRenderer', () => {
     expect(await screen.findByText(/The operator needs evidence/)).toBeInTheDocument()
   })
 
-  it('runs one live investigation then labels later phases as response inspection', async () => {
+  it('runs one live investigation and presents one coherent evidence view', async () => {
     const response = {
       investigation_id: 'run-1', alarm_id: 'synthetic-ptp-001', mode: 'deterministic_fixture_proof',
       current_observations_with_tool_provenance: [{ evidence_id: 'hardware-1', scope: 'hardware', signal: 'nic_timestamp_fault', state: 'present', observed_at: '2026-09-22T08:01:00Z', provenance: 'fixture-v1' }],
@@ -71,12 +71,10 @@ describe('SceneRenderer', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(response), { status: 200 }))
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
-    fireEvent.click(screen.getByRole('button', { name: /Verify live system/ }))
-    await screen.findByText('What is running now?')
-    fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
-    await screen.findByText('What did the systems report?')
+    fireEvent.click(screen.getByRole('button', { name: /Run live investigation/ }))
+    await screen.findByText('What did the agent find?')
     expect(screen.getByText('nic timestamp fault · present')).toBeInTheDocument()
-    expect(screen.getByText(/Each checkpoint inspects the same evidence record/)).toBeInTheDocument()
+    expect(screen.getByText(/1 versioned sources retrieved/)).toBeInTheDocument()
     await waitFor(() => expect(globalThis.fetch).toHaveBeenCalledTimes(2))
   })
 
@@ -148,18 +146,15 @@ describe('SceneRenderer', () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(response), { status: 200 }))
     const scene = scenes.find((item) => item.type === 'live-journey')!
     render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
-    fireEvent.click(screen.getByRole('button', { name: /Verify live system/ }))
-    await screen.findByText('What is running now?')
-    fireEvent.click(screen.getByRole('button', { name: /Investigate hardware signal/ }))
-    await screen.findByText('What did the systems report?')
-    fireEvent.click(screen.getByRole('button', { name: /Inspect approved history/ }))
-    fireEvent.click(screen.getByRole('button', { name: /Evaluate the evidence/ }))
-    expect(await screen.findByText('AGENT ORCHESTRATES')).toBeInTheDocument()
-    expect(screen.getByText('POLICY DECIDES')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Run live investigation/ }))
+    await screen.findByText('What did the agent find?')
+    fireEvent.click(screen.getByRole('button', { name: /Follow the evidence/ }))
+    expect(await screen.findByText('AGENT')).toBeInTheDocument()
+    expect(screen.getByText('EVIDENCE POLICY')).toBeInTheDocument()
     expect(screen.getByText('LLM NOT CALLED')).toBeInTheDocument()
     expect(screen.getByText('INTEL CPU TARGET')).toBeInTheDocument()
     expect(screen.getByText('Not configured in this environment')).toBeInTheDocument()
-    expect(screen.getByText('HUMAN ACTS')).toBeInTheDocument()
+    expect(screen.getByText('HUMAN AUTHORITY')).toBeInTheDocument()
   })
 
   it('includes the optional CPU explanation boundary in guided architecture', async () => {
