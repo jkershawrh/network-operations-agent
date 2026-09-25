@@ -8,7 +8,7 @@ export const demoConfig: DemoConfig = {
   subtitle: 'A timing alarm can cross network, platform, and hardware boundaries',
   event: 'Network Operations quickstart',
   audience: 'Network operators, platform teams, and technical decision makers',
-  cta: 'Choose the depth that fits the room.',
+  cta: 'The story is complete. The incident is not.',
   brand: {
     primary: { name: 'Red Hat', logo: storyAsset('logos/redhat.svg'), alt: 'Red Hat' },
     partner: { name: 'Intel', logo: storyAsset('logos/intel.png'), alt: 'Intel' },
@@ -51,9 +51,9 @@ export const demoConfig: DemoConfig = {
     },
     {
       id: 'payoff', label: '04', title: 'Evidence & Handoff', scenes: [
-        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'Close on Flightpath evidence—not a memorized number', emptyState: 'Run both live investigations before making the payoff claim.', line1: 'The agent does not close the incident.', line2: 'It makes the next decision defensible.', cta: 'Continue into guided practice or the lab →', speakerPrompt: 'Read back only the causes, observation counts, request timing, and action boundary returned in this session. If the proof was not run, return to Act 02.' },
+        { id: 'evidence-payoff', type: 'evidence-payoff', beat: 'transformation', eyebrow: 'What this session proved', title: 'Close on Flightpath evidence—not a memorized number', emptyState: 'Run both live investigations before making the payoff claim.', line1: 'The alarm stayed the same.', line2: 'The evidence changed the decision.', cta: 'Carry this incident into guided practice →', speakerPrompt: 'Read back only the causes, observation counts, request timing, and action boundary returned in this session. If the proof was not run, return to Act 02.' },
       ],
     },
   ],
-  relatedStories: [{ title: 'Guided investigation', duration: '25–35 minutes', question: 'Can the operator trace and challenge the evidence?', technology: 'Live workspace · Structured evidence · Human review', instruction: 'Move from narrated proof into the operator workspace. Run a scenario, inspect provenance, compare history, and make the review decision.', href: '/' }],
+  relatedStories: [{ title: 'Continue this incident', duration: '25–35 minutes', question: 'Can the operator trace and challenge the evidence?', technology: 'Live workspace · Structured evidence · Human review', instruction: 'Keep the same timing alarm and evidence trail. Inspect its provenance, challenge the conclusion, and make the human review decision.', href: '/' }],
 }

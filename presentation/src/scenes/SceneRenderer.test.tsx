@@ -32,8 +32,20 @@ describe('SceneRenderer', () => {
     expect(screen.getByText('PTP synchronization degraded')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Verify Flightpath readiness/ })).toBeInTheDocument()
     expect(screen.queryByLabelText('Live technical deployment topology')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Live journey progress').querySelectorAll('button')).toHaveLength(4)
     fireEvent.click(screen.getByRole('button', { name: 'Inspect technical topology' }))
     expect(screen.getByLabelText('Live technical deployment topology')).toBeInTheDocument()
+  })
+
+  it('paces the opening as three sparse internal beats', async () => {
+    const scene = scenes.find((item) => item.type === 'incident-open')!
+    render(<SceneRenderer scene={scene} brand={demoConfig.brand} />)
+    expect(screen.getByText('One symptom has crossed the network, platform, and hardware boundary.')).toBeInTheDocument()
+    expect(screen.queryByText('Hardware timing')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Reveal the ambiguity/ }))
+    expect(await screen.findByText('Hardware timing')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Reframe the decision/ }))
+    expect(await screen.findByText(/The operator needs evidence/)).toBeInTheDocument()
   })
 
   it('runs one live investigation then labels later phases as response inspection', async () => {

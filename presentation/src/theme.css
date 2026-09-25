@@ -116,6 +116,16 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .incident-cause.tone-primary { border-top-color: var(--rh-red); }
 .incident-cause > strong { font-size: 1.15rem; }
 .incident-decision { padding: .75rem 1rem; color: var(--intel-cyan); font-weight: 700; background: var(--intel-cyan-dim); border-radius: var(--radius-sm); }
+.incident-open { position: relative; min-height: 430px; display: grid; place-items: center; }
+.opening-beat-marker { position: absolute; top: 0; right: 0; color: var(--text-disabled); font: 700 .62rem 'Red Hat Mono'; }
+.incident-focus, .incident-synthesis { width: min(850px, 100%); display: grid; justify-items: center; gap: 1rem; text-align: center; }
+.incident-focus > span, .incident-synthesis > span { color: var(--rh-red); font: 700 .68rem 'Red Hat Mono'; letter-spacing: .12em; }
+.incident-focus > strong { max-width: 780px; font: 800 clamp(2.4rem, 5vw, 4.6rem)/1 'Red Hat Display'; letter-spacing: -.04em; }
+.incident-focus > small, .incident-synthesis > small { color: var(--text-dim); font-size: .9rem; }
+.incident-ambiguity { width: min(900px, 100%); display: grid; gap: 1.2rem; }
+.incident-ambiguity-title { font: 700 clamp(1.5rem, 2.8vw, 2.5rem) 'Red Hat Display'; text-align: center; }
+.incident-synthesis > strong { max-width: 900px; color: var(--intel-cyan); font: 700 clamp(2rem, 4vw, 3.8rem)/1.08 'Red Hat Display'; letter-spacing: -.03em; }
+.opening-advance { position: absolute; bottom: 0; right: 0; }
 
 .architecture, .pipeline { display: flex; justify-content: center; align-items: stretch; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-5); }
 .architecture-node { min-width: 210px; background: var(--surface-1); border: 2px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); display: grid; gap: .4rem; }
@@ -222,12 +232,17 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .scene:has(.operator-workspace) > .lede { display: none; }
 .operator-workspace { width: min(1420px, 100%); height: min(720px, calc(100vh - 118px)); margin: 0 auto; display: grid; grid-template-columns: 170px minmax(0, 1fr) 220px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); text-align: left; }
 .workspace-rail { display: flex; flex-direction: column; padding: .75rem 0; border-right: 1px solid var(--border); background: #191919; }
+.rail-title { padding: .25rem .75rem .7rem; color: var(--intel-cyan); font: 700 .58rem 'Red Hat Mono'; letter-spacing: .1em; }
 .workspace-rail button { display: grid; grid-template-columns: 25px 1fr; align-items: center; gap: .5rem; min-height: 46px; padding: .45rem .65rem; color: var(--text-disabled); background: transparent; border: 0; border-left: 3px solid transparent; text-align: left; font-size: .68rem; cursor: default; }
+.workspace-rail button > div { display: grid; gap: .08rem; }
+.workspace-rail button > div > strong { font-size: .72rem; }
+.workspace-rail button > div > small { color: var(--text-disabled); font-size: .56rem; }
 .workspace-rail button span { width: 22px; height: 22px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 50%; font: 700 .58rem 'Red Hat Mono'; }
 .workspace-rail button.active { color: var(--text); border-left-color: var(--intel-cyan); background: var(--intel-cyan-dim); }
 .workspace-rail button.active span { color: var(--intel-cyan); border-color: var(--intel-cyan); }
 .workspace-rail button.complete { color: var(--text-secondary); cursor: pointer; }
 .workspace-rail button.complete span { color: var(--success); border-color: var(--success); }
+.checkpoint-count { margin-top: auto; padding: .65rem .75rem; color: var(--text-disabled); border-top: 1px solid var(--border); font: .56rem 'Red Hat Mono'; text-transform: uppercase; }
 .workspace-main { min-width: 0; display: flex; flex-direction: column; padding: 1rem 1.1rem .8rem; }
 .workspace-act { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
 .workspace-act > div:first-child { display: grid; gap: .15rem; }
@@ -270,6 +285,9 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
 .condition-change .next { border-color: var(--intel-cyan); }
 .condition-change small, .comparison-workspace small { color: var(--text-dim); font-size: .65rem; }
 .comparison-workspace { grid-template-columns: 1fr 1fr; }
+.comparison-thesis { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .8rem; padding: .65rem .8rem; border: 1px solid var(--intel-cyan); background: var(--intel-cyan-dim); }
+.comparison-thesis strong { font-size: .82rem; }
+.comparison-thesis small { color: var(--intel-cyan); font-weight: 700; }
 .comparison-workspace article { border-top: 3px solid var(--success); }
 .comparison-workspace article > strong { color: var(--success); font: 700 1.25rem 'Red Hat Display'; }
 .comparison-workspace article > div { color: var(--text-secondary); font-size: .7rem; }
@@ -410,6 +428,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .scene:has(.operator-workspace) > .lede { display: block; }
   .operator-workspace { height: auto; grid-template-columns: 1fr; overflow: visible; }
   .workspace-rail { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+  .rail-title, .checkpoint-count { display: none; }
   .workspace-rail button { min-width: 120px; border-left: 0; border-bottom: 3px solid transparent; }
   .workspace-rail button.active { border-bottom-color: var(--intel-cyan); }
   .workspace-main { min-height: 620px; }
@@ -421,6 +440,7 @@ blockquote { font: 500 clamp(1.8rem, 4vw, 3.3rem)/1.28 'Red Hat Display'; margin
   .agent-run > b { transform: rotate(90deg); text-align: center; }
   .evidence-list article, .history-list article { grid-template-columns: 1fr; }
   .condition-change, .comparison-workspace { grid-template-columns: 1fr; }
+  .comparison-thesis { grid-column: auto; grid-template-columns: 1fr; }
   .change-arrow { text-align: center; }
   .runtime-strip { grid-template-columns: 1fr 1fr; }
   .workspace-actions { flex-wrap: wrap; justify-content: flex-start; }

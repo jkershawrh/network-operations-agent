@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { motion } from 'motion/react'
 import type { LiveJourneyScene } from '../types'
 import { SceneFrame } from './SceneFrame'
 import { TechnicalTopology } from './TechnicalTopology'
@@ -56,6 +57,13 @@ const phases: Array<{
   { id: 'authority', label: 'Human authority', kicker: 'Where does the agent stop?', explanation: 'The agent recommends the next discriminating test, but executes nothing. A qualified operator owns the next action.', cta: 'Change the incident condition', lane: 'decision' },
   { id: 'run-platform', label: 'Changed condition', kicker: 'Does the diagnosis follow the evidence?', explanation: 'Run the same workflow with a platform timing signal. The architecture and policy stay fixed; only the observed condition changes.', cta: 'Investigate platform signal', lane: 'agent' },
   { id: 'compare', label: 'Measured comparison', kicker: 'What changed?', explanation: 'Compare both completed live responses. The alarm class is the same, but the supporting evidence leads to a different cause while the no-action boundary remains intact.', cta: 'Open guided investigation', lane: 'decision' },
+]
+
+const audienceActs = [
+  { label: 'Intake', detail: 'Frame the alarm', start: 0, end: 0 },
+  { label: 'Investigate', detail: 'Build the evidence', start: 1, end: 3 },
+  { label: 'Decide', detail: 'Bound the conclusion', start: 4, end: 5 },
+  { label: 'Compare', detail: 'Change the condition', start: 6, end: 7 },
 ]
 
 const titleCase = (value: string) => value.replaceAll('_', ' ')
@@ -136,6 +144,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   const currentResult = phase.id === 'run-platform' || phase.id === 'compare' ? platform : hardware
   const currentEvidence = phase.id === 'run-platform' || phase.id === 'compare' ? platformEvidence : hardwareEvidence
   const phaseNumber = phaseIndex + 1
+  const audienceActIndex = audienceActs.findIndex((act) => phaseIndex >= act.start && phaseIndex <= act.end)
 
   const reset = () => {
     clearJourneyEvidence()
@@ -149,7 +158,9 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
   return <SceneFrame scene={scene}>
     <div className="operator-workspace" data-testid="live-operator-workspace">
       <div className="workspace-rail" aria-label="Live journey progress">
-        {phases.map((item, index) => <button key={item.id} className={index === phaseIndex ? 'active' : index < phaseIndex ? 'complete' : ''} disabled={index > phaseIndex} onClick={() => index < phaseIndex && setPhaseIndex(index)}><span>{index < phaseIndex ? '✓' : index + 1}</span>{item.label}</button>)}
+        <div className="rail-title">LIVE JOURNEY</div>
+        {audienceActs.map((act, index) => <button key={act.label} className={index === audienceActIndex ? 'active' : index < audienceActIndex ? 'complete' : ''} disabled={index > audienceActIndex} onClick={() => index < audienceActIndex && setPhaseIndex(act.start)}><span>{index < audienceActIndex ? '✓' : index + 1}</span><div><strong>{act.label}</strong><small>{act.detail}</small></div></button>)}
+        <div className="checkpoint-count">checkpoint {phaseNumber} / {phases.length}</div>
       </div>
 
       <section className="workspace-main">
@@ -173,9 +184,9 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
         </div>}
 
         {phase.id === 'observations' && hardware && <div className="evidence-list">
-          {hardware.current_observations_with_tool_provenance.map((item) => <article key={item.evidence_id} className={hardware.primary_hypothesis.supporting_evidence_ids.includes(item.evidence_id) ? 'supporting' : ''}>
+          {hardware.current_observations_with_tool_provenance.map((item, index) => <motion.article key={item.evidence_id} className={hardware.primary_hypothesis.supporting_evidence_ids.includes(item.evidence_id) ? 'supporting' : ''} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * .12 }}>
             <span>{item.scope}</span><strong>{titleCase(item.signal)} · {item.state}</strong><small>{item.evidence_id} · {item.provenance}</small>
-          </article>)}
+          </motion.article>)}
         </div>}
 
         {phase.id === 'history' && hardware && <div className="history-list">
@@ -201,6 +212,7 @@ export function LiveJourney({ scene }: { scene: LiveJourneyScene }) {
         </div>}
 
         {phase.id === 'compare' && hardwareEvidence && platformEvidence && hardware && platform && <div className="comparison-workspace">
+          <div className="comparison-thesis"><span>SAME ALARM</span><strong>PTP synchronization degraded</strong><small>Evidence—not the label—changed the decision.</small></div>
           {[{ label: 'Hardware signal', evidence: hardwareEvidence, result: hardware }, { label: 'Platform signal', evidence: platformEvidence, result: platform }].map((item) => <article key={item.evidence.scenarioId}>
             <span>{item.label}</span><strong>{titleCase(item.evidence.cause)}</strong><div><b>{item.evidence.observationCount}</b> observations <b>{item.evidence.latencyMs}ms</b> request</div><small>Support: {item.evidence.supportingEvidenceIds.join(', ')} · action executed: {String(item.result.action_executed)}</small>
           </article>)}

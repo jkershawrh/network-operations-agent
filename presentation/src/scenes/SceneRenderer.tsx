@@ -51,6 +51,28 @@ function GuidedArchitecture({ scene }: { scene: Extract<SceneConfig, { type: 'gu
   )
 }
 
+function IncidentOpening({ scene }: { scene: Extract<SceneConfig, { type: 'incident-open' }> }) {
+  const [beat, setBeat] = useState(0)
+  return <SceneFrame scene={scene}>
+    <div className={`incident-open incident-beat-${beat}`} onClick={(event) => event.stopPropagation()}>
+      <div className="opening-beat-marker">{beat + 1} / 3</div>
+      <AnimatePresence mode="wait">
+        {beat === 0 && <motion.div className="incident-focus" key="alarm" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+          <span>02:17 · ACTIVE ALARM</span><strong>{scene.alarm}</strong><small>One symptom has crossed the network, platform, and hardware boundary.</small>
+        </motion.div>}
+        {beat === 1 && <motion.div className="incident-ambiguity" key="causes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div className="incident-ambiguity-title">The same alarm supports two plausible stories.</div>
+          <div className="incident-split">{scene.possibilities.map((possibility) => <div className={`incident-cause tone-${possibility.tone}`} key={possibility.label}><span>Possible cause</span><strong>{possibility.label}</strong><small>{possibility.signal}</small></div>)}</div>
+        </motion.div>}
+        {beat === 2 && <motion.div className="incident-synthesis" key="decision" initial={{ opacity: 0, scale: .97 }} animate={{ opacity: 1, scale: 1 }}>
+          <span>THE OPERATOR'S PROBLEM</span><strong>{scene.decision}</strong><small>{scene.symptom}</small>
+        </motion.div>}
+      </AnimatePresence>
+      <button className="button button-primary opening-advance" onClick={() => setBeat((current) => current === 2 ? 0 : current + 1)}>{beat === 0 ? 'Reveal the ambiguity' : beat === 1 ? 'Reframe the decision' : 'Replay opening' } →</button>
+    </div>
+  </SceneFrame>
+}
+
 export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { primary: { logo: string; alt: string }; partner: { logo: string; alt: string } } }) {
   if (scene.type === 'custom') {
     const Custom = scene.component
@@ -68,13 +90,7 @@ export function SceneRenderer({ scene, brand }: { scene: SceneConfig; brand: { p
     </div></SceneFrame>
   }
 
-  if (scene.type === 'incident-open') return <SceneFrame scene={scene}>
-    <div className="incident-open">
-      <div className="incident-alarm"><span>Active alarm</span><strong>{scene.alarm}</strong><small>{scene.symptom}</small></div>
-      <div className="incident-split">{scene.possibilities.map((possibility) => <div className={`incident-cause tone-${possibility.tone}`} key={possibility.label}><span>Possible cause</span><strong>{possibility.label}</strong><small>{possibility.signal}</small></div>)}</div>
-      <div className="incident-decision">{scene.decision}</div>
-    </div>
-  </SceneFrame>
+  if (scene.type === 'incident-open') return <IncidentOpening scene={scene} />
 
   if (scene.type === 'intro') {
     return (
