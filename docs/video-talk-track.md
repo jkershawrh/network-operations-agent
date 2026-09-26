@@ -1,210 +1,207 @@
-# Network Operations Demo — Video Talk Track
+Network operations teams rarely struggle because they lack alerts.
 
-**Target duration:** 6–7 minutes  
-**Core message:** Evidence chooses the cause. AI explains the result. The operator retains authority.
+They struggle because one alert can represent several very different failures.
 
-## Opening
+Today, we have a production timing alarm.
 
-Network operations teams rarely struggle because they lack alerts. They struggle because one alert can represent several very different failures.
+PTP synchronization has degraded.
 
-Today, we have a production timing alarm: PTP synchronization has degraded.
+.
 
-**Click:** Reveal the ambiguity.
+The same symptom could begin in the network interface hardware, or it could come from the platform timing service.
 
-The same symptom could begin in the network interface hardware, or it could come from the platform timing service. Those causes require different responses.
+Those causes require different responses.
 
-**Click:** Reframe the decision.
+The operator does not need a more confident guess.
 
-So the operator does not need a more confident guess. They need evidence that crosses the network, platform, and hardware boundaries.
+The operator needs evidence that crosses the network, platform, and hardware boundaries.
 
-## Guided Architecture
+.
 
-We designed the investigation around six explicit boundaries. Let’s earn each part of the architecture by asking what the operator needs.
+This investigation begins by defining exactly what happened.
 
-### 1. Scenario contract
+A validated scenario contract describes the alarm and its operating scope.
 
-What exactly happened?
+The alert is treated as input, not as a diagnosis.
 
-**Click:** Reveal technical boundary.
+.
 
-A validated scenario contract defines the alarm and its operating scope. The alert is treated as input—not as a diagnosis.
+Next, the system asks what the environment shows right now.
 
-**Click:** Ask next question.
+Allowlisted diagnostic tools collect current network, platform, and hardware observations.
 
-### 2. Read-only diagnostics
+These tools are read-only.
 
-What do the systems show right now?
+They preserve where every observation came from, and they cannot modify the environment.
 
-**Click:** Reveal technical boundary.
+.
 
-Allowlisted MCP tools collect current network, platform, and hardware observations. These tools are read-only, retain provenance, and cannot modify the environment.
+The investigation also asks whether this has happened before.
 
-**Click:** Ask next question.
+Versioned cases and runbooks provide approved historical context.
 
-### 3. Approved history
+That context can help interpret current observations, but history is never allowed to masquerade as current evidence.
 
-Has this happened before?
+.
 
-**Click:** Reveal technical boundary.
+The next question is which cause the evidence actually supports.
 
-Versioned cases and runbooks provide historical context. But history is not allowed to masquerade as current evidence.
+A deterministic policy compares the current observations with the approved context.
 
-**Click:** Ask next question.
+It selects a supported cause, or it abstains when the evidence is incomplete or contradictory.
 
-### 4. Evidence policy
+The decision is not made by the language model.
 
-Which cause is actually supported?
+.
 
-**Click:** Reveal technical boundary.
+Generative AI enters only after the evidence decision.
 
-A deterministic evidence policy compares the current observations with the approved context. It selects a supported cause—or abstains when evidence is missing or contradictory.
+Granite runs on Intel Xeon CPU infrastructure and drafts a concise explanation for the operator.
 
-**Click:** Ask next question.
+The model cannot introduce new evidence.
 
-### 5. Intel CPU inference
+It cannot change the selected cause.
 
-Where can generative AI help?
+It cannot authorize remediation.
 
-**Click:** Reveal technical boundary.
+.
 
-Granite runs on Intel Xeon CPU infrastructure after the evidence decision. It drafts a concise explanation for the operator.
+The final boundary is human authority.
 
-The model cannot introduce evidence, change the selected cause, or authorize remediation.
+The system can recommend the next discriminating test and propose an operational response.
 
-**Click:** Ask next question.
+The operator still owns the next action.
 
-### 6. Human authority
+Every claim has a source.
 
-Who owns the next action?
+Every decision has a boundary.
 
-**Click:** Reveal technical boundary.
+Every action has an accountable owner.
 
-The operator does. The system recommends a discriminating test and proposed next step, but action remains behind a human approval boundary.
+.
 
-**Click:** Complete architecture.
+Now we will run two conditions through the same deployed architecture on Red Hat OpenShift.
 
-Every claim now has a source, every decision has a boundary, and every action has an accountable owner.
+Before making any claim, the application verifies that the services and diagnostics boundary are ready.
 
-## Live Walkthrough
+The results that follow come from the running environment when the interface displays live status.
 
-Now we’ll run two conditions through the same deployed architecture on OpenShift.
+If the interface displays rehearsal or offline status, those results are fallback examples and are not presented as live evidence.
 
-### Checkpoint 1: Readiness
+.
 
-**Click:** Verify live system.
+In the first condition, the system investigates a possible hardware timing problem.
 
-Before making any claim, the application verifies that the deployed services and diagnostics boundary are ready.
-
-This is not a prerecorded sequence. The following results come from the running environment.
-
-### Checkpoint 2: Hardware investigation
-
-**Click:** Investigate hardware signal.
-
-The agent is now normalizing the alarm, collecting three diagnostic scopes, retrieving approved context, and applying the evidence policy.
-
-**Pause for the live response.**
-
-The response takes approximately ten seconds because the workflow includes a live Granite inference on Intel CPU.
-
-### Checkpoint 3: Current diagnostics
+The agent normalizes the alarm, collects observations from three diagnostic scopes, retrieves approved context, and applies the evidence policy.
 
 The current evidence includes network, OpenShift platform, and hardware observations.
 
-Notice that every observation retains an evidence ID and provenance. The hardware timestamp fault is present, while the competing platform signal is absent.
+Every observation retains an evidence identifier and its provenance.
 
-**Click:** Inspect approved history.
+In this condition, the hardware timestamp fault is present while the competing platform signal is absent.
 
-### Checkpoint 4: Historical context
+.
 
-The system retrieves versioned operational knowledge. It can help interpret the observations, but it cannot override what the systems reported.
+The system retrieves versioned operational knowledge to help interpret those observations.
 
-**Click:** Evaluate the evidence.
+The historical context can support the explanation, but it cannot override what the systems reported.
 
-### Checkpoint 5: Decision and LLM boundary
+The deterministic policy follows the current evidence and identifies hardware timing as the supported cause.
 
-The agent orchestrated the investigation. The deterministic policy selected hardware timing as the supported cause.
+Granite then drafts the operator explanation on the Intel CPU inference workload shown by the live response.
 
-Granite 3.2 8B then drafted the operator explanation on an Intel Xeon 6767P CPU workload.
+The separation is visible.
 
-The important separation is visible here: the policy decides, the model explains, and the human acts.
+The policy decides.
 
-**Click:** Review the authority boundary.
+The model explains.
 
-### Checkpoint 6: Human authority
+The human acts.
+
+.
 
 The agent proposes the next discriminating test and a possible operational response.
 
-But no remediation has occurred. Human approval is explicitly required.
+No remediation has occurred.
 
-**Click:** Change the incident condition.
+Human approval is explicitly required.
 
-### Checkpoint 7: Changed condition
+.
 
-Now we keep the alarm, architecture, tools, and policy exactly the same.
+For the second condition, the alarm, architecture, tools, and policy remain the same.
 
-The only thing we change is the underlying evidence: this time, the problem originates in the platform timing service.
+Only the underlying evidence changes.
 
-**Click:** Investigate platform signal.
+This time, the problem originates in the platform timing service.
 
-**Pause for the live response.**
+The workflow again gathers current observations, retrieves approved context, applies the same deterministic policy, and uses the model only to explain the supported result.
 
-### Checkpoint 8: Comparison
+.
 
-The second investigation followed the new evidence to a different conclusion: platform timing.
+The second investigation reaches a different conclusion.
 
-So we have the same alert and the same workflow—but two distinct, evidence-backed diagnoses.
+The evidence now supports platform timing.
 
-That is the proof. The system is not repeating a memorized answer or trusting the alarm label. Its conclusion follows the live evidence.
+We have the same alert and the same workflow, but two distinct evidence-backed diagnoses.
 
-## Why It Worked
+The system is not repeating a memorized answer.
 
-**Advance to:** Why It Worked.
+It is not trusting the alarm label.
+
+Its conclusion follows the current evidence.
+
+.
 
 Three operating mechanisms make this result repeatable.
 
-First, provenance comes before confidence. Every supporting observation retains its source.
+First, provenance comes before confidence.
 
-Second, the workflow fails closed. Missing or conflicting evidence produces an inconclusive result instead of a confident fabrication.
+Every supporting observation retains its source.
 
-Third, recommendation is not action. The agent can investigate and explain, but operational authority remains with the person responsible for the network.
+Second, the workflow fails closed.
 
-## Payoff
+Missing or conflicting evidence produces an inconclusive result instead of a confident fabrication.
 
-**Advance to:** Evidence & Handoff.
+Third, recommendation is not action.
 
-This session completed two live infrastructure investigations.
+The agent can investigate and explain, but operational authority remains with the person responsible for the network.
+
+.
+
+This session completed two infrastructure investigations.
 
 One alarm produced two different supported causes because the evidence changed.
 
-Granite participated live on Intel CPU, but only as an explanation layer.
+Granite participated on Intel CPU as an explanation layer.
 
-Across both investigations, the number of automated actions was zero.
+The system performed no automated remediation.
 
-Evidence chose the cause. AI explained the result. Human authority was preserved.
+Evidence chose the cause.
 
-## Close
+AI explained the result.
 
-**Advance to the finale.**
+Human authority was preserved.
 
-Evidence before inference. Human before action.
+.
 
-The presentation and guided proof end here. The hands-on Network Operations lab is a separate environment with its own network, ordered from Partner AI Launchpad.
+Evidence before inference.
 
-In that lab, participants build and qualify the workflow themselves: they inspect provenance, extend the scenario, test failure boundaries, and produce the operator decision brief.
+Human before action.
 
-Red Hat provides the governed application platform and operational boundaries. Intel provides the CPU infrastructure for practical enterprise inference. Together, they make agentic operations explainable, deployable, and accountable.
+.
 
-**Click:** Order the hands-on lab—or close the presentation.
+The presentation and guided proof end here.
 
-## Recording Checklist
+The hands-on Network Operations lab is a separate environment available through Partner AI Launchpad.
 
-- Record at 1920×1080 in fullscreen.
-- Confirm the live system is ready before starting.
-- Verify both live investigations complete successfully.
-- Confirm `granite-3.2-8b-tools` and Intel Xeon appear in the live proof.
-- Confirm the payoff shows two causes and zero automated actions.
-- Hide browser notifications and unrelated tabs.
-- Keep the cursor still except when advancing the story.
-- Pause after each architecture question before revealing its answer.
-- Leave the final screen visible for three seconds before ending the recording.
+In that lab, participants build and qualify the workflow themselves.
+
+They inspect provenance, extend the scenario, test failure boundaries, and produce an operator decision brief.
+
+Red Hat provides the governed application platform and operational boundaries.
+
+Intel provides the CPU infrastructure for practical enterprise inference.
+
+Together, they make agentic network operations explainable, deployable, and accountable.
+
+.
