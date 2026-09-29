@@ -1,0 +1,19 @@
+api_version: launchpad.redhat.com/v1alpha1
+kind: CertificationProposal
+metadata:
+  catalog_item_id: network-operations-agent
+spec:
+  factory_authority:
+    certified: false
+    promotion_eligible: false
+    max_workshop_seats: 0
+  external_history:
+    evidence_document: docs/quickstart-validation.md
+    maximum_seats: 1
+    applies_to_factory_candidate: false
+  required_independent_gates:
+    - trusted_render_review
+    - artifact_and_destination_qualification
+    - one_seat_certification
+    - capacity_certification
+    - reclaim_zero_residue

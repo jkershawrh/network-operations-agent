@@ -1,0 +1,21 @@
+{
+  "schema_version": "demo-story.redhat-intel.com/artifact-release/v1",
+  "component": "presentation",
+  "distribution": "combined-workload-and-presentation-image",
+  "source_repository": "https://github.com/jkershawrh/network-operations-agent",
+  "source_revision": "365d2c911e663cbb14aba53fd200b7722e0d9b07",
+  "workflow_run": "https://github.com/jkershawrh/network-operations-agent/actions/runs/36160534781",
+  "image": "ghcr.io/jkershawrh/network-operations-agent@sha256:74afaf7d26791327fe4d1d7e5f302c7532b644f8d902daf1e914f9c2c4e5faf1",
+  "architecture": "linux/amd64",
+  "served_path": "/story/",
+  "workflow_checks": {
+    "presentation_unit_build_offline_check": "PASS",
+    "story_html_and_bundled_asset_smoke": "PASS",
+    "spdx_sbom_generated": "PASS",
+    "keyless_signature_verified": "PASS",
+    "spdx_attestation_verified": "PASS",
+    "source_provenance_attestation_verified": "PASS"
+  },
+  "certified": false,
+  "promotion_eligible": false
+}

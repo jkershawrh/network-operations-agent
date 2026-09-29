@@ -1,0 +1,23 @@
+{
+  "schema_version": "demo-story.redhat-intel.com/factory-development-journey/v1",
+  "candidate": "network-operations-agent",
+  "source_revision": "365d2c911e663cbb14aba53fd200b7722e0d9b07",
+  "workflow_run": "https://github.com/jkershawrh/network-operations-agent/actions/runs/36160534781",
+  "checks": {
+    "python_contract_and_behavior_suite": "PASS",
+    "mcp_suite": "PASS",
+    "showroom_build": "PASS",
+    "lab_build": "PASS",
+    "helm_lint": "PASS",
+    "combined_image_smoke": "PASS"
+  },
+  "external_launchpad_qualification": {
+    "evidence_document": "docs/quickstart-validation.md",
+    "qualified_source_revision": "4ae303791d2b0060d0a198852f16dc6ef4ffefa4",
+    "qualified_image": "sha256:8595d9a490b6d300ca9d821249e97b5d5634239012c91decede7995f60228bbb",
+    "maximum_seats": 1,
+    "applies_to_this_factory_artifact": false,
+    "confers_factory_authority": false
+  },
+  "certification_claimed_for_factory_artifact": false
+}

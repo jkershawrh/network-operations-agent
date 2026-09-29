@@ -1,0 +1,19 @@
+{
+  "schema_version": "demo-story.redhat-intel.com/presentation-verification/v1",
+  "source_revision": "365d2c911e663cbb14aba53fd200b7722e0d9b07",
+  "workflow_run": "https://github.com/jkershawrh/network-operations-agent/actions/runs/36160534781",
+  "checks": {
+    "presentation_tests": "PASS",
+    "production_build": "PASS",
+    "offline_asset_check": "PASS",
+    "combined_image_story_html": "PASS",
+    "combined_image_story_javascript": "PASS",
+    "combined_image_brand_assets": "PASS"
+  },
+  "served_from_combined_image": true,
+  "served_path": "/story/",
+  "browser_visual_certification_claimed": false,
+  "launchpad_trusted_render_claimed": false,
+  "certified": false,
+  "promotion_eligible": false
+}
