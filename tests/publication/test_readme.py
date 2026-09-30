@@ -44,6 +44,23 @@ class ReadmePublicationTests(unittest.TestCase):
             playbook = (ROOT / playbook_name).read_text(encoding="utf-8")
             self.assertIn("supplemental_files: ./showroom/supplemental-ui", playbook)
 
+    def test_lab_conclusion_explains_artifact_retention_and_platform_cleanup(self):
+        conclusion = (
+            ROOT
+            / "showroom-lab"
+            / "modules"
+            / "ROOT"
+            / "pages"
+            / "conclusion.adoc"
+        ).read_text(encoding="utf-8")
+        normalized = " ".join(conclusion.split())
+
+        self.assertIn("sanitized", normalized.lower())
+        self.assertIn("outside the lab", normalized.lower())
+        self.assertIn("reclaims the entire seat namespace", normalized)
+        self.assertIn("revokes its model credential", normalized)
+        self.assertIn("zero-residue platform cleanup", normalized)
+
 
 if __name__ == "__main__":
     unittest.main()

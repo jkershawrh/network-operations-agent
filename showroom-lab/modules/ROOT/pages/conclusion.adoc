@@ -15,6 +15,20 @@ The reusable pattern is intentionally industry portable:
 
 Your files are in `$HOME/network-agent-evidence`. They are the “leave with something” outcome for this lab.
 
+== Keep your takeaway, clean up the platform
+
+Before the lab ends, review the exported scenario, qualification report, and
+decision brief. Retain only sanitized takeaway artifacts that contain synthetic
+evidence and no credentials, tokens, customer data, or other sensitive values.
+Download those files to an approved location outside the lab if you want to
+keep them; files left in the terminal workspace are not a durable archive.
+
+You do not need to delete the project yourself. When the workshop ends,
+Launchpad reclaims the entire seat namespace, revokes its model credential, and
+removes the workload, routes, secrets, and storage as zero-residue platform
+cleanup. A sanitized copy that you deliberately retained outside the lab is a
+learner takeaway, not leftover platform state.
+
 == What you learned
 
 You can now explain why an agentic workflow needs more than a model and a collection of tools. Trust comes from the complete system: narrow tool contracts, current evidence with provenance, versioned context, deterministic policy, explicit abstention, platform isolation, and human authority.
