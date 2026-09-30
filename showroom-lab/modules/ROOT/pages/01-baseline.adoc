@@ -25,6 +25,21 @@ Identify the application and diagnostics deployments. The application may call t
 
 The two-deployment shape is intentional. If tool implementation and orchestration lived in one process, it would be harder to reason about the boundary between “the agent decided to request a check” and “a diagnostic system produced an observation.” Separate Services also make availability failures visible and testable.
 
+=== Console checkpoint: Correlate the running system
+
+Open *OpenShift Console* and stay in the same namespace shown by `oc project -q`
+in Terminal. Navigate to *Workloads → Deployments* and inspect the application
+and diagnostics Deployments. Record each Deployment's available replicas and
+immutable image reference. Then open *Networking → Services* and confirm the
+diagnostics Service is internal to the namespace rather than exposed by a
+public Route.
+
+Compare the Console values with the Terminal output above. Both views must show
+the same workloads, replica state, and namespace. The Console is the visual
+operational surface; Terminal remains the independently executable proof. Do
+not open Secret contents or copy credential values. If the two views disagree,
+capture the mismatch and stop before treating the baseline as known-good.
+
 [source,bash,role="execute"]
 ----
 APP_URL="https://$(oc get route \

@@ -61,6 +61,26 @@ class ReadmePublicationTests(unittest.TestCase):
         self.assertIn("revokes its model credential", normalized)
         self.assertIn("zero-residue platform cleanup", normalized)
 
+    def test_lab_uses_console_to_correlate_namespace_scoped_runtime_evidence(self):
+        baseline = (
+            ROOT
+            / "showroom-lab"
+            / "modules"
+            / "ROOT"
+            / "pages"
+            / "01-baseline.adoc"
+        ).read_text(encoding="utf-8")
+        normalized = " ".join(baseline.split())
+
+        for phrase in (
+            "=== Console checkpoint: Correlate the running system",
+            "OpenShift Console",
+            "same namespace",
+            "Compare the Console values with the Terminal output",
+            "Do not open Secret contents",
+        ):
+            self.assertIn(phrase, normalized)
+
 
 if __name__ == "__main__":
     unittest.main()
